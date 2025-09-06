@@ -1,0 +1,29 @@
+# 7. Core Algorithms & Business Logic
+
+## 7.1 Booking Conflict Detection (pseudocode)
+
+```ts
+// inputs: provider_id, proposed_start, proposed_end
+async function isAvailable(provider_id, proposed_start, proposed_end) {
+  const overlapping = await db.query(`
+    SELECT 1 FROM bookings
+    WHERE provider_id = $1
+      AND status IN ('confirmed','in_progress')
+      AND NOT (scheduled_end <= $2 OR scheduled_start >= $3)
+    LIMIT 1`, [provider_id, proposed_start, proposed_end]);
+  return overlapping.rowCount === 0;
+}
+```
+
+* Use DB-level transaction and SELECT ... FOR UPDATE for race conditions.
+* Alternatively queue booking creation via Redis lock `provider:${id}:lock`.
+
+## 7.2 Commission Calculation
+
+* Commission = platform\_rate% \* total\_amount. Store both amounts on booking and transaction for audit.
+
+## 7.3 Idempotent Webhook Handling (payments)
+
+* Webhook must include external `momo_txn_id`. For each webhook, check if a transaction with that external id exists; if so, ignore duplicate.
+
+---
