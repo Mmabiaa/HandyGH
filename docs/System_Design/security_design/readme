@@ -1,0 +1,27 @@
+# 8. Security Design
+
+## 8.1 Authentication & Authorization
+
+* OTP-based login; issue JWT with short TTL (e.g., 15m) and refresh token (7d).
+* Store refresh tokens hashed in DB to allow revocation.
+* RBAC middleware for admin routes.
+
+## 8.2 Data Protection
+
+* TLS everywhere (HTTPS).
+* Hash passwords with Argon2 / bcrypt (if any).
+* Encrypt PII fields at rest using DB-level encryption or envelope encryption (KMS).
+* Limit access to verification documents; only admin role can view; audit every access.
+
+## 8.3 API Security
+
+* Rate-limit endpoints (100 req/min per IP; stricter for auth).
+* Input validation with Zod/Joi to prevent injection.
+* Use parameterized queries via ORM to prevent SQL injection.
+* Sanitize uploaded files; virus-scan if possible.
+
+## 8.4 Payment Security
+
+* Never store full payment credentials; store only necessary tokens.
+* Use HMAC signed webhooks and verify signature.
+* Maintain a transaction ledger for reconciliation.

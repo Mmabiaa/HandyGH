@@ -1,0 +1,23 @@
+# 6. Sequence Flows (Important flows)
+
+## 6.1 Booking + Payment (Happy Path)
+
+1. Customer hits search → selects provider/service → clicks Book.
+2. Frontend POST `/bookings` → backend validates provider availability (no overlap).
+3. Booking created (status: `requested`).
+4. Backend triggers notification to provider (push/SMS/email).
+5. Customer initiates payment: `/payments/momo/charge` → backend calls MTN MoMo API (sandbox).
+6. MoMo returns payment status asynchronous via webhook → `/payments/webhook/momo` updates transaction to `success`.
+7. On success, booking.payment\_status = `paid`, booking.status = `confirmed`. Commission computed and stored.
+8. Provider receives confirmation, performs job, marks `in_progress` → `completed`.
+9. Customer leaves review.
+
+## 6.2 Provider Accepts / Suggests New Time
+
+* Provider receives booking request → may accept or propose new time (PATCH endpoint). The system notifies customer; upon acceptance, status transitions to `confirmed`.
+
+## 6.3 Dispute Flow
+
+* Customer opens dispute within 7 days with evidence photos attached. Admin notified. Admin reviews, requests more evidence or issues refund. Refund flow triggers transaction reversal or manual refund.
+
+---

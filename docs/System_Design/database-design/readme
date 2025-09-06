@@ -1,0 +1,102 @@
+# 4. Database Design & DDL
+
+## 4.1 ERD (textual)
+
+* users (id PK) ← one-to-one → providers (provider\_id PK, user\_id FK)
+* providers → provider\_services (1-to-many)
+* provider\_services → bookings (1-to-many)
+* bookings → transactions (1-to-many)
+* bookings → messages (1-to-many)
+* bookings → reviews (1-to-one after complete)
+* disputes → bookings
+
+## 4.2 Schema (Postgres SQL — essential tables)
+
+```sql
+-- users
+CREATE TABLE users (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  role TEXT NOT NULL CHECK (role IN ('customer','provider','admin')),
+  name TEXT,
+  email TEXT UNIQUE,
+  phone TEXT UNIQUE,
+  password_hash TEXT,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- providers
+CREATE TABLE providers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  business_name TEXT,
+  categories TEXT[],    -- e.g. ['plumbing','electrical']
+  location GEOGRAPHY(POINT, 4326), -- PostGIS (lat,lon)
+  address TEXT,
+  verified BOOLEAN DEFAULT FALSE,
+  verification_doc_url TEXT,
+  rating_avg NUMERIC(3,2) DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- provider_services
+CREATE TABLE provider_services (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  provider_id UUID REFERENCES providers(id) ON DELETE CASCADE,
+  title TEXT,
+  description TEXT,
+  price_type TEXT CHECK (price_type IN ('hourly','fixed')),
+  price_amount NUMERIC(12,2) NOT NULL,
+  duration_minutes INT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- bookings
+CREATE TABLE bookings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  booking_ref TEXT UNIQUE,
+  customer_id UUID REFERENCES users(id),
+  provider_id UUID REFERENCES providers(id),
+  provider_service_id UUID REFERENCES provider_services(id),
+  status TEXT CHECK (status IN ('requested','confirmed','in_progress','completed','cancelled','disputed')) DEFAULT 'requested',
+  scheduled_start TIMESTAMP WITH TIME ZONE,
+  scheduled_end TIMESTAMP WITH TIME ZONE,
+  address TEXT,
+  total_amount NUMERIC(12,2),
+  commission_amount NUMERIC(12,2),
+  payment_status TEXT CHECK (payment_status IN ('pending','paid','failed','refunded')) DEFAULT 'pending',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- transactions
+CREATE TABLE transactions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  booking_id UUID REFERENCES bookings(id),
+  txn_provider VARCHAR(255), -- e.g., momo_txn_id
+  payer_id UUID,
+  payee_id UUID,
+  amount NUMERIC(12,2),
+  currency VARCHAR(10) DEFAULT 'GHS',
+  status TEXT CHECK (status IN ('initiated','success','failed','refunded')),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- reviews
+CREATE TABLE reviews (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  booking_id UUID REFERENCES bookings(id) UNIQUE,
+  customer_id UUID REFERENCES users(id),
+  provider_id UUID REFERENCES providers(id),
+  rating INT CHECK (rating BETWEEN 1 AND 5),
+  comment TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+```
+
+Notes:
+
+* Use `gen_random_uuid()` from `pgcrypto` extension or `uuid_generate_v4()` from `uuid-ossp`.
+* Add indices for geospatial queries and common lookups: `CREATE INDEX ON providers USING GIST(location);`, index on `bookings.scheduled_start`.
+
+---

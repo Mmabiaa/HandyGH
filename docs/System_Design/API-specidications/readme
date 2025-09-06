@@ -1,0 +1,74 @@
+# 5. API Specification (OpenAPI-style summaries + sample payloads)
+
+All endpoints return:
+
+```json
+{ "success": true|false, "data": {...}, "errors": {...}, "meta": {...} }
+```
+
+### Auth
+
+* `POST /api/v1/auth/otp/request`
+  Body: `{ "phone": "+233xx" }`
+  Response: `{ "success": true, "data": { "otp_sent": true } }`
+
+* `POST /api/v1/auth/otp/verify`
+  Body: `{ "phone": "+233xx", "otp": "123456" }`
+  Response: `{ "data": { "access_token": "jwt...", "refresh_token": "r_jwt" } }`
+
+### Providers
+
+* `POST /api/v1/providers` — create provider profile
+  Auth: provider JWT
+  Body: `{ "business_name":"Kofi Plumbing", "categories":["plumbing"], "address":"Accra", "lat":5.6, "lon":-0.2 }`
+
+* `GET /api/v1/providers?category=plumbing&lat=5.6037&lon=-0.1870&radius=5` — search
+  Response: list of provider summaries with distance & avg rating.
+
+### Bookings
+
+* `POST /api/v1/bookings`
+  Auth: customer
+  Body:
+
+  ```json
+  {
+    "provider_service_id": "uuid",
+    "scheduled_start": "2025-10-01T10:00:00Z",
+    "estimated_duration_min": 120,
+    "address": "House 45, Accra",
+    "payment_method": "momo"
+  }
+  ```
+
+  Response: booking object with status "requested".
+
+* `PATCH /api/v1/bookings/{id}/accept` — provider accepts
+  Body: `{}`
+
+* `PATCH /api/v1/bookings/{id}/status` — change status (validate transitions)
+
+### Payments
+
+* `POST /api/v1/payments/momo/charge` — initiate payment
+  Body: `{ "booking_id": "uuid", "phone": "+233xx" }`
+  Response: `{ "provider_payload": { ... } }` or status indicating next steps (polling or webhook).
+
+* `POST /api/v1/payments/webhook/momo` — webhook (MTN posts here)
+  Body: provider-specified; handle idempotency.
+
+* `POST /api/v1/payments/manual/confirm` — manual ref (fallback)
+  Body: `{ "booking_id":"uuid","momo_ref":"MTN-12345","amount":100.0 }`
+
+### Reviews
+
+* `POST /api/v1/bookings/{id}/reviews` — after completion
+  Body: `{ "rating": 4, "comment":"Good job" }`
+
+### Admin
+
+* `GET /api/v1/admin/reports/transactions?from=&to=` — CSV export
+
+(Full OpenAPI file should be generated programmatically — I can generate a swagger.json next if you want.)
+
+---
