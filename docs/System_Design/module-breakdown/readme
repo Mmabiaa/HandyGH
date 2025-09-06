@@ -1,0 +1,46 @@
+# 3. Detailed Module Breakdown (LLD)
+
+## 3.1 Modules / Services
+
+* **Auth Service**
+
+  * OTP request/verify, JWT issue/refresh/revoke, password reset, role assignment.
+* **User/Profile Service**
+
+  * Customer & Provider profile CRUD, provider verification, agency mode.
+* **Search Service**
+
+  * Category filter, location radius search, sort by rating/price.
+* **Booking Service**
+
+  * Booking creation, availability checks, state transitions, calendar sync.
+* **Payment Service**
+
+  * Initiate MoMo charge, handle webhooks, reconciliation, commission calc.
+* **Messaging Service**
+
+  * Per-booking chat, attachments, retention policy.
+* **Review Service**
+
+  * Save ratings/reviews, aggregate provider rating.
+* **Admin Service**
+
+  * Reports, user moderation, dispute resolution.
+* **Notification Service**
+
+  * Email, SMS, in-app notifications; background job processing.
+* **Audit & Logging Service**
+
+  * Centralized action logs, payment ledgers, tamper-evident storage.
+
+## 3.2 Key Libraries & Patterns
+
+* TypeScript for type safety.
+* ORM: Prisma (TypeScript) or TypeORM / Sequelize.
+* Background queue: BullMQ (Redis).
+* Validation: Zod or Joi.
+* Testing: Jest (unit), Playwright/Cypress (E2E).
+* Linter: ESLint + Prettier.
+* Secrets: Vault or provider secret manager.
+
+---
