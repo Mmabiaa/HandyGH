@@ -557,12 +557,4 @@ Week 9 (prepare prod)
 
 ---
 
-# 20. Next Action Items (immediate, pick one to start)
 
-1. Generate full **OpenAPI (swagger.json)** for all endpoints above (I can output it).
-2. Produce **Prisma schema** or SQL migration files from the DDL.
-3. Scaffold a **Next.js + Express/TS** starter repo with folder structure, auth, and sample pages.
-4. Create a **detailed test plan** and sample Jest + Playwright test files for core flows.
-5. Draft the **provider onboarding flow (UX)** with wireframes and microcopy for field visits.
-
-Which of these would you like me to generate now? I’ll produce the artifact straight away.
