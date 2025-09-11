@@ -1,3 +1,4 @@
+
 # HandyGH - Local Services Marketplace
 
 A trustworthy, mobile-first web platform that connects customers with local service providers in Ghana.
