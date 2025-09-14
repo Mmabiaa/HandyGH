@@ -13,6 +13,7 @@ import paymentRoutes from './routes/payment.routes';
 import messageRoutes from './routes/message.routes';
 import reviewRoutes from './routes/review.routes';
 import adminRoutes from './routes/admin.routes';
+import 'dotenv/config';
 
 const app = express();
 const server = createServer(app);

@@ -1,7 +1,7 @@
 import express from 'express';
 import { createServer } from 'http';
 import { app } from './app';
-import { env } from './config/env.config';
+import 'dotenv/config';
 import { logger } from './utils/logger';
 
 const PORT = env.PORT || 3000;
