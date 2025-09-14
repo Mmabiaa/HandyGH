@@ -13,14 +13,30 @@ const categories = [
 ];
 
 const featuredProviders = [
-  {
-    id: 1,
-    name: 'Elite Cleaners',
-    rating: 4.9,
-    reviews: 124,
-    category: 'Cleaning',
-    image: 'https://i.pinimg.com/736x/bc/a5/32/bca532dae317b32b15e1d8e66978b568.jpg',
-  },
+    {
+        id: 1,
+        name: 'Elite Cleaners',
+        rating: 4.9,
+        reviews: 124,
+        category: 'Cleaning',
+        image: 'https://i.pinimg.com/736x/bc/a5/32/bca532dae317b32b15e1d8e66978b568.jpg',
+      },
+      {
+        id: 2,
+        name: 'ProFix Plumbing',
+        rating: 4.7,
+        reviews: 89,
+        category: 'Plumbing',
+        image: 'https://i.pinimg.com/736x/47/36/1c/47361c83a7a6d1c6a7e2f1b45f9493f2.jpg',
+      },
+      {
+        id: 3,
+        name: 'Crafted Carpentry',
+        rating: 4.8,
+        reviews: 102,
+        category: 'Carpentry',
+        image: 'https://i.pinimg.com/736x/d8/44/0e/d8440e7f37f6f2b3db6df4b3cbf3a0f1.jpg',
+      },
   // Add more providers
 ];
 
