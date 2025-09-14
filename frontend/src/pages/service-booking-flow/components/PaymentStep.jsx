@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { bookingService } from '../../../services/bookingService';
-import StripePaymentForm from '../../../components/payment/StripePaymentForm';
+import { paymentService } from '../../../services/paymentService';
+import MoMoPaymentForm from '../../../components/payment/MoMoPaymentForm';
 import Button from '../../../components/ui/Button';
 import Icon from '../../../components/AppIcon';
 
@@ -18,14 +19,14 @@ const PaymentStep = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Create payment intent when component mounts
+  // Create booking when component mounts
   useEffect(() => {
     if (user && userProfile && bookingData?.service) {
-      createPaymentIntent();
+      createBooking();
     }
   }, [user, userProfile, bookingData?.service]);
 
-  const createPaymentIntent = async () => {
+  const createBooking = async () => {
     setIsLoading(true);
     setError('');
 
@@ -40,26 +41,18 @@ const PaymentStep = ({
         additionalCharges: 0,
         totalAmount: calculateTotalAmount(),
         duration: bookingData?.service?.duration || 60,
-        dateTime: bookingData?.dateTime,
-        location: bookingData?.location,
-        serviceDetails: bookingData?.serviceDetails
+        scheduledDate: bookingData?.dateTime?.date,
+        scheduledTime: bookingData?.dateTime?.time,
+        serviceAddress: bookingData?.location?.address,
+        specialInstructions: bookingData?.serviceDetails?.specialInstructions || '',
+        customerNotes: bookingData?.serviceDetails?.customerNotes || ''
       };
 
-      // Customer info
-      const customerInfo = {
-        userId: user?.id,
-        firstName: userProfile?.first_name || '',
-        lastName: userProfile?.last_name || '',
-        email: userProfile?.email || user?.email,
-        phone: userProfile?.phone || '',
-        stripeCustomerId: userProfile?.stripe_customer_id
-      };
-
-      const result = await bookingService?.createBookingPaymentIntent(bookingRequest, customerInfo);
+      const result = await bookingService?.createBooking(bookingRequest);
       setPaymentIntentData(result);
     } catch (error) {
-      console.error('Create payment intent error:', error);
-      setError('Failed to initialize payment system. Please try again.');
+      console.error('Create booking error:', error);
+      setError('Failed to create booking. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -89,7 +82,7 @@ const PaymentStep = ({
 
   const handleRetry = () => {
     setError('');
-    createPaymentIntent();
+    createBooking();
   };
 
   if (!user || !userProfile) {
@@ -106,7 +99,7 @@ const PaymentStep = ({
       <div className="text-center">
         <h2 className="text-2xl font-bold text-foreground mb-2">Complete Payment</h2>
         <p className="text-muted-foreground">
-          Secure payment powered by Stripe
+          Secure payment powered by MTN MoMo
         </p>
       </div>
       {/* Booking Summary */}
@@ -131,7 +124,7 @@ const PaymentStep = ({
             <div className="flex justify-between">
               <span className="font-medium text-foreground">Total Amount:</span>
               <span className="font-bold text-primary text-lg">
-                {bookingService?.formatAmount(calculateTotalAmount())}
+                {paymentService?.formatAmount(calculateTotalAmount())}
               </span>
             </div>
           </div>
@@ -160,14 +153,14 @@ const PaymentStep = ({
           </div>
         </div>
       ) : paymentIntentData ? (
-        <StripePaymentForm
-          clientSecret={paymentIntentData?.clientSecret}
-          amount={paymentIntentData?.amount}
+        <MoMoPaymentForm
+          bookingId={paymentIntentData?.id}
+          amount={calculateTotalAmount()}
           currency="GHS"
-          bookingData={paymentIntentData}
+          customerPhone={userProfile?.phone || user?.phone}
           onSuccess={handlePaymentSuccess}
           onError={handlePaymentError}
-          confirmButtonText={`Pay ${bookingService?.formatAmount(calculateTotalAmount())}`}
+          confirmButtonText={`Pay ${paymentService?.formatAmount(calculateTotalAmount())}`}
         />
       ) : null}
       {/* Navigation Buttons */}
@@ -189,7 +182,7 @@ const PaymentStep = ({
           <div>
             <h4 className="font-medium text-blue-900 mb-1">Secure Payment</h4>
             <p className="text-sm text-blue-700">
-              Your payment is processed securely by Stripe. We never store your payment information.
+              Your payment is processed securely by MTN MoMo. We never store your payment information.
             </p>
           </div>
         </div>

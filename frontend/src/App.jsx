@@ -1,20 +1,22 @@
+// src/App.jsx
 import React from 'react';
-import { AuthProvider } from './contexts/AuthContext';
-import { StripeProvider } from './contexts/StripeContext';
-import Routes from './Routes';
-import ErrorBoundary from './components/ErrorBoundary';
-import './styles/index.css';
+import { Provider } from 'react-redux';
+import { store } from './store/store';
+import { BrowserRouter as Router } from 'react-router-dom';
+import AppRoutes from './Routes';
+import { Toaster } from 'react-hot-toast';
 
-const App = () => {
+function App() {
   return (
-    <ErrorBoundary>
-      <AuthProvider>
-        <StripeProvider>
-          <Routes />
-        </StripeProvider>
-      </AuthProvider>
-    </ErrorBoundary>
+    <Provider store={store}>
+      <Router>
+        <div className="min-h-screen bg-gray-50">
+          <AppRoutes />
+          <Toaster position="top-right" />
+        </div>
+      </Router>
+    </Provider>
   );
-};
+}
 
 export default App;

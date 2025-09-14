@@ -13,14 +13,30 @@ const categories = [
 ];
 
 const featuredProviders = [
-  {
-    id: 1,
-    name: 'Elite Cleaners',
-    rating: 4.9,
-    reviews: 124,
-    category: 'Cleaning',
-    image: '/images/providers/cleaner.jpg',
-  },
+    {
+        id: 1,
+        name: 'Elite Cleaners',
+        rating: 4.9,
+        reviews: 124,
+        category: 'Cleaning',
+        image: 'https://i.pinimg.com/736x/bc/a5/32/bca532dae317b32b15e1d8e66978b568.jpg',
+      },
+      {
+        id: 2,
+        name: 'ProFix Plumbing',
+        rating: 4.7,
+        reviews: 89,
+        category: 'Plumbing',
+        image: 'https://i.pinimg.com/736x/47/36/1c/47361c83a7a6d1c6a7e2f1b45f9493f2.jpg',
+      },
+      {
+        id: 3,
+        name: 'Crafted Carpentry',
+        rating: 4.8,
+        reviews: 102,
+        category: 'Carpentry',
+        image: 'https://i.pinimg.com/736x/d8/44/0e/d8440e7f37f6f2b3db6df4b3cbf3a0f1.jpg',
+      },
   // Add more providers
 ];
 
@@ -31,6 +47,7 @@ const testimonials = [
     role: 'Homeowner',
     content: 'Found a reliable plumber within minutes. The service was excellent!',
     rating: 5,
+    src: 'https://i.pinimg.com/736x/ca/53/8d/ca538d479d5d54352be7733a701956c9.jpg'
   },
   // Add more testimonials
 ];
@@ -89,7 +106,7 @@ const LandingPage = () => {
             </div>
             <div className="md:w-1/2">
               <img 
-                src="/images/hero-illustration.svg" 
+                src="https://i.pinimg.com/736x/18/e1/b5/18e1b58b3094b5d5dfc68908a87fa8a2.jpg" 
                 alt="Service professionals" 
                 className="w-full max-w-lg mx-auto"
               />
