@@ -19,7 +19,7 @@ const featuredProviders = [
     rating: 4.9,
     reviews: 124,
     category: 'Cleaning',
-    image: '/images/providers/cleaner.jpg',
+    image: 'https://i.pinimg.com/736x/bc/a5/32/bca532dae317b32b15e1d8e66978b568.jpg',
   },
   // Add more providers
 ];
@@ -89,7 +89,7 @@ const LandingPage = () => {
             </div>
             <div className="md:w-1/2">
               <img 
-                src="/images/hero-illustration.svg" 
+                src="https://i.pinimg.com/736x/18/e1/b5/18e1b58b3094b5d5dfc68908a87fa8a2.jpg" 
                 alt="Service professionals" 
                 className="w-full max-w-lg mx-auto"
               />
