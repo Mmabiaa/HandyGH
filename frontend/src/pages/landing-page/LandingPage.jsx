@@ -92,12 +92,6 @@ const LandingPage = () => {
             </nav>
             <div className="flex space-x-4">
               <Link 
-                to="/user-login" 
-                className="text-gray-700 hover:text-blue-600 font-medium"
-              >
-                Sign In
-              </Link>
-              <Link 
                 to="/user-registration" 
                 className="bg-blue-600 text-white hover:bg-blue-700 font-medium py-2 px-4 rounded-lg transition-colors"
               >
