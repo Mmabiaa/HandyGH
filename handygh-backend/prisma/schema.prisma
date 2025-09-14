@@ -1,0 +1,199 @@
+model User {
+  id          String   @id @default(cuid())
+  role        Role     @default(CUSTOMER)
+  name        String?
+  email       String?  @unique
+  phone       String   @unique
+  passwordHash String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  provider    Provider?
+  bookingsAsCustomer Booking[] @relation("CustomerBookings")
+  reviews     Review[]
+  refreshTokens RefreshToken[]
+  
+  @@map("users")
+}
+
+model Provider {
+  id               String    @id @default(cuid())
+  userId           String    @unique
+  businessName     String?
+  categories       String[]
+  latitude         Float?
+  longitude        Float?
+  address          String?
+  verified         Boolean   @default(false)
+  verificationDocUrl String?
+  ratingAvg        Decimal   @default(0) @db.Decimal(3,2)
+  ratingCount      Int       @default(0)
+  createdAt        DateTime  @default(now())
+  
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  services         ProviderService[]
+  bookings         Booking[]
+  reviews          Review[]
+  
+  @@map("providers")
+}
+
+model ProviderService {
+  id                String    @id @default(cuid())
+  providerId        String
+  title             String
+  description       String?
+  priceType         PriceType
+  priceAmount       Decimal   @db.Decimal(12,2)
+  durationMinutes   Int?
+  isActive          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  
+  provider          Provider  @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  bookings          Booking[]
+  
+  @@map("provider_services")
+}
+
+model Booking {
+  id                  String        @id @default(cuid())
+  bookingRef          String        @unique
+  customerId          String
+  providerId          String
+  providerServiceId   String
+  status              BookingStatus @default(REQUESTED)
+  scheduledStart      DateTime
+  scheduledEnd        DateTime?
+  address             String
+  totalAmount         Decimal       @db.Decimal(12,2)
+  commissionAmount    Decimal?      @db.Decimal(12,2)
+  paymentStatus       PaymentStatus @default(PENDING)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  
+  customer            User          @relation("CustomerBookings", fields: [customerId], references: [id])
+  provider            Provider      @relation(fields: [providerId], references: [id])
+  providerService     ProviderService @relation(fields: [providerServiceId], references: [id])
+  transactions        Transaction[]
+  messages            Message[]
+  review              Review?
+  dispute             Dispute?
+  
+  @@map("bookings")
+}
+
+model Transaction {
+  id           String            @id @default(cuid())
+  bookingId    String
+  txnProvider  String?           // MTN MoMo transaction ID
+  payerId      String?
+  payeeId      String?
+  amount       Decimal           @db.Decimal(12,2)
+  currency     String            @default("GHS")
+  status       TransactionStatus @default(INITIATED)
+  metadata     Json?             // Store provider-specific data
+  createdAt    DateTime          @default(now())
+  
+  booking      Booking           @relation(fields: [bookingId], references: [id])
+  
+  @@map("transactions")
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  bookingId  String   @unique
+  customerId String
+  providerId String
+  rating     Int      @db.SmallInt
+  comment    String?
+  createdAt  DateTime @default(now())
+  
+  booking    Booking  @relation(fields: [bookingId], references: [id])
+  customer   User     @relation(fields: [customerId], references: [id])
+  provider   Provider @relation(fields: [providerId], references: [id])
+  
+  @@map("reviews")
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  bookingId String
+  senderId  String
+  content   String
+  attachments String[] // URLs to uploaded files
+  createdAt DateTime @default(now())
+  
+  booking   Booking  @relation(fields: [bookingId], references: [id])
+  
+  @@map("messages")
+}
+
+model Dispute {
+  id          String        @id @default(cuid())
+  bookingId   String        @unique
+  reason      String
+  description String
+  evidence    String[]      // URLs to uploaded evidence
+  status      DisputeStatus @default(OPEN)
+  resolution  String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
+  booking     Booking       @relation(fields: [bookingId], references: [id])
+  
+  @@map("disputes")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("refresh_tokens")
+}
+
+enum Role {
+  CUSTOMER
+  PROVIDER
+  ADMIN
+}
+
+enum PriceType {
+  HOURLY
+  FIXED
+}
+
+enum BookingStatus {
+  REQUESTED
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  DISPUTED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum TransactionStatus {
+  INITIATED
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum DisputeStatus {
+  OPEN
+  INVESTIGATING
+  RESOLVED
+  CLOSED
+}
