@@ -41,3 +41,12 @@ export const disputeSchema = z.object({
   description: z.string(),
   evidence: z.array(z.string()).optional(),
 });
+
+export const otpRequestSchema = z.object({
+  phone: z.string().min(10).max(15),
+});
+
+export const otpVerifySchema = z.object({
+  phone: z.string().min(10).max(15),
+  otp: z.string().min(4).max(6),
+});

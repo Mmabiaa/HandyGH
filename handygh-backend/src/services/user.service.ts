@@ -11,7 +11,7 @@ class UserService {
     const user = await prisma.user.create({
       data: {
         ...data,
-        passwordHash: hashedPassword,
+        password_hash: hashedPassword,
       },
     });
     return user;
@@ -33,7 +33,7 @@ class UserService {
       where: { id: user.id },
       data: {
         ...data,
-        updatedAt: new Date(),
+        updated_at: new Date(),
       },
     });
   }

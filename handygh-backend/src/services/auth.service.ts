@@ -31,9 +31,9 @@ class AuthService {
 
     await prisma.refreshToken.create({
       data: {
-        userId: user.id,
+        user_id: user.id,
         token: refreshToken,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
       },
     });
 
@@ -46,13 +46,13 @@ class AuthService {
       throw new Error('Invalid refresh token');
     }
 
-    const user = await prisma.user.findUnique({ where: { id: refreshToken.userId } });
+    const user = await prisma.user.findUnique({ where: { id: refreshToken.user_id } });
     const newAccessToken = createAccessToken(user.id);
     const newRefreshToken = createRefreshToken(user.id);
 
     await prisma.refreshToken.update({
       where: { id: refreshToken.id },
-      data: { token: newRefreshToken, expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) },
+      data: { token: newRefreshToken, expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) },
     });
 
     return { accessToken: newAccessToken, refreshToken: newRefreshToken };

@@ -19,3 +19,11 @@ export const verifyToken = async (token: string): Promise<object | null> => {
     return null;
   }
 };
+
+export const createAccessToken = (userId: string): string => {
+  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '15m' });
+};
+
+export const createRefreshToken = (userId: string): string => {
+  return jwt.sign({ userId, type: 'refresh' }, JWT_SECRET, { expiresIn: '7d' });
+};
