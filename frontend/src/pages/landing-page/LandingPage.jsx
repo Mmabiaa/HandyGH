@@ -203,7 +203,7 @@ const LandingPage = () => {
       <section className="py-16 bg-blue-900">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-4">How It Works</h2>
-          <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+          <p className="text-center text-white mb-12 max-w-2xl mx-auto">
             Getting the help you need is simple with our three-step process
           </p>
           <div className="grid md:grid-cols-3 gap-8">
