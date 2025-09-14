@@ -8,8 +8,7 @@ const categories = [
   { id: 1, name: 'Home Cleaning', icon: '🧹' },
   { id: 2, name: 'Plumbing', icon: '🚰' },
   { id: 3, name: 'Electrical', icon: '💡' },
-  { id: 4, name: 'Moving', icon: '📦' },
-  { id: 5, name: 'Gardening', icon: '🌿' },
+  { id: 4, name: 'Carpentry', icon: '📦' },
 ];
 
 const featuredProviders = [
@@ -79,7 +78,7 @@ const LandingPage = () => {
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold">H</span>
+                <span className="text-white font-bold">🏠</span>
               </div>
               <span className="text-xl font-bold text-gray-900">HandyGH</span>
             </div>
@@ -90,8 +89,7 @@ const LandingPage = () => {
               <Link to="/contact" className="text-gray-700 hover:text-blue-600">Contact</Link>
               <Link to="/user-login" className="text-gray-700 hover:text-blue-600">Login</Link>
             </nav>
-            <div className="flex space-x-4">
-              
+            <div className="flex space-x-4"> 
               <Link 
                 to="/user-registration" 
                 className="bg-blue-600 text-white hover:bg-blue-700 font-medium py-2 px-4 rounded-lg transition-colors"
@@ -202,7 +200,7 @@ const LandingPage = () => {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-blue-900">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-4">How It Works</h2>
           <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
@@ -279,7 +277,7 @@ const LandingPage = () => {
       </section>
 
       {/* Features */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-blue-900">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Why Choose HandyGH?</h2>
           <div className="grid md:grid-cols-3 gap-8">
