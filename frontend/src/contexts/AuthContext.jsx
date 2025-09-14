@@ -1,44 +1,63 @@
 // src/contexts/AuthContext.jsx
-import React, { createContext, useContext, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { useLoginMutation, useRegisterMutation } from '../store/slices/apiSlice';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { user, isAuthenticated } = useSelector((state) => state.auth);
-  const [login, { isLoading: loginLoading }] = useLoginMutation();
-  const [register, { isLoading: registerLoading }] = useRegisterMutation();
+  const [user, setUser] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Check if user is logged in on app start
+    const userData = localStorage.getItem('handygh_user');
+    if (userData) {
+      try {
+        const parsedUser = JSON.parse(userData);
+        if (parsedUser.isAuthenticated) {
+          setUser(parsedUser);
+          setIsAuthenticated(true);
+        }
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        localStorage.removeItem('handygh_user');
+      }
+    }
+  }, []);
 
   const loginUser = async (credentials) => {
     try {
-      const result = await login(credentials).unwrap();
-      localStorage.setItem('token', result.token);
-      navigate('/dashboard');
+      // This would normally make an API call
+      // For now, we'll use the mock logic from the login page
       return { success: true };
     } catch (error) {
-      return { success: false, error: error.data?.message || 'Login failed' };
+      return { success: false, error: error.message || 'Login failed' };
     }
   };
 
   const registerUser = async (userData) => {
     try {
-      const result = await register(userData).unwrap();
-      localStorage.setItem('token', result.token);
-      navigate('/onboarding');
+      // This would normally make an API call
       return { success: true };
     } catch (error) {
-      return { success: false, error: error.data?.message || 'Registration failed' };
+      return { success: false, error: error.message || 'Registration failed' };
     }
   };
 
   const logoutUser = () => {
-    localStorage.removeItem('token');
-    dispatch(logout());
-    navigate('/login');
+    localStorage.removeItem('handygh_user');
+    localStorage.removeItem('accessToken');
+    setUser(null);
+    setIsAuthenticated(false);
+  };
+
+  const updateUser = (userData) => {
+    setUser(userData);
+    setIsAuthenticated(!!userData);
+    if (userData) {
+      localStorage.setItem('handygh_user', JSON.stringify(userData));
+    } else {
+      localStorage.removeItem('handygh_user');
+    }
   };
 
   return (
@@ -49,7 +68,8 @@ export const AuthProvider = ({ children }) => {
         login: loginUser,
         logout: logoutUser,
         register: registerUser,
-        isLoading: loginLoading || registerLoading,
+        updateUser,
+        isLoading: false,
       }}
     >
       {children}

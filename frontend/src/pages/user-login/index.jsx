@@ -59,13 +59,16 @@ const UserLogin = () => {
         throw new Error('Invalid email or password. Please check your credentials and try again.');
       }
 
-      // Store user data in localStorage
-      localStorage.setItem('handygh_user', JSON.stringify({
+      // Create user data
+      const userData = {
         email: formData?.email,
         type: userType,
         isAuthenticated: true,
         rememberMe: formData?.rememberMe
-      }));
+      };
+
+      // Store user data in localStorage
+      localStorage.setItem('handygh_user', JSON.stringify(userData));
 
       setUserEmail(formData?.email);
 
