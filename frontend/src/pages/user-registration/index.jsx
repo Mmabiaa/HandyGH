@@ -124,7 +124,7 @@ const UserRegistration = () => {
   const handleNext = async () => {
     if (validateStep(currentStep)) {
       if (currentStep === 2) {
-        // Sign up the user with Supabase
+        // Sign up the user with backend API
         setIsLoading(true);
         
         try {
@@ -143,8 +143,8 @@ const UserRegistration = () => {
             return;
           }
 
-          if (data?.user) {
-            console.log('User created successfully:', data.user);
+          if (data?.user || data?.accessToken) {
+            console.log('User created successfully:', data);
             // Skip OTP for now and go to success
             setCurrentStep(4);
           } else {

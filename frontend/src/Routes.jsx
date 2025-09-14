@@ -13,6 +13,8 @@ import CustomerDashboard from './pages/customer-dashboard';
 import LandingPage from './pages/landing-page/LandingPage';
 import SearchPage from './pages/search/SearchPage';
 import ProviderProfile from './pages/providers/ProviderProfile';
+import AboutPage from './pages/about/AboutPage';
+import ContactPage from './pages/contact/ContactPage';
 
 const Routes = () => {
   return (
@@ -20,6 +22,8 @@ const Routes = () => {
       <ScrollToTop />
       <RouterRoutes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/contact" element={<ContactPage />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/providers/:id" element={<ProviderProfile />} />
         <Route path="/user-login" element={<UserLogin />} />
