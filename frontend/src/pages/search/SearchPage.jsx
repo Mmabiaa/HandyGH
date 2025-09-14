@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { Search, Sliders, X, MapPin, Star, Filter, Clock, DollarSign } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ProviderCard from '../../components/ProviderCard';
+import Icon from '../../components/AppIcon';
 
 // Mock data - replace with actual API calls
 const mockProviders = [
@@ -91,6 +92,39 @@ const SearchPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Navigation Header */}
+      <header className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <Link to="/" className="flex items-center space-x-2">
+              <Icon name="Wrench" size={24} className="text-primary" />
+              <span className="text-xl font-bold text-gray-900">HandyGH</span>
+            </Link>
+            <nav className="hidden md:flex space-x-8">
+              <Link to="/" className="text-gray-700 hover:text-primary">Home</Link>
+              <Link to="/about" className="text-gray-700 hover:text-primary">About</Link>
+              <Link to="/search" className="text-primary font-medium">Services</Link>
+              <Link to="/contact" className="text-gray-700 hover:text-primary">Contact</Link>
+              <Link to="/user-login" className="text-gray-700 hover:text-primary">Login</Link>
+            </nav>
+            <div className="flex space-x-4">
+              <Link 
+                to="/user-login" 
+                className="text-gray-700 hover:text-primary font-medium"
+              >
+                Sign In
+              </Link>
+              <Link 
+                to="/user-registration" 
+                className="bg-primary text-white hover:bg-primary/90 font-medium py-2 px-4 rounded-lg transition-colors"
+              >
+                Get Started
+              </Link>
+            </div>
+          </div>
+        </div>
+      </header>
+
       {/* Search Header */}
       <div className="bg-white shadow-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">

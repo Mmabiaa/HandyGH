@@ -1,10 +1,10 @@
 import { S3 } from 'aws-sdk';
-import { config } from './env.config';
+import envConfig from './env.config';
 
 const s3 = new S3({
-  accessKeyId: config.AWS_ACCESS_KEY_ID,
-  secretAccessKey: config.AWS_SECRET_ACCESS_KEY,
-  region: config.AWS_REGION,
+  accessKeyId: envConfig.S3_ACCESS_KEY,
+  secretAccessKey: envConfig.S3_SECRET_KEY,
+  region: envConfig.S3_REGION,
 });
 
 export const uploadFile = async (file: Express.Multer.File, bucket: string): Promise<S3.ManagedUpload.SendData> => {
@@ -19,5 +19,5 @@ export const uploadFile = async (file: Express.Multer.File, bucket: string): Pro
 };
 
 export const getFileUrl = (bucket: string, key: string): string => {
-  return `https://${bucket}.s3.${config.AWS_REGION}.amazonaws.com/${key}`;
+  return `https://${bucket}.s3.${envConfig.S3_REGION}.amazonaws.com/${key}`;
 };

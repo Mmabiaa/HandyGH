@@ -138,18 +138,13 @@ const UserLogin = () => {
 
   const redirectToDashboard = async (userType) => {
     try {
-      // Get user profile to determine user type
-      const { data: { user: currentUser } } = await authService?.getSession();
-      if (currentUser) {
-        const { profile } = await authService?.getUserProfile(currentUser?.id);
-        
-        if (profile?.user_type === 'provider') {
-          navigate('/provider-dashboard');
-        } else if (profile?.user_type === 'admin') {
-          navigate('/customer-dashboard'); // Default for demo
-        } else {
-          navigate('/customer-dashboard');
-        }
+      // Get user data from localStorage
+      const userData = JSON.parse(localStorage.getItem('handygh_user') || '{}');
+      
+      if (userData?.type === 'provider') {
+        navigate('/provider-dashboard');
+      } else if (userData?.type === 'admin') {
+        navigate('/customer-dashboard'); // Default for demo
       } else {
         navigate('/customer-dashboard');
       }

@@ -73,6 +73,41 @@ const features = [
 const LandingPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Navigation Header */}
+      <header className="bg-white shadow-sm">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold">H</span>
+              </div>
+              <span className="text-xl font-bold text-gray-900">HandyGH</span>
+            </div>
+            <nav className="hidden md:flex space-x-8">
+              <Link to="/" className="text-gray-700 hover:text-blue-600">Home</Link>
+              <Link to="/about" className="text-gray-700 hover:text-blue-600">About</Link>
+              <Link to="/search" className="text-gray-700 hover:text-blue-600">Services</Link>
+              <Link to="/contact" className="text-gray-700 hover:text-blue-600">Contact</Link>
+              <Link to="/user-login" className="text-gray-700 hover:text-blue-600">Login</Link>
+            </nav>
+            <div className="flex space-x-4">
+              <Link 
+                to="/user-login" 
+                className="text-gray-700 hover:text-blue-600 font-medium"
+              >
+                Sign In
+              </Link>
+              <Link 
+                to="/user-registration" 
+                className="bg-blue-600 text-white hover:bg-blue-700 font-medium py-2 px-4 rounded-lg transition-colors"
+              >
+                Get Started
+              </Link>
+            </div>
+          </div>
+        </div>
+      </header>
+
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
         <div className="container mx-auto px-4">
@@ -235,9 +270,12 @@ const LandingPage = () => {
                     <Star className="w-4 h-4 text-yellow-400 fill-current mr-1" />
                     <span className="mr-2">{provider.rating} ({provider.reviews} reviews)</span>
                   </div>
-                  <button className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
+                  <Link 
+                    to={`/providers/${provider.id}`}
+                    className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors block text-center"
+                  >
                     View Profile
-                  </button>
+                  </Link>
                 </div>
               </motion.div>
             ))}

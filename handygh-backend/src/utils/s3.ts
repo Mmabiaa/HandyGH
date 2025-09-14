@@ -1,16 +1,16 @@
 import AWS from 'aws-sdk';
 import { S3 } from 'aws-sdk';
-import { s3Config } from '../config/s3.config';
+import envConfig from '../config/env.config';
 
 const s3 = new S3({
-  accessKeyId: s3Config.accessKeyId,
-  secretAccessKey: s3Config.secretAccessKey,
-  region: s3Config.region,
+  accessKeyId: envConfig.S3_ACCESS_KEY,
+  secretAccessKey: envConfig.S3_SECRET_KEY,
+  region: envConfig.S3_REGION,
 });
 
 export const uploadFile = async (file: Express.Multer.File, folder: string): Promise<string> => {
   const params = {
-    Bucket: s3Config.bucketName,
+    Bucket: envConfig.S3_BUCKET,
     Key: `${folder}/${file.originalname}`,
     Body: file.buffer,
     ContentType: file.mimetype,
@@ -23,7 +23,7 @@ export const uploadFile = async (file: Express.Multer.File, folder: string): Pro
 
 export const deleteFile = async (filePath: string): Promise<void> => {
   const params = {
-    Bucket: s3Config.bucketName,
+    Bucket: envConfig.S3_BUCKET,
     Key: filePath,
   };
 
@@ -31,5 +31,5 @@ export const deleteFile = async (filePath: string): Promise<void> => {
 };
 
 export const getFileUrl = (filePath: string): string => {
-  return `https://${s3Config.bucketName}.s3.${s3Config.region}.amazonaws.com/${filePath}`;
+  return `https://${envConfig.S3_BUCKET}.s3.${envConfig.S3_REGION}.amazonaws.com/${filePath}`;
 };
