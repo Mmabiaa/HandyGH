@@ -31,6 +31,7 @@ const testimonials = [
     role: 'Homeowner',
     content: 'Found a reliable plumber within minutes. The service was excellent!',
     rating: 5,
+    src: 'https://i.pinimg.com/736x/ca/53/8d/ca538d479d5d54352be7733a701956c9.jpg'
   },
   // Add more testimonials
 ];

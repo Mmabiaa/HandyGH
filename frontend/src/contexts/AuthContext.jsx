@@ -1,121 +1,66 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
+// src/contexts/AuthContext.jsx
+import React, { createContext, useContext, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { useLoginMutation, useRegisterMutation } from '../store/slices/apiSlice';
 
-const AuthContext = createContext({})
-
-export const useAuth = () => {
-  const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider')
-  }
-  return context
-}
+const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null)
-  const [userProfile, setUserProfile] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [profileLoading, setProfileLoading] = useState(false)
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const [login, { isLoading: loginLoading }] = useLoginMutation();
+  const [register, { isLoading: registerLoading }] = useRegisterMutation();
 
-  // Isolated async operations - never called from auth callbacks
-  const profileOperations = {
-    async load(userId) {
-      if (!userId) return
-      setProfileLoading(true)
-      try {
-        const { data, error } = await supabase?.from('user_profiles')?.select('*')?.eq('id', userId)?.single()
-        if (!error) setUserProfile(data)
-      } catch (error) {
-        console.error('Profile load error:', error)
-      } finally {
-        setProfileLoading(false)
-      }
-    },
-
-    clear() {
-      setUserProfile(null)
-      setProfileLoading(false)
-    }
-  }
-
-  // Auth state handlers - PROTECTED from async modification
-  const authStateHandlers = {
-    // This handler MUST remain synchronous - Supabase requirement
-    onChange: (event, session) => {
-      setUser(session?.user ?? null)
-      setLoading(false)
-      
-      if (session?.user) {
-        profileOperations?.load(session?.user?.id) // Fire-and-forget
-      } else {
-        profileOperations?.clear()
-      }
-    }
-  }
-
-  useEffect(() => {
-    // Initial session check
-    supabase?.auth?.getSession()?.then(({ data: { session } }) => {
-      authStateHandlers?.onChange(null, session)
-    })
-
-    // CRITICAL: This must remain synchronous
-    const { data: { subscription } } = supabase?.auth?.onAuthStateChange(
-      authStateHandlers?.onChange
-    )
-
-    return () => subscription?.unsubscribe()
-  }, [])
-
-  // Auth methods
-  const signIn = async (email, password) => {
+  const loginUser = async (credentials) => {
     try {
-      const { data, error } = await supabase?.auth?.signInWithPassword({ email, password })
-      return { data, error }
+      const result = await login(credentials).unwrap();
+      localStorage.setItem('token', result.token);
+      navigate('/dashboard');
+      return { success: true };
     } catch (error) {
-      return { error: { message: 'Network error. Please try again.' } }
+      return { success: false, error: error.data?.message || 'Login failed' };
     }
-  }
+  };
 
-  const signOut = async () => {
+  const registerUser = async (userData) => {
     try {
-      const { error } = await supabase?.auth?.signOut()
-      if (!error) {
-        setUser(null)
-        profileOperations?.clear()
-      }
-      return { error }
+      const result = await register(userData).unwrap();
+      localStorage.setItem('token', result.token);
+      navigate('/onboarding');
+      return { success: true };
     } catch (error) {
-      return { error: { message: 'Network error. Please try again.' } }
+      return { success: false, error: error.data?.message || 'Registration failed' };
     }
-  }
+  };
 
-  const updateProfile = async (updates) => {
-    if (!user) return { error: { message: 'No user logged in' } }
-    
-    try {
-      const { data, error } = await supabase?.from('user_profiles')?.update(updates)?.eq('id', user?.id)?.select()?.single()
-      if (!error) setUserProfile(data)
-      return { data, error }
-    } catch (error) {
-      return { error: { message: 'Network error. Please try again.' } }
-    }
-  }
-
-  const value = {
-    user,
-    userProfile,
-    loading,
-    profileLoading,
-    signIn,
-    signOut,
-    updateProfile,
-    isAuthenticated: !!user
-  }
+  const logoutUser = () => {
+    localStorage.removeItem('token');
+    dispatch(logout());
+    navigate('/login');
+  };
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated,
+        login: loginUser,
+        logout: logoutUser,
+        register: registerUser,
+        isLoading: loginLoading || registerLoading,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
-}
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
