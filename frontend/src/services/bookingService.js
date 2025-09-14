@@ -63,7 +63,7 @@ export const bookingService = {
   async updateBookingStatus(bookingId, status, providerNotes = '') {
     try {
       const response = await api.patch(`/api/v1/bookings/${bookingId}/status`, {
-        status,
+          status,
         providerNotes
       });
       return response.data;

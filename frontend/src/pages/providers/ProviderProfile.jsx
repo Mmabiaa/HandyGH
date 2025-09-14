@@ -118,15 +118,15 @@ const ProviderProfile = () => {
               <Icon name="Wrench" size={24} className="text-primary" />
               <span className="text-xl font-bold text-gray-900">HandyGH</span>
             </Link>
-            <Link 
-              to="/search" 
+            <Link
+              to="/search"
               className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
             >
               <Icon name="ArrowLeft" size={16} className="mr-2" />
               Back to Search
             </Link>
+            </div>
           </div>
-        </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -139,9 +139,9 @@ const ProviderProfile = () => {
                 <img 
                   src={provider.image || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face'} 
                   alt={provider.businessName}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
 
               {/* Provider Details */}
               <div className="text-center mb-6">
@@ -152,47 +152,47 @@ const ProviderProfile = () => {
                 <div className="flex items-center justify-center space-x-2 mb-2">
                   <div className="flex">
                     {renderStars(Math.round(provider.rating || 4.5))}
-                  </div>
+                    </div>
                   <span className="text-sm text-gray-600">
                     {provider.rating || 4.5} ({provider.totalReviews || 24} reviews)
                   </span>
-                </div>
+              </div>
 
                 {/* Verification Badge */}
                 <div className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800 mb-4">
                   <Icon name="Shield" size={16} className="mr-1" />
                   Verified Provider
-                </div>
-              </div>
+                        </div>
+                      </div>
 
               {/* Contact Info */}
               <div className="space-y-3">
                 <div className="flex items-center text-gray-600">
                   <Icon name="MapPin" size={16} className="mr-3 text-gray-400" />
                   <span>{provider.location || 'Accra, Ghana'}</span>
-                </div>
+                        </div>
                 <div className="flex items-center text-gray-600">
                   <Icon name="Phone" size={16} className="mr-3 text-gray-400" />
                   <span>{provider.phone || '+233 123 456 789'}</span>
-                </div>
+                        </div>
                 <div className="flex items-center text-gray-600">
                   <Icon name="Mail" size={16} className="mr-3 text-gray-400" />
                   <span>{provider.email || 'contact@provider.com'}</span>
-                </div>
-              </div>
+                        </div>
+                      </div>
 
               {/* Experience */}
               <div className="mt-6 p-4 bg-gray-50 rounded-lg">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-600">Experience</span>
                   <span className="text-sm text-gray-900">{provider.experienceYears || 5}+ years</span>
-                </div>
+                        </div>
                 <div className="flex items-center justify-between mt-2">
                   <span className="text-sm font-medium text-gray-600">Jobs Completed</span>
                   <span className="text-sm text-gray-900">{provider.jobsCompleted || 150}+</span>
-                </div>
-              </div>
-            </div>
+                      </div>
+                    </div>
+                  </div>
 
             {/* Quick Actions */}
             <div className="bg-white rounded-lg shadow-sm p-6">
@@ -215,9 +215,9 @@ const ProviderProfile = () => {
                   <Icon name="Heart" size={16} className="mr-2" />
                   Add to Favorites
                 </Button>
-              </div>
-            </div>
-          </div>
+                              </div>
+                            </div>
+                          </div>
 
           {/* Right Column - Services and Reviews */}
           <div className="lg:col-span-2">
@@ -232,7 +232,7 @@ const ProviderProfile = () => {
                       <span className="text-sm font-semibold text-primary">
                         {bookingService.formatAmount(service.basePrice)}
                       </span>
-                    </div>
+                        </div>
                     <p className="text-sm text-gray-600 mb-3">{service.description}</p>
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-gray-500">
@@ -252,8 +252,8 @@ const ProviderProfile = () => {
                     <p>No services available at the moment</p>
                   </div>
                 )}
-              </div>
             </div>
+          </div>
 
             {/* Reviews Section */}
             <div className="bg-white rounded-lg shadow-sm p-6">
@@ -264,40 +264,40 @@ const ProviderProfile = () => {
                 <div className="text-3xl font-bold text-gray-900 mr-4">
                   {provider.rating || 4.5}
                 </div>
-                <div>
+                  <div>
                   <div className="flex mb-1">
                     {renderStars(Math.round(provider.rating || 4.5))}
-                  </div>
+                    </div>
                   <p className="text-sm text-gray-600">
                     Based on {provider.totalReviews || 24} reviews
                   </p>
+                  </div>
                 </div>
-              </div>
 
               {/* Individual Reviews */}
               <div className="space-y-4">
                 {reviews.map((review) => (
                   <div key={review.id} className="border-b border-gray-200 pb-4 last:border-b-0">
                     <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center">
+                  <div className="flex items-center">
                         <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mr-3">
                           <span className="text-sm font-medium text-primary">
                             {review.customerName.charAt(0)}
                           </span>
-                        </div>
+                  </div>
                         <div>
                           <p className="font-medium text-gray-900">{review.customerName}</p>
                           <div className="flex">
                             {renderStars(review.rating)}
-                          </div>
-                        </div>
-                      </div>
+                  </div>
+                </div>
+              </div>
                       <span className="text-sm text-gray-500">{review.date}</span>
                     </div>
                     <p className="text-gray-600 ml-11">{review.comment}</p>
                   </div>
                 ))}
-              </div>
+            </div>
 
               {/* Load More Reviews */}
               <div className="text-center mt-6">
