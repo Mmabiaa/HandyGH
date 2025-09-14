@@ -92,6 +92,12 @@ const LandingPage = () => {
             </nav>
             <div className="flex space-x-4">
               <Link 
+                to="/user-login" 
+                className="text-gray-700 hover:text-blue-600 font-medium"
+              >
+                Sign In
+              </Link>
+              <Link 
                 to="/user-registration" 
                 className="bg-blue-600 text-white hover:bg-blue-700 font-medium py-2 px-4 rounded-lg transition-colors"
               >
@@ -201,10 +207,10 @@ const LandingPage = () => {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-blue-900">
+      <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-4">How It Works</h2>
-          <p className="text-center text-white mb-12 max-w-2xl mx-auto">
+          <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
             Getting the help you need is simple with our three-step process
           </p>
           <div className="grid md:grid-cols-3 gap-8">

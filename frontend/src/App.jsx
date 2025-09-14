@@ -10,6 +10,7 @@ import {
 } from 'react-router-dom';
 import AppRoutes from './Routes';
 import { Toaster } from 'react-hot-toast';
+import { AuthProvider } from './contexts/AuthContext';
 
 function AppContent() {
   const location = useLocation();
@@ -32,9 +33,11 @@ function AppContent() {
 function App() {
   return (
     <Provider store={store}>
-      <Router>
-        <AppContent />
-      </Router>
+      <AuthProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </AuthProvider>
     </Provider>
   );
 }
