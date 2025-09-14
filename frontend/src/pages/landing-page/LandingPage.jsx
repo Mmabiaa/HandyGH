@@ -27,7 +27,7 @@ const featuredProviders = [
         rating: 4.7,
         reviews: 89,
         category: 'Plumbing',
-        image: 'https://i.pinimg.com/736x/47/36/1c/47361c83a7a6d1c6a7e2f1b45f9493f2.jpg',
+        image: 'https://i.pinimg.com/736x/f6/76/1d/f6761db73758139be3247097595433b5.jpg',
       },
       {
         id: 3,
@@ -35,7 +35,7 @@ const featuredProviders = [
         rating: 4.8,
         reviews: 102,
         category: 'Carpentry',
-        image: 'https://i.pinimg.com/736x/d8/44/0e/d8440e7f37f6f2b3db6df4b3cbf3a0f1.jpg',
+        image: 'https://i.pinimg.com/736x/60/5e/5c/605e5c6a4e9831c7b98501ae6497ef8b.jpg',
       },
   // Add more providers
 ];
@@ -91,7 +91,7 @@ const LandingPage = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link 
-                  to="/register" 
+                  to="/user-registration" 
                   className="bg-white text-blue-700 hover:bg-blue-50 font-semibold py-3 px-6 rounded-lg text-center transition-colors"
                 >
                   Get Started
@@ -314,7 +314,7 @@ const LandingPage = () => {
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link
-              to="/register"
+              to="/user-registration"
               className="bg-white text-blue-700 hover:bg-blue-50 font-semibold py-3 px-8 rounded-lg transition-colors"
             >
               Sign Up Free
