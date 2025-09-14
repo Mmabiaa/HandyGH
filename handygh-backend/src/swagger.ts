@@ -1,19 +1,24 @@
 import swaggerJsDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { Express } from 'express';
-import { swaggerConfig } from './config/swagger.config';
 
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: swaggerConfig.title,
-      version: swaggerConfig.version,
-      description: swaggerConfig.description,
+      title: 'HandyGH API',
+      version: '1.0.0',
+      description: 'API documentation for HandyGH, a local services marketplace for Ghana.',
+      contact: {
+        name: 'HandyGH Support',
+        url: 'https://handygh.com/support',
+        email: 'support@handygh.com',
+      },
     },
     servers: [
       {
-        url: swaggerConfig.baseUrl,
+        url: 'http://localhost:3000/api/v1',
+        description: 'Development server',
       },
     ],
   },

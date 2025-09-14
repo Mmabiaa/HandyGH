@@ -13,12 +13,13 @@ A trustworthy, mobile-first web platform that connects customers with local serv
 
 ## Tech Stack
 
-- **Frontend**: Next.js 15, TypeScript, Tailwind CSS
+- **Frontend**: React 18, Vite, TypeScript, Tailwind CSS, Redux Toolkit
 - **Backend**: Node.js, Express, TypeScript
 - **Database**: PostgreSQL with Prisma ORM
 - **Cache/Queue**: Redis, BullMQ
 - **Authentication**: JWT with OTP verification
 - **Payments**: MTN MoMo API
+- **Real-time**: Socket.io
 - **File Storage**: AWS S3
 - **Testing**: Jest, Supertest
 
@@ -66,38 +67,41 @@ npm run db:studio
 
 Backend (API):
 \`\`\`bash
-cd backend
+cd handygh-backend
 npm run dev
 \`\`\`
 
-Frontend (Next.js):
+Frontend (React + Vite):
 \`\`\`bash
-npm run dev
+cd frontend
+npm start
 \`\`\`
 
 The application will be available at:
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:3001
-- API Documentation: http://localhost:3001/api-docs
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:3000
+- WebSocket: ws://localhost:4001
+- API Documentation: http://localhost:3000/api-docs
 
 ## Project Structure
 
 \`\`\`
-├── app/                    # Next.js app directory
-│   ├── api/               # API routes
-│   ├── auth/              # Authentication pages
-│   ├── dashboard/         # User dashboard
-│   ├── providers/         # Provider pages
-│   └── admin/             # Admin panel
-├── backend/               # Express.js backend
+├── frontend/              # React + Vite frontend
+│   ├── src/
+│   │   ├── components/    # React components
+│   │   ├── pages/         # Page components
+│   │   ├── services/      # API services
+│   │   ├── store/         # Redux store
+│   │   ├── contexts/      # React contexts
+│   │   ├── lib/           # Utilities and API client
+│   │   └── styles/        # CSS and styling
+├── handygh-backend/       # Express.js backend
 │   ├── src/
 │   │   ├── controllers/   # Route controllers
 │   │   ├── services/      # Business logic
 │   │   ├── middleware/    # Express middleware
 │   │   ├── utils/         # Utility functions
 │   │   └── types/         # TypeScript types
-├── components/            # React components
-├── lib/                   # Shared utilities
 ├── prisma/               # Database schema and migrations
 └── tests/                # Test files
 \`\`\`

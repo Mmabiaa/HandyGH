@@ -1,46 +1,18 @@
-import { supabase } from '../lib/supabase';
+import api from '../lib/apiClient';
 
 export const authService = {
   // Sign up a new user
   async signUp(userData) {
     try {
-      const { email, password, firstName, lastName, userType, phone, businessName, serviceCategory, experience, description } = userData;
-
-      // Create user in Supabase Auth
-      const { data, error } = await supabase?.auth?.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            first_name: firstName,
-            last_name: lastName,
-            user_type: userType,
-            phone: phone
-          }
-        }
-      });
-
-      if (error) throw error;
-
-      // If it's a provider, create provider profile after user is created
-      if (userType === 'provider' && data?.user) {
-        // Wait for user profile to be created by trigger, then add provider profile
-        setTimeout(async () => {
-          try {
-            await supabase?.from('provider_profiles')?.insert({
-                user_id: data?.user?.id,
-                business_name: businessName || `${firstName} ${lastName} Services`,
-                business_description: description || '',
-                experience_years: experience || 0,
-                verification_status: 'pending'
-              });
-          } catch (providerError) {
-            console.error('Provider profile creation error:', providerError);
-          }
-        }, 1000);
+      const response = await api.post('/api/v1/auth/register', userData);
+      
+      // Store tokens
+      if (response.data.accessToken) {
+        localStorage.setItem('accessToken', response.data.accessToken);
+        localStorage.setItem('refreshToken', response.data.refreshToken);
       }
-
-      return { data, error: null };
+      
+      return { data: response.data, error: null };
     } catch (error) {
       return { data: null, error };
     }
@@ -49,13 +21,15 @@ export const authService = {
   // Sign in user
   async signIn(email, password) {
     try {
-      const { data, error } = await supabase?.auth?.signInWithPassword({
-        email,
-        password
-      });
-
-      if (error) throw error;
-      return { data, error: null };
+      const response = await api.post('/api/v1/auth/login', { email, password });
+      
+      // Store tokens
+      if (response.data.accessToken) {
+        localStorage.setItem('accessToken', response.data.accessToken);
+        localStorage.setItem('refreshToken', response.data.refreshToken);
+      }
+      
+      return { data: response.data, error: null };
     } catch (error) {
       return { data: null, error };
     }
@@ -64,8 +38,18 @@ export const authService = {
   // Sign out user
   async signOut() {
     try {
-      const { error } = await supabase?.auth?.signOut();
-      if (error) throw error;
+      // Clear local tokens
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      
+      // Call backend logout if needed
+      try {
+        await api.post('/api/v1/auth/logout');
+      } catch (error) {
+        // Ignore backend logout errors
+        console.warn('Backend logout failed:', error);
+      }
+      
       return { error: null };
     } catch (error) {
       return { error };
@@ -75,9 +59,13 @@ export const authService = {
   // Get current user session
   async getSession() {
     try {
-      const { data: { session }, error } = await supabase?.auth?.getSession();
-      if (error) throw error;
-      return { session, error: null };
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        return { session: null, error: null };
+      }
+      
+      const response = await api.get('/api/v1/auth/me');
+      return { session: response.data, error: null };
     } catch (error) {
       return { session: null, error };
     }
@@ -86,10 +74,8 @@ export const authService = {
   // Get user profile
   async getUserProfile(userId) {
     try {
-      const { data, error } = await supabase?.from('user_profiles')?.select('*')?.eq('id', userId)?.single();
-
-      if (error) throw error;
-      return { profile: data, error: null };
+      const response = await api.get(`/api/v1/users/${userId}`);
+      return { profile: response.data, error: null };
     } catch (error) {
       return { profile: null, error };
     }
@@ -98,10 +84,8 @@ export const authService = {
   // Get provider profile (if user is a provider)
   async getProviderProfile(userId) {
     try {
-      const { data, error } = await supabase?.from('provider_profiles')?.select('*')?.eq('user_id', userId)?.single();
-
-      if (error && error?.code !== 'PGRST116') throw error; // Not found is okay
-      return { profile: data, error: error?.code === 'PGRST116' ? null : error };
+      const response = await api.get(`/api/v1/providers/profile/${userId}`);
+      return { profile: response.data, error: null };
     } catch (error) {
       return { profile: null, error };
     }
@@ -110,13 +94,8 @@ export const authService = {
   // Update user profile
   async updateUserProfile(userId, updates) {
     try {
-      const { data, error } = await supabase?.from('user_profiles')?.update({
-          ...updates,
-          updated_at: new Date()?.toISOString()
-        })?.eq('id', userId)?.select()?.single();
-
-      if (error) throw error;
-      return { data, error: null };
+      const response = await api.patch(`/api/v1/users/${userId}`, updates);
+      return { data: response.data, error: null };
     } catch (error) {
       return { data: null, error };
     }
@@ -125,13 +104,8 @@ export const authService = {
   // Update provider profile
   async updateProviderProfile(userId, updates) {
     try {
-      const { data, error } = await supabase?.from('provider_profiles')?.update({
-          ...updates,
-          updated_at: new Date()?.toISOString()
-        })?.eq('user_id', userId)?.select()?.single();
-
-      if (error) throw error;
-      return { data, error: null };
+      const response = await api.patch(`/api/v1/providers/profile/${userId}`, updates);
+      return { data: response.data, error: null };
     } catch (error) {
       return { data: null, error };
     }
@@ -140,15 +114,8 @@ export const authService = {
   // Social login
   async signInWithOAuth(provider) {
     try {
-      const { data, error } = await supabase?.auth?.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: window.location?.origin + '/auth/callback'
-        }
-      });
-
-      if (error) throw error;
-      return { data, error: null };
+      const response = await api.post('/api/v1/auth/oauth', { provider });
+      return { data: response.data, error: null };
     } catch (error) {
       return { data: null, error };
     }
@@ -157,12 +124,18 @@ export const authService = {
   // Reset password
   async resetPassword(email) {
     try {
-      const { data, error } = await supabase?.auth?.resetPasswordForEmail(email, {
-        redirectTo: window.location?.origin + '/reset-password'
-      });
+      const response = await api.post('/api/v1/auth/reset-password', { email });
+      return { data: response.data, error: null };
+    } catch (error) {
+      return { data: null, error };
+    }
+  },
 
-      if (error) throw error;
-      return { data, error: null };
+  // Verify OTP
+  async verifyOTP(email, otp) {
+    try {
+      const response = await api.post('/api/v1/auth/verify-otp', { email, otp });
+      return { data: response.data, error: null };
     } catch (error) {
       return { data: null, error };
     }

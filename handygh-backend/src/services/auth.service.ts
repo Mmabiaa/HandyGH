@@ -1,7 +1,7 @@
 import { User } from '../models/user.model';
 import { RefreshToken } from '../models/refreshToken.model';
+import { sendOTPNotification } from '../utils/notification';
 import { generateOTP, validateOTP } from '../utils/otp';
-import { sendSMS } from '../utils/notification';
 import { createAccessToken, createRefreshToken } from '../utils/jwt';
 import { prisma } from '../models/prismaClient';
 import { RedisClient } from '../config/redis.config';
