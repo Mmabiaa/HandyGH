@@ -91,7 +91,7 @@ const LandingPage = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link 
-                  to="/register" 
+                  to="/user-registration" 
                   className="bg-white text-blue-700 hover:bg-blue-50 font-semibold py-3 px-6 rounded-lg text-center transition-colors"
                 >
                   Get Started
@@ -314,7 +314,7 @@ const LandingPage = () => {
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link
-              to="/register"
+              to="/user-registration"
               className="bg-white text-blue-700 hover:bg-blue-50 font-semibold py-3 px-8 rounded-lg transition-colors"
             >
               Sign Up Free
