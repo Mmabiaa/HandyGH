@@ -13,6 +13,7 @@ import paymentRoutes from './routes/payment.routes';
 import messageRoutes from './routes/message.routes';
 import reviewRoutes from './routes/review.routes';
 import adminRoutes from './routes/admin.routes';
+import disputeRoutes from './routes/dispute.routes';
 import 'dotenv/config';
 
 const app = express();
@@ -36,6 +37,7 @@ app.use('/api/v1/payments', paymentRoutes);
 app.use('/api/v1/messages', messageRoutes);
 app.use('/api/v1/reviews', reviewRoutes);
 app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/disputes', disputeRoutes);
 
 // Error handling middleware
 app.use(errorMiddleware);
