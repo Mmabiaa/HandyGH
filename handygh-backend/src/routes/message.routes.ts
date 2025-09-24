@@ -1,22 +1,32 @@
 import { Router } from 'express';
 import { 
   getMessages, 
-  sendMessage, 
-  uploadAttachment 
+  sendMessage,
+  updateMessage,
+  deleteMessage,
+  markMessagesAsRead,
+  getUnreadCount
 } from '../controllers/message.controller';
-import { authMiddleware } from '../middleware/auth.middleware';
-import { validationMiddleware } from '../middleware/validation.middleware';
-import { messageSchema } from '../utils/validation';
+import { authenticateJWT } from '../middleware/auth.middleware';
 
 const router = Router();
 
-// Get chat history for a booking
-router.get('/:id/messages', authMiddleware, getMessages);
+// Get chat history for a booking - FR-18
+router.get('/bookings/:id/messages', authenticateJWT, getMessages);
 
-// Send a message in a booking
-router.post('/:id/messages', authMiddleware, validationMiddleware(messageSchema), sendMessage);
+// Send a message in a booking - FR-18
+router.post('/bookings/:id/messages', authenticateJWT, sendMessage);
 
-// Upload an attachment for a message
-router.post('/:id/messages/upload', authMiddleware, uploadAttachment);
+// Update a message
+router.patch('/messages/:messageId', authenticateJWT, updateMessage);
+
+// Delete a message
+router.delete('/messages/:messageId', authenticateJWT, deleteMessage);
+
+// Mark messages as read
+router.patch('/bookings/:bookingId/read', authenticateJWT, markMessagesAsRead);
+
+// Get unread message count
+router.get('/unread-count', authenticateJWT, getUnreadCount);
 
 export default router;

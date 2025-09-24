@@ -4,14 +4,23 @@ import { z } from 'zod';
 
 const providerService = new ProviderService();
 
-// Schema for provider creation
+// Schema for provider creation - aligned with FR-2
 const createProviderSchema = z.object({
   userId: z.string(),
   businessName: z.string().optional(),
-  categories: z.array(z.string()).optional(),
+  categories: z.array(z.string()).min(1, 'At least one category is required'),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
   address: z.string().optional(),
+  profilePhoto: z.string().url().optional(),
+  verificationDocument: z.string().url().optional(),
+  services: z.array(z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    priceType: z.enum(['HOURLY', 'FIXED']),
+    priceAmount: z.number().positive(),
+    durationMinutes: z.number().positive().optional()
+  })).min(1, 'At least one service is required')
 });
 
 // Schema for updating provider profile
@@ -21,6 +30,17 @@ const updateProviderSchema = z.object({
   latitude: z.number().optional(),
   longitude: z.number().optional(),
   address: z.string().optional(),
+  profilePhoto: z.string().url().optional(),
+  verificationDocument: z.string().url().optional(),
+  services: z.array(z.object({
+    id: z.string().optional(), // For updating existing services
+    title: z.string(),
+    description: z.string().optional(),
+    priceType: z.enum(['HOURLY', 'FIXED']),
+    priceAmount: z.number().positive(),
+    durationMinutes: z.number().positive().optional(),
+    isActive: z.boolean().optional()
+  })).optional()
 });
 
 // Controller to create a provider profile
@@ -34,14 +54,57 @@ export const createProvider = async (req: Request, res: Response) => {
   }
 };
 
-// Controller to get all providers with filters
+// Controller to get all providers with filters - aligned with FR-5
 export const getProviders = async (req: Request, res: Response) => {
   try {
-    const filters = req.query;
-    const providers = await providerService.getProviders(filters);
-    res.status(200).json(providers);
+    const { 
+      category, 
+      lat, 
+      lon, 
+      radius = 5, 
+      priceMin, 
+      priceMax, 
+      rating, 
+      verified, 
+      available,
+      page = 1,
+      limit = 20
+    } = req.query;
+
+    const filters = {
+      category: category as string,
+      latitude: lat ? parseFloat(lat as string) : undefined,
+      longitude: lon ? parseFloat(lon as string) : undefined,
+      radius: parseFloat(radius as string),
+      priceMin: priceMin ? parseFloat(priceMin as string) : undefined,
+      priceMax: priceMax ? parseFloat(priceMax as string) : undefined,
+      rating: rating ? parseFloat(rating as string) : undefined,
+      verified: verified === 'true',
+      available: available === 'true',
+      page: parseInt(page as string),
+      limit: parseInt(limit as string)
+    };
+
+    const result = await providerService.searchProviders(filters);
+    
+    res.status(200).json({
+      success: true,
+      data: result.providers,
+      meta: {
+        total: result.total,
+        page: filters.page,
+        limit: filters.limit,
+        totalPages: Math.ceil(result.total / filters.limit)
+      },
+      errors: null
+    });
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ 
+      success: false,
+      data: null,
+      errors: { message: 'Internal Server Error' },
+      meta: null
+    });
   }
 };
 

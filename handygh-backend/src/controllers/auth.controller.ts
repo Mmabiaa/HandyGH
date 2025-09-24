@@ -150,25 +150,55 @@ export const requestOtp = async (req: Request, res: Response) => {
     try {
         const { phone } = otpRequestSchema.parse(req.body);
         await authService.requestOTP(phone);
-        return res.status(200).json({ message: 'OTP sent successfully' });
+        return res.status(200).json({ 
+            success: true,
+            message: 'OTP sent successfully',
+            data: null,
+            errors: null
+        });
     } catch (error) {
         if (error instanceof ZodError) {
-            return res.status(400).json({ error: { message: error.errors } });
+            return res.status(400).json({ 
+                success: false,
+                data: null,
+                errors: error.errors,
+                meta: null
+            });
         }
-        return res.status(500).json({ error: { message: 'Internal server error' } });
+        return res.status(500).json({ 
+            success: false,
+            data: null,
+            errors: { message: 'Internal server error' },
+            meta: null
+        });
     }
 };
 
 export const verifyOtp = async (req: Request, res: Response) => {
     try {
         const { phone, otp } = otpVerifySchema.parse(req.body);
-        const user = await authService.verifyOTP(phone, otp);
-        return res.status(200).json({ user });
+        const result = await authService.verifyOTP(phone, otp);
+        return res.status(200).json({ 
+            success: true,
+            data: result,
+            errors: null,
+            meta: null
+        });
     } catch (error) {
         if (error instanceof ZodError) {
-            return res.status(400).json({ error: { message: error.errors } });
+            return res.status(400).json({ 
+                success: false,
+                data: null,
+                errors: error.errors,
+                meta: null
+            });
         }
-        return res.status(500).json({ error: { message: 'Internal server error' } });
+        return res.status(500).json({ 
+            success: false,
+            data: null,
+            errors: { message: 'Internal server error' },
+            meta: null
+        });
     }
 };
 

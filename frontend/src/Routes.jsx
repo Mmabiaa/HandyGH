@@ -3,6 +3,7 @@ import React from "react";
 import { Routes as RouterRoutes, Route } from "react-router-dom";
 import ScrollToTop from "components/ScrollToTop";
 import ErrorBoundary from "components/ErrorBoundary";
+import ProtectedRoute from "components/ProtectedRoute";
 import NotFound from "pages/NotFound";
 import UserLogin from './pages/user-login/index';
 import ServiceBookingFlow from './pages/service-booking-flow/index';
@@ -21,17 +22,56 @@ const Routes = () => {
     <ErrorBoundary>
       <ScrollToTop />
       <RouterRoutes>
+        {/* Public routes */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/providers/:id" element={<ProviderProfile />} />
+        
+        {/* Authentication routes */}
         <Route path="/user-login" element={<UserLogin />} />
-        <Route path="/service-booking-flow" element={<ServiceBookingFlow />} />
-        <Route path="/booking-management" element={<BookingManagement />} />
         <Route path="/user-registration" element={<UserRegistration />} />
-        <Route path="/provider-dashboard" element={<ProviderDashboard />} />
-        <Route path="/customer-dashboard" element={<CustomerDashboard />} />
+        
+        {/* Protected routes - Customer only */}
+        <Route 
+          path="/service-booking-flow" 
+          element={
+            <ProtectedRoute requiredRole="CUSTOMER">
+              <ServiceBookingFlow />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/customer-dashboard" 
+          element={
+            <ProtectedRoute requiredRole="CUSTOMER">
+              <CustomerDashboard />
+            </ProtectedRoute>
+          } 
+        />
+        
+        {/* Protected routes - Provider only */}
+        <Route 
+          path="/provider-dashboard" 
+          element={
+            <ProtectedRoute requiredRole="PROVIDER">
+              <ProviderDashboard />
+            </ProtectedRoute>
+          } 
+        />
+        
+        {/* Protected routes - Both Customer and Provider */}
+        <Route 
+          path="/booking-management" 
+          element={
+            <ProtectedRoute allowedRoles={['CUSTOMER', 'PROVIDER']}>
+              <BookingManagement />
+            </ProtectedRoute>
+          } 
+        />
+        
+        {/* Catch all route */}
         <Route path="*" element={<NotFound />} />
       </RouterRoutes>
     </ErrorBoundary>

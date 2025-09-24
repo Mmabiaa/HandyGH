@@ -1,21 +1,25 @@
 import { Router } from 'express';
 import { 
-  initiateMoMoPayment, 
-  handleMoMoWebhook, 
-  confirmManualPayment 
+  initiateMomoPayment, 
+  confirmManualPayment,
+  updatePaymentStatus,
+  getPaymentHistory
 } from '../controllers/payment.controller';
-import { authMiddleware } from '../middleware/auth.middleware';
+import { authenticateJWT, requireCustomer } from '../middleware/auth.middleware';
 import { rateLimitMiddleware } from '../middleware/rateLimit.middleware';
 
 const router = Router();
 
-// Initiate MoMo payment
-router.post('/momo/charge', authMiddleware, rateLimitMiddleware, initiateMoMoPayment);
+// Initiate MTN MoMo payment - FR-11
+router.post('/momo/charge', authenticateJWT, requireCustomer, rateLimitMiddleware, initiateMomoPayment);
 
-// Handle MoMo webhook
-router.post('/webhook/momo', handleMoMoWebhook);
+// Manual payment confirmation - FR-14
+router.post('/manual/confirm', authenticateJWT, requireCustomer, confirmManualPayment);
 
-// Manual payment confirmation
-router.post('/manual/confirm', authMiddleware, confirmManualPayment);
+// Update payment status (webhook or admin)
+router.patch('/status', updatePaymentStatus);
+
+// Get payment history for authenticated user
+router.get('/history', authenticateJWT, getPaymentHistory);
 
 export default router;

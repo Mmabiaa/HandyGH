@@ -1,5 +1,3 @@
-import { User } from '../models/user.model';
-import { RefreshToken } from '../models/refreshToken.model';
 import { sendOTPNotification } from '../utils/notification';
 import { generateOTP, validateOTP } from '../utils/otp';
 import { createAccessToken, createRefreshToken } from '../utils/jwt';
@@ -8,21 +6,29 @@ import { RedisClient } from '../config/redis.config';
 
 class AuthService {
   async requestOTP(phone: string): Promise<void> {
-    const otp = generateOTP();
-    await RedisClient.setex(`otp:${phone}`, 300, otp); // Store OTP in Redis with 5 min TTL
-    await sendSMS(phone, `Your OTP is: ${otp}`);
+    const otp = await generateOTP(phone);
+    await sendOTPNotification(phone, otp);
   }
 
-  async verifyOTP(phone: string, otp: string): Promise<User> {
-    const storedOTP = await RedisClient.get(`otp:${phone}`);
-    if (!storedOTP || storedOTP !== otp) {
+  async verifyOTP(phone: string, otp: string): Promise<any> {
+    const isValid = await validateOTP(phone, otp);
+    if (!isValid) {
       throw new Error('Invalid or expired OTP');
     }
 
-    let user = await prisma.user.findUnique({ where: { phone } });
+    let user = await prisma.user.findUnique({ 
+      where: { phone },
+      include: { provider: true }
+    });
+    
     if (!user) {
       user = await prisma.user.create({
-        data: { phone },
+        data: { 
+          phone,
+          role: 'CUSTOMER', // Default role, can be updated during profile completion
+          is_active: true
+        },
+        include: { provider: true }
       });
     }
 
@@ -37,7 +43,14 @@ class AuthService {
       },
     });
 
-    return { ...user, accessToken, refreshToken };
+    // Remove password from response
+    const { password_hash: _, ...userWithoutPassword } = user;
+
+    return { 
+      user: userWithoutPassword, 
+      accessToken, 
+      refreshToken 
+    };
   }
 
   async refreshTokens(token: string): Promise<{ accessToken: string; refreshToken: string }> {
