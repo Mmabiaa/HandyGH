@@ -1,6 +1,5 @@
-// src/contexts/AuthContext.jsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import  apiClient  from '../lib/apiClient';
+import apiClient from '../lib/apiClient';
 
 const AuthContext = createContext();
 
@@ -13,7 +12,6 @@ export const AuthProvider = ({ children }) => {
     // Check if user is logged in on app start
     const userData = localStorage.getItem('handygh_user');
     const accessToken = localStorage.getItem('accessToken');
-    
     if (userData && accessToken) {
       try {
         const parsedUser = JSON.parse(userData);
@@ -30,14 +28,24 @@ export const AuthProvider = ({ children }) => {
     setIsLoading(false);
   }, []);
 
+  // --- MOCK/DEMO LOGIN SUPPORT ---
+  // Call this after mock login/OTP to set a fake access token
+  const setDemoAuth = (userObj) => {
+    localStorage.setItem('handygh_user', JSON.stringify(userObj));
+    localStorage.setItem('accessToken', 'demo-access-token');
+    setUser(userObj);
+    setIsAuthenticated(true);
+  };
+
+  // --- API-based Auth (for real backend) ---
   const requestOTP = async (phone) => {
     try {
       const response = await apiClient.post('/auth/otp/request', { phone });
       return response.data;
     } catch (error) {
-      return { 
-        success: false, 
-        error: error.response?.data?.errors?.message || 'Failed to send OTP' 
+      return {
+        success: false,
+        error: error.response?.data?.errors?.message || 'Failed to send OTP'
       };
     }
   };
@@ -46,20 +54,16 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await apiClient.post('/auth/otp/verify', { phone, otp });
       const { user, accessToken, refreshToken } = response.data.data;
-      
-      // Store tokens and user data
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
       localStorage.setItem('handygh_user', JSON.stringify(user));
-      
       setUser(user);
       setIsAuthenticated(true);
-      
       return { success: true, user };
     } catch (error) {
-      return { 
-        success: false, 
-        error: error.response?.data?.errors?.message || 'OTP verification failed' 
+      return {
+        success: false,
+        error: error.response?.data?.errors?.message || 'OTP verification failed'
       };
     }
   };
@@ -68,20 +72,16 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await apiClient.post('/auth/login', credentials);
       const { user, accessToken, refreshToken } = response.data;
-      
-      // Store tokens and user data
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
       localStorage.setItem('handygh_user', JSON.stringify(user));
-      
       setUser(user);
       setIsAuthenticated(true);
-      
       return { success: true, user };
     } catch (error) {
-      return { 
-        success: false, 
-        error: error.response?.data?.error?.message || 'Login failed' 
+      return {
+        success: false,
+        error: error.response?.data?.error?.message || 'Login failed'
       };
     }
   };
@@ -90,20 +90,16 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await apiClient.post('/auth/register', userData);
       const { user, accessToken, refreshToken } = response.data;
-      
-      // Store tokens and user data
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
       localStorage.setItem('handygh_user', JSON.stringify(user));
-      
       setUser(user);
       setIsAuthenticated(true);
-      
       return { success: true, user };
     } catch (error) {
-      return { 
-        success: false, 
-        error: error.response?.data?.error?.message || 'Registration failed' 
+      return {
+        success: false,
+        error: error.response?.data?.error?.message || 'Registration failed'
       };
     }
   };
@@ -136,10 +132,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Helper functions for role-based access
-  const isCustomer = () => user?.role === 'CUSTOMER';
-  const isProvider = () => user?.role === 'PROVIDER';
-  const isAdmin = () => user?.role === 'ADMIN';
-  const hasRole = (role) => user?.role === role;
+  const isCustomer = () => user?.role === 'CUSTOMER' || user?.type === 'customer';
+  const isProvider = () => user?.role === 'PROVIDER' || user?.type === 'provider';
+  const isAdmin = () => user?.role === 'ADMIN' || user?.type === 'admin';
+  const hasRole = (role) => user?.role === role || user?.type === role?.toLowerCase();
 
   return (
     <AuthContext.Provider
@@ -157,6 +153,7 @@ export const AuthProvider = ({ children }) => {
         isProvider,
         isAdmin,
         hasRole,
+        setDemoAuth, // <-- expose for mock/demo login
       }}
     >
       {children}

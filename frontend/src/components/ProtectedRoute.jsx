@@ -9,7 +9,7 @@ const ProtectedRoute = ({ children, requiredRole = null, allowedRoles = null }) 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -18,12 +18,16 @@ const ProtectedRoute = ({ children, requiredRole = null, allowedRoles = null }) 
     return <Navigate to="/user-login" state={{ from: location }} replace />;
   }
 
-  // Check role-based access
-  if (requiredRole && user?.role !== requiredRole) {
+  // Support both .role and .type for mock/demo users
+  const userRole = (user?.role || user?.type || '').toUpperCase();
+
+  // Strict required role
+  if (requiredRole && userRole !== requiredRole.toUpperCase()) {
     return <Navigate to="/unauthorized" replace />;
   }
 
-  if (allowedRoles && !allowedRoles.includes(user?.role)) {
+  // Multiple allowed roles
+  if (allowedRoles && !allowedRoles.map(r => r.toUpperCase()).includes(userRole)) {
     return <Navigate to="/unauthorized" replace />;
   }
 

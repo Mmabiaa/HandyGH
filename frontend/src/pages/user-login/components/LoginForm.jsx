@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../../contexts/AuthContext';
 import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
 import { Checkbox } from '../../../components/ui/Checkbox';
 import Icon from '../../../components/AppIcon';
 
+const mockCredentials = [
+  { type: 'customer', email: 'customer@handygh.com', password: 'customer123' },
+  { type: 'provider', email: 'provider@handygh.com', password: 'provider123' },
+  { type: 'admin', email: 'admin@handygh.com', password: 'admin123' }
+];
+
 const LoginForm = ({ onSubmit, isLoading, error }) => {
-  const { signIn } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -14,61 +18,48 @@ const LoginForm = ({ onSubmit, isLoading, error }) => {
   });
   const [formErrors, setFormErrors] = useState({});
 
-  // Mock credentials for testing
-  const mockCredentials = [
-    { type: 'Customer', email: 'customer@handygh.com', password: 'customer123' },
-    { type: 'Provider', email: 'provider@handygh.com', password: 'provider123' },
-    { type: 'Admin', email: 'admin@handygh.com', password: 'admin123' }
-  ];
-
   const validateForm = () => {
     const errors = {};
-    
     if (!formData?.email?.trim()) {
       errors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/?.test(formData?.email)) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData?.email)) {
       errors.email = 'Please enter a valid email address';
     }
-    
     if (!formData?.password) {
       errors.password = 'Password is required';
     }
-    
     setFormErrors(errors);
-    return Object.keys(errors)?.length === 0;
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e?.preventDefault();
-    
-    if (!validateForm()) {
+    if (!validateForm()) return;
+
+    // Check mock credentials only
+    const userType = mockCredentials.find(
+      (cred) =>
+        cred.email === formData.email &&
+        cred.password === formData.password
+    )?.type;
+
+    if (!userType) {
+      setFormErrors({ general: 'Invalid email or password. Please check your credentials and try again.' });
       return;
     }
 
-    try {
-      const { data, error } = await signIn(formData?.email, formData?.password);
-      
-      if (error) {
-        setFormErrors({ general: error?.message });
-      } else if (data?.user) {
-        // Success handled by AuthContext
-        onSubmit?.();
-      }
-    } catch (err) {
-      setFormErrors({ general: 'An unexpected error occurred. Please try again.' });
-    }
+    // Success: call onSubmit with formData
+    onSubmit?.({ ...formData, type: userType });
   };
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e?.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-    
-    // Clear specific field error when user starts typing
     if (formErrors?.[name]) {
-      setFormErrors(prev => ({ ...prev, [name]: '' }));
+      setFormErrors((prev) => ({ ...prev, [name]: '' }));
     }
   };
 
@@ -165,7 +156,7 @@ const LoginForm = ({ onSubmit, isLoading, error }) => {
             >
               <div className="flex justify-between items-center">
                 <div>
-                  <span className="text-sm font-medium text-foreground">{cred?.type}:</span>
+                  <span className="text-sm font-medium text-foreground">{cred?.type.charAt(0).toUpperCase() + cred?.type.slice(1)}:</span>
                   <span className="text-xs text-muted-foreground ml-2">{cred?.email}</span>
                 </div>
                 <span className="text-xs text-muted-foreground">{cred?.password}</span>
@@ -173,7 +164,7 @@ const LoginForm = ({ onSubmit, isLoading, error }) => {
             </button>
           ))}
         </div>
-        {mockCredentials?.find(c => c?.type === 'Provider') && (
+        {mockCredentials?.find(c => c?.type === 'provider') && (
           <p className="text-xs text-warning mt-2 text-center">
             * Provider accounts may require additional verification
           </p>
