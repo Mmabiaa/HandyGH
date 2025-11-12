@@ -9,10 +9,8 @@ from apps.bookings.views import BookingViewSet
 app_name = 'bookings'
 
 router = DefaultRouter()
-router.register(r'bookings', BookingViewSet, basename='booking')
+router.register(r'', BookingViewSet, basename='booking')
 
 urlpatterns = [
     path('', include(router.urls)),
 ]
-app_name = 'bookings'
-urlpatterns = []
