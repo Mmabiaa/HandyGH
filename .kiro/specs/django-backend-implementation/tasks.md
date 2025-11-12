@@ -462,7 +462,7 @@
   - Add ReDoc UI at /api/redoc/
   - _Requirements: 14.1_
 
-- [-] 11.2 Add API documentation to endpoints
+- [x] 11.2 Add API documentation to endpoints
   - Add docstrings to all ViewSets and APIViews
   - Use @swagger_auto_schema decorator for detailed docs
   - Document request/response schemas

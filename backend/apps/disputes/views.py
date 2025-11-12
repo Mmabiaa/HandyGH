@@ -384,6 +384,17 @@ class DisputeViewSet(viewsets.GenericViewSet):
                 status=e.status_code
             )
     
+    @swagger_auto_schema(
+        operation_description="Add evidence to an open dispute",
+        request_body=AddEvidenceSerializer,
+        responses={
+            200: DisputeDetailSerializer,
+            400: "Bad Request - Dispute is closed or invalid evidence",
+            403: "Forbidden - Not a dispute participant",
+            404: "Not Found - Dispute not found"
+        },
+        tags=['Disputes']
+    )
     @action(detail=True, methods=['post'], url_path='add-evidence')
     def add_evidence(self, request, pk=None):
         """
