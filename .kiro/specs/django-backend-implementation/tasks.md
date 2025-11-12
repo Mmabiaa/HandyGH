@@ -38,7 +38,7 @@
   - Set up exception handling
   - _Requirements: 11.1, 11.2, 11.3_
 
-- [ ] 2. Authentication System Implementation
+- [-] 2. Authentication System Implementation
   - Create authentication app with OTP and JWT functionality
   - Implement OTP generation, storage, and verification
   - Implement JWT token issuance and refresh mechanism
@@ -46,7 +46,7 @@
   - Create authentication API endpoints
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
 
-- [ ] 2.1 Create User model
+- [-] 2.1 Create User model
   - Create custom User model extending AbstractBaseUser
   - Add fields: id (UUID), phone, email, name, role, is_active
   - Implement custom UserManager
