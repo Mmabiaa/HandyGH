@@ -3,16 +3,14 @@ Pytest configuration and fixtures for tests.
 """
 
 import pytest
+from django.core.management import call_command
 
 
 @pytest.fixture(scope='session')
-def django_db_setup():
-    """Setup test database."""
-    from django.conf import settings
-    settings.DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ':memory:',
-    }
+def django_db_setup(django_db_setup, django_db_blocker):
+    """Setup test database with migrations."""
+    with django_db_blocker.unblock():
+        call_command('migrate', '--run-syncdb', verbosity=0)
 
 
 @pytest.fixture

@@ -76,7 +76,7 @@
   - Add request/response serializers
   - _Requirements: 1.1, 1.2, 1.5_
 
-- [-] 2.5 Write authentication tests
+- [x] 2.5 Write authentication tests
   - Unit tests for OTPService (generation, verification, rate limiting)
   - Unit tests for JWTService (token creation, refresh, revocation)
   - Integration tests for OTP flow (request → verify → tokens)
