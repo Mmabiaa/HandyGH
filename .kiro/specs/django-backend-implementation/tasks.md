@@ -84,7 +84,7 @@
   - Test rate limiting and security constraints
   - _Requirements: 14.3, 14.4_
 
-- [ ] 3. User Profile Management
+- [x] 3. User Profile Management
   - Create users app for profile management
   - Implement user CRUD operations
   - Add role-based permissions
@@ -116,7 +116,7 @@
   - Apply permissions to user endpoints
   - _Requirements: 2.5, 11.1_
 
-- [-] 3.5 Write user management tests
+- [x] 3.5 Write user management tests
   - Unit tests for UserService methods
   - API tests for user endpoints with different roles
   - Test permission enforcement

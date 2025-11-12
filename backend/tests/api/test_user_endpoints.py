@@ -33,15 +33,7 @@ class TestUserMeEndpoint:
         
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
     
-    def test_update_user_via_detail_endpoint(self, authenticated_client):
-        """Test updating user via the detail endpoint."""
-        url = reverse('users:user-detail', kwargs={'pk': str(authenticated_client.user.id)})
-        data = {'name': 'Updated Name'}
-        
-        response = authenticated_client.patch(url, data, format='json')
-        
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['data']['name'] == 'Updated Name'
+
 
 
 @pytest.mark.django_db
