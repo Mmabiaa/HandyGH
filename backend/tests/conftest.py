@@ -149,3 +149,111 @@ def authenticated_client(api_client, customer_user):
     api_client.user = customer_user
     
     return api_client
+
+
+# Booking-related fixtures
+
+@pytest.fixture
+def customer(db):
+    """Create a customer user for booking tests."""
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    
+    return User.objects.create(
+        phone='+233241111111',
+        email='customer@test.com',
+        name='Test Customer',
+        role='CUSTOMER'
+    )
+
+
+@pytest.fixture
+def provider(db, provider_user):
+    """Create a provider profile for testing."""
+    from apps.providers.models import Provider
+    
+    return Provider.objects.create(
+        user=provider_user,
+        business_name='Test Provider Business',
+        categories=['plumbing'],
+        latitude=5.6037,
+        longitude=-0.1870,
+        address='Accra, Ghana',
+        verified=True,
+        is_active=True
+    )
+
+
+@pytest.fixture
+def service_category(db):
+    """Create a service category for testing."""
+    from apps.providers.models import ServiceCategory
+    
+    return ServiceCategory.objects.create(
+        name='Plumbing',
+        slug='plumbing',
+        description='Plumbing services',
+        is_active=True
+    )
+
+
+@pytest.fixture
+def provider_service(db, provider, service_category):
+    """Create a provider service for testing."""
+    from apps.providers.models import ProviderService
+    from decimal import Decimal
+    
+    return ProviderService.objects.create(
+        provider=provider,
+        category=service_category,
+        title='Emergency Plumbing',
+        description='24/7 emergency plumbing services',
+        price_type='HOURLY',
+        price_amount=Decimal('50.00'),
+        duration_estimate_min=120,
+        is_active=True
+    )
+
+
+@pytest.fixture
+def booking(db, customer, provider, provider_service):
+    """Create a booking for testing."""
+    from apps.bookings.models import Booking
+    from django.utils import timezone
+    from datetime import timedelta
+    from decimal import Decimal
+    
+    scheduled_start = timezone.now() + timedelta(days=1)
+    scheduled_end = scheduled_start + timedelta(hours=2)
+    
+    return Booking.objects.create(
+        booking_ref='BK-TEST123',
+        customer=customer,
+        provider=provider,
+        provider_service=provider_service,
+        status='REQUESTED',
+        scheduled_start=scheduled_start,
+        scheduled_end=scheduled_end,
+        address='123 Test Street, Accra',
+        notes='Test booking',
+        total_amount=Decimal('100.00'),
+        payment_status='PENDING'
+    )
+
+
+@pytest.fixture
+def customer_token(db, customer):
+    """Create JWT token for customer."""
+    from apps.authentication.services import JWTService
+    
+    tokens = JWTService.create_tokens(customer)
+    return tokens['access_token']
+
+
+@pytest.fixture
+def provider_token(db, provider_user):
+    """Create JWT token for provider."""
+    from apps.authentication.services import JWTService
+    
+    tokens = JWTService.create_tokens(provider_user)
+    return tokens['access_token']
