@@ -107,3 +107,15 @@ exclude_lines = [
     "class .*\\bProtocol\\):",
     "@(abc\\.)?abstractmethod",
 ]
+
+[tool.bandit]
+exclude_dirs = [
+    "*/tests/*",
+    "*/migrations/*",
+    "*/venv/*",
+    "*/.venv/*",
+]
+skips = [
+    "B101",  # assert_used - we use asserts in tests
+    "B601",  # paramiko_calls - not applicable
+]
