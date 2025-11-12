@@ -35,6 +35,16 @@ from .serializers import (
 )
 
 
+@swagger_auto_schema(
+    method='get',
+    operation_description="Get dashboard overview statistics including users, bookings, and revenue",
+    responses={
+        200: DashboardStatsSerializer,
+        403: "Forbidden - Admin access required",
+        500: "Internal Server Error"
+    },
+    tags=['Admin Dashboard']
+)
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, IsAdmin])
 def dashboard_stats(request):
@@ -62,6 +72,33 @@ def dashboard_stats(request):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(
+    method='get',
+    operation_description="Get user statistics with optional date range filtering",
+    manual_parameters=[
+        openapi.Parameter(
+            'start_date',
+            openapi.IN_QUERY,
+            description="Start date for filtering (ISO format: YYYY-MM-DD)",
+            type=openapi.TYPE_STRING,
+            format=openapi.FORMAT_DATE
+        ),
+        openapi.Parameter(
+            'end_date',
+            openapi.IN_QUERY,
+            description="End date for filtering (ISO format: YYYY-MM-DD)",
+            type=openapi.TYPE_STRING,
+            format=openapi.FORMAT_DATE
+        ),
+    ],
+    responses={
+        200: UserStatisticsSerializer,
+        400: "Bad Request - Invalid date format",
+        403: "Forbidden - Admin access required",
+        500: "Internal Server Error"
+    },
+    tags=['Admin Dashboard']
+)
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, IsAdmin])
 def user_statistics(request):
@@ -112,6 +149,33 @@ def user_statistics(request):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(
+    method='get',
+    operation_description="Get booking statistics with optional date range filtering",
+    manual_parameters=[
+        openapi.Parameter(
+            'start_date',
+            openapi.IN_QUERY,
+            description="Start date for filtering (ISO format: YYYY-MM-DD)",
+            type=openapi.TYPE_STRING,
+            format=openapi.FORMAT_DATE
+        ),
+        openapi.Parameter(
+            'end_date',
+            openapi.IN_QUERY,
+            description="End date for filtering (ISO format: YYYY-MM-DD)",
+            type=openapi.TYPE_STRING,
+            format=openapi.FORMAT_DATE
+        ),
+    ],
+    responses={
+        200: BookingStatisticsSerializer,
+        400: "Bad Request - Invalid date format",
+        403: "Forbidden - Admin access required",
+        500: "Internal Server Error"
+    },
+    tags=['Admin Dashboard']
+)
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, IsAdmin])
 def booking_statistics(request):
@@ -148,6 +212,33 @@ def booking_statistics(request):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(
+    method='get',
+    operation_description="Get transaction statistics with optional date range filtering",
+    manual_parameters=[
+        openapi.Parameter(
+            'start_date',
+            openapi.IN_QUERY,
+            description="Start date for filtering (ISO format: YYYY-MM-DD)",
+            type=openapi.TYPE_STRING,
+            format=openapi.FORMAT_DATE
+        ),
+        openapi.Parameter(
+            'end_date',
+            openapi.IN_QUERY,
+            description="End date for filtering (ISO format: YYYY-MM-DD)",
+            type=openapi.TYPE_STRING,
+            format=openapi.FORMAT_DATE
+        ),
+    ],
+    responses={
+        200: TransactionStatisticsSerializer,
+        400: "Bad Request - Invalid date format",
+        403: "Forbidden - Admin access required",
+        500: "Internal Server Error"
+    },
+    tags=['Admin Dashboard']
+)
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, IsAdmin])
 def transaction_statistics(request):
@@ -184,6 +275,37 @@ def transaction_statistics(request):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(
+    method='get',
+    operation_description="List all users with optional filtering and search",
+    manual_parameters=[
+        openapi.Parameter(
+            'role',
+            openapi.IN_QUERY,
+            description="Filter by user role",
+            type=openapi.TYPE_STRING,
+            enum=['CUSTOMER', 'PROVIDER', 'ADMIN']
+        ),
+        openapi.Parameter(
+            'is_active',
+            openapi.IN_QUERY,
+            description="Filter by active status",
+            type=openapi.TYPE_BOOLEAN
+        ),
+        openapi.Parameter(
+            'search',
+            openapi.IN_QUERY,
+            description="Search by phone, email, or name",
+            type=openapi.TYPE_STRING
+        ),
+    ],
+    responses={
+        200: AdminUserListSerializer(many=True),
+        403: "Forbidden - Admin access required",
+        500: "Internal Server Error"
+    },
+    tags=['Admin Dashboard']
+)
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, IsAdmin])
 def list_users(request):
