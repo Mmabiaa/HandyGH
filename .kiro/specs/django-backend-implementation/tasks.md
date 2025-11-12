@@ -491,14 +491,14 @@
   - Configure CI/CD for automated testing
   - _Requirements: 14.3, 14.4, 14.5_
 
-- [-] 12.1 Configure pytest and testing tools
+- [x] 12.1 Configure pytest and testing tools
   - Install pytest, pytest-django, pytest-cov
   - Create pytest.ini configuration
   - Set up test database configuration
   - Install factory_boy for test data
   - _Requirements: 14.3_
 
-- [ ] 12.2 Create test fixtures and factories
+- [-] 12.2 Create test fixtures and factories
   - Create UserFactory, ProviderFactory, BookingFactory
   - Add fixture files for common test data
   - Create helper functions for test setup
