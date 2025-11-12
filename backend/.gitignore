@@ -56,7 +56,7 @@ htmlcov/
 .hypothesis/
 
 # Logs
-logs/
+logs/*.log
 *.log
 
 # Backup files
