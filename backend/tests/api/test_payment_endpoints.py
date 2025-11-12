@@ -212,7 +212,7 @@ class TestManualPaymentConfirmEndpoint:
         
         assert response.status_code == status.HTTP_200_OK
         assert response.data['success'] is True
-        assert 'transaction_id' in response.data['data']
+        assert 'id' in response.data['data']
         
         # Verify transaction was created
         txn = Transaction.objects.get(id=response.data['data']['id'])

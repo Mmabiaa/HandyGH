@@ -256,7 +256,9 @@ class PaymentService:
         txn.status = 'SUCCESS'
         txn.txn_provider_ref = provider_ref
         if metadata:
-            txn.metadata.update(metadata)
+            # Convert Decimal values to strings for JSON serialization
+            serializable_metadata = PaymentService._make_json_serializable(metadata)
+            txn.metadata.update(serializable_metadata)
         txn.save()
         
         # Update booking payment status
@@ -301,7 +303,9 @@ class PaymentService:
         txn.status = 'FAILED'
         txn.metadata['failure_reason'] = reason
         if metadata:
-            txn.metadata.update(metadata)
+            # Convert Decimal values to strings for JSON serialization
+            serializable_metadata = PaymentService._make_json_serializable(metadata)
+            txn.metadata.update(serializable_metadata)
         txn.save()
         
         # Update booking payment status
@@ -330,6 +334,34 @@ class PaymentService:
         return Transaction.objects.filter(
             idempotency_key=idempotency_key
         ).first()
+    
+    @staticmethod
+    def _make_json_serializable(data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Convert non-JSON-serializable values (like Decimal) to strings.
+        
+        Args:
+            data: Dictionary that may contain non-serializable values
+            
+        Returns:
+            Dictionary with all values JSON-serializable
+        """
+        result = {}
+        for key, value in data.items():
+            if isinstance(value, Decimal):
+                result[key] = str(value)
+            elif isinstance(value, dict):
+                result[key] = PaymentService._make_json_serializable(value)
+            elif isinstance(value, list):
+                result[key] = [
+                    PaymentService._make_json_serializable(item) if isinstance(item, dict)
+                    else str(item) if isinstance(item, Decimal)
+                    else item
+                    for item in value
+                ]
+            else:
+                result[key] = value
+        return result
 
 
 class MoMoService:
