@@ -14,7 +14,7 @@ SOLID Principles:
 
 from rest_framework import serializers
 from .models import Dispute
-from apps.bookings.serializers import BookingSerializer
+from apps.bookings.serializers import BookingDetailSerializer
 from apps.users.serializers import UserSerializer
 
 
@@ -91,7 +91,7 @@ class DisputeListSerializer(serializers.ModelSerializer):
 class DisputeDetailSerializer(serializers.ModelSerializer):
     """Serializer for dispute details."""
     
-    booking = BookingSerializer(read_only=True)
+    booking = BookingDetailSerializer(read_only=True)
     raised_by = UserSerializer(read_only=True)
     resolved_by = UserSerializer(read_only=True)
     is_open = serializers.BooleanField(read_only=True)
