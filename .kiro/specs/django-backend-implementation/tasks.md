@@ -323,14 +323,14 @@
   - Test rating aggregation accuracy
   - _Requirements: 14.3, 14.4_
 
-- [ ] 8. Messaging System
+- [-] 8. Messaging System
   - Create messaging app for in-app chat
   - Implement message creation and retrieval
   - Add attachment support
   - Create messaging API endpoints
   - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
 
-- [ ] 8.1 Create Message model
+- [-] 8.1 Create Message model
   - Create Message model with booking, sender, content, attachments
   - Add created_at timestamp
   - Create indexes on booking_id, sender_id, created_at
