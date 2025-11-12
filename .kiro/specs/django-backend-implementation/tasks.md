@@ -122,7 +122,7 @@
   - Test permission enforcement
   - _Requirements: 14.3, 14.4_
 
-- [ ] 4. Provider Profile and Services
+- [x] 4. Provider Profile and Services
   - Create providers app for provider management
   - Implement provider profile CRUD
   - Add service management functionality
@@ -167,14 +167,14 @@
   - Add comprehensive serializers
   - _Requirements: 3.1, 3.2, 3.3, 4.1, 4.2_
 
-- [-] 4.6 Write provider tests
+- [x] 4.6 Write provider tests
   - Unit tests for ProviderService and ServiceManagementService
   - Unit tests for search algorithm with various filters
   - API tests for all provider endpoints
   - Test distance calculation accuracy
   - _Requirements: 14.3, 14.4_
 
-- [ ] 5. Booking System Implementation
+- [-] 5. Booking System Implementation
   - Create bookings app for booking management
   - Implement booking creation with validation
   - Add availability checking logic
@@ -182,7 +182,7 @@
   - Create booking API endpoints
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-- [ ] 5.1 Create Booking model
+- [-] 5.1 Create Booking model
   - Create Booking model with all required fields
   - Add status field with choices (REQUESTED, CONFIRMED, IN_PROGRESS, COMPLETED, CANCELLED, DISPUTED)
   - Create BookingStatusHistory model for audit trail
