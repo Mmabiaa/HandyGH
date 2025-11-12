@@ -91,13 +91,13 @@
   - Create user profile API endpoints
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
 
-- [-] 3.1 Create UserProfile model
+- [ ] 3.1 Create UserProfile model
   - Extend User model with additional profile fields
   - Add profile_picture_url, address, preferences
   - Create and run migrations
   - _Requirements: 2.1, 2.2, 13.1_
 
-- [ ] 3.2 Implement UserService
+- [x] 3.2 Implement UserService
   - Create UserService with CRUD operations
   - Add get_user(), update_user(), deactivate_user()
   - Implement role validation logic
