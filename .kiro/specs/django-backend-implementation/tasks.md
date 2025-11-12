@@ -401,7 +401,7 @@
   - Test dispute window validation
   - _Requirements: 14.3, 14.4_
 
-- [ ] 10. Admin Dashboard Operations
+- [-] 10. Admin Dashboard Operations
   - Create admin_dashboard app for admin functionality
   - Implement user moderation features
   - Add reporting and analytics
@@ -409,7 +409,7 @@
   - Create admin API endpoints
   - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5_
 
-- [ ] 10.1 Implement AdminReportService
+- [-] 10.1 Implement AdminReportService
   - Create get_dashboard_stats() for overview
   - Add get_user_statistics()
   - Implement get_booking_statistics()
