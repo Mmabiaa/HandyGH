@@ -122,7 +122,7 @@
   - Test permission enforcement
   - _Requirements: 14.3, 14.4_
 
-- [-] 4. Provider Profile and Services
+- [ ] 4. Provider Profile and Services
   - Create providers app for provider management
   - Implement provider profile CRUD
   - Add service management functionality
@@ -157,7 +157,7 @@
   - Optimize queries with select_related and prefetch_related
   - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
-- [ ] 4.5 Create provider API endpoints
+- [-] 4.5 Create provider API endpoints
   - POST /api/v1/providers/ - Create provider profile
   - GET /api/v1/providers/ - Search providers with filters
   - GET /api/v1/providers/{id}/ - Get provider details
