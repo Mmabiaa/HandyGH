@@ -12,6 +12,11 @@ import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'handygh.settings.development')
 django.setup()
 
+# Add testserver to ALLOWED_HOSTS for testing
+from django.conf import settings
+if 'testserver' not in settings.ALLOWED_HOSTS:
+    settings.ALLOWED_HOSTS.append('testserver')
+
 from django.test import Client
 from apps.users.models import User
 from apps.providers.models import Provider, ServiceCategory
