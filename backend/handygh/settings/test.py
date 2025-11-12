@@ -24,15 +24,8 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.MD5PasswordHasher',
 ]
 
-# Disable migrations for faster test database creation
-class DisableMigrations:
-    def __contains__(self, item):
-        return True
-
-    def __getitem__(self, item):
-        return None
-
-MIGRATION_MODULES = DisableMigrations()
+# Enable migrations for tests (needed for proper database setup)
+# MIGRATION_MODULES can be disabled for faster tests if needed
 
 # Email backend - Console for tests
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

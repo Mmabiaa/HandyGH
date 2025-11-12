@@ -2,17 +2,26 @@
 Pytest configuration and fixtures for tests.
 """
 
-import os
-import django
-
-# Configure Django settings before importing models
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'handygh.settings.test')
-django.setup()
-
 import pytest
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from datetime import timedelta
+
+# Import pytest_django plugin
+pytest_plugins = ['pytest_django']
+
+
+@pytest.fixture(scope='session')
+def django_db_setup():
+    """Setup test database."""
+    from django.conf import settings
+    settings.DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:',
+    }
+
+
+# Import after Django is configured
 from apps.authentication.models import OTPToken, RefreshToken
 from core.utils import hash_value, generate_otp
 
