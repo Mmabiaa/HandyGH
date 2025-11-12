@@ -12,6 +12,13 @@ from rest_framework import serializers
 from decimal import Decimal
 from .models import Provider, ProviderService, ServiceCategory
 from apps.users.serializers import UserSerializer
+from core.validators import (
+    validate_latitude,
+    validate_longitude,
+    validate_positive_decimal,
+    validate_business_name,
+    validate_url
+)
 
 
 class ServiceCategorySerializer(serializers.ModelSerializer):
@@ -90,11 +97,21 @@ class ProviderServiceCreateSerializer(serializers.ModelSerializer):
         return value
     
     def validate_price_amount(self, value):
-        """Validate price amount."""
-        if value <= 0:
-            raise serializers.ValidationError(
-                "Price amount must be greater than 0"
-            )
+        """Validate price amount is positive."""
+        validate_positive_decimal(value)
+        return value
+    
+    def validate_duration_estimate_min(self, value):
+        """Validate duration estimate is reasonable."""
+        if value is not None:
+            if value < 15:
+                raise serializers.ValidationError(
+                    "Duration estimate must be at least 15 minutes"
+                )
+            if value > 1440:  # 24 hours
+                raise serializers.ValidationError(
+                    "Duration estimate cannot exceed 24 hours (1440 minutes)"
+                )
         return value
 
 
