@@ -75,7 +75,9 @@ def user_statistics(request):
         - User must be admin
     """
     try:
-        serializer = DateRangeSerializer(data=request.query_params)
+        # Create mutable copy of query params
+        query_data = request.query_params.dict()
+        serializer = DateRangeSerializer(data=query_data)
         serializer.is_valid(raise_exception=True)
         
         stats = AdminReportService.get_user_statistics(
@@ -89,6 +91,11 @@ def user_statistics(request):
             'success': True,
             'data': response_serializer.data
         })
+    except ValidationError as e:
+        return Response({
+            'success': False,
+            'errors': e.detail if hasattr(e, 'detail') else {'detail': str(e)}
+        }, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({
             'success': False,
@@ -321,7 +328,9 @@ def export_csv(request):
         - User must be admin
     """
     try:
-        serializer = ExportFilterSerializer(data=request.query_params)
+        # Create mutable copy of query params
+        query_data = request.query_params.dict()
+        serializer = ExportFilterSerializer(data=query_data)
         serializer.is_valid(raise_exception=True)
         
         export_type = serializer.validated_data['export_type']
@@ -359,6 +368,11 @@ def export_csv(request):
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
         
         return response
+    except ValidationError as e:
+        return Response({
+            'success': False,
+            'errors': e.detail if hasattr(e, 'detail') else {'detail': str(e)}
+        }, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({
             'success': False,
