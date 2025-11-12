@@ -64,7 +64,9 @@ class TestMoMoChargeEndpoint:
         
         response = api_client.post(url, data, format='json')
         
-        assert response.status_code == status.HTTP_404_NOT_FOUND
+        # Serializer validation catches invalid booking and returns 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert 'not found' in str(response.data).lower()
     
     def test_momo_charge_already_paid(self, api_client, customer_user, sample_booking):
         """Test charge for already paid booking."""
