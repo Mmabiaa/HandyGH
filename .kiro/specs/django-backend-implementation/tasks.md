@@ -295,20 +295,20 @@
   - Create and run migrations
   - _Requirements: 7.1, 7.2, 7.5, 13.1, 13.5_
 
-- [-] 7.2 Implement ReviewService
+- [x] 7.2 Implement ReviewService
   - Create create_review() with validation
   - Add validate_review_eligibility() (booking must be completed)
   - Implement prevent_duplicate_reviews()
   - _Requirements: 7.1, 7.2, 7.5_
 
-- [ ] 7.3 Implement RatingAggregationService
+- [x] 7.3 Implement RatingAggregationService
   - Create update_provider_rating() method
   - Calculate average rating from all reviews
   - Update provider.rating_avg and provider.rating_count
   - Use database aggregation functions
   - _Requirements: 7.3_
 
-- [ ] 7.4 Create review API endpoints
+- [-] 7.4 Create review API endpoints
   - POST /api/v1/bookings/{id}/reviews/ - Submit review
   - GET /api/v1/providers/{id}/reviews/ - Get provider reviews
   - GET /api/v1/reviews/{id}/ - Get review details
