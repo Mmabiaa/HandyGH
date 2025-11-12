@@ -483,7 +483,7 @@
   - Create Postman collection
   - _Requirements: 14.1, 14.2_
 
-- [ ] 12. Testing and Quality Assurance
+- [-] 12. Testing and Quality Assurance
   - Set up pytest configuration
   - Create test fixtures and factories
   - Write comprehensive test suite
@@ -491,7 +491,7 @@
   - Configure CI/CD for automated testing
   - _Requirements: 14.3, 14.4, 14.5_
 
-- [ ] 12.1 Configure pytest and testing tools
+- [-] 12.1 Configure pytest and testing tools
   - Install pytest, pytest-django, pytest-cov
   - Create pytest.ini configuration
   - Set up test database configuration
