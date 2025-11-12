@@ -323,7 +323,7 @@
   - Test rating aggregation accuracy
   - _Requirements: 14.3, 14.4_
 
-- [-] 8. Messaging System
+- [x] 8. Messaging System
   - Create messaging app for in-app chat
   - Implement message creation and retrieval
   - Add attachment support
@@ -351,21 +351,21 @@
   - Implement pagination
   - _Requirements: 8.1, 8.2_
 
-- [-] 8.4 Write messaging tests
+- [x] 8.4 Write messaging tests
   - Unit tests for MessagingService
   - API tests for messaging endpoints
   - Test access control enforcement
   - Test message ordering
   - _Requirements: 14.3, 14.4_
 
-- [ ] 9. Dispute Management System
+- [-] 9. Dispute Management System
   - Create disputes app for dispute handling
   - Implement dispute creation with evidence
   - Add dispute resolution workflow
   - Create dispute API endpoints
   - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5_
 
-- [ ] 9.1 Create Dispute model
+- [-] 9.1 Create Dispute model
   - Create Dispute model with booking, reason, description, evidence, status
   - Add status choices (OPEN, INVESTIGATING, RESOLVED, CLOSED)
   - Add unique constraint on booking_id
