@@ -244,20 +244,20 @@
   - Create and run migrations
   - _Requirements: 6.1, 6.2, 13.1, 13.3_
 
-- [-] 6.2 Implement CommissionService
+- [x] 6.2 Implement CommissionService
   - Create calculate_commission() method
   - Add get_commission_rate() with configurable rates
   - Implement commission calculation logic
   - _Requirements: 6.4_
 
-- [ ] 6.3 Implement PaymentService
+- [x] 6.3 Implement PaymentService
   - Create initiate_payment() method
   - Add process_payment_success(), process_payment_failure()
   - Implement transaction creation and status updates
   - Add idempotency checking for webhooks
   - _Requirements: 6.1, 6.2, 6.3_
 
-- [ ] 6.4 Implement MoMoService (mock for development)
+- [x] 6.4 Implement MoMoService (mock for development)
   - Create MoMoService interface
   - Implement MockMoMoService for development
   - Add charge() method that simulates payment
