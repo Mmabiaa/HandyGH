@@ -61,14 +61,14 @@
   - Add rate limiting (5 requests per hour per phone)
   - _Requirements: 1.1, 1.3, 1.4, 11.2_
 
-- [ ] 2.3 Implement JWT token management
+- [x] 2.3 Implement JWT token management
   - Create RefreshToken model to store refresh tokens
   - Implement JWTService with create_tokens(), refresh_tokens(), revoke_token()
   - Configure JWT settings (15min access, 7 days refresh)
   - Add token hashing before storage
   - _Requirements: 1.2, 1.5, 11.1, 11.3_
 
-- [ ] 2.4 Create authentication API endpoints
+- [x] 2.4 Create authentication API endpoints
   - POST /api/v1/auth/otp/request/ - Request OTP
   - POST /api/v1/auth/otp/verify/ - Verify OTP and issue tokens
   - POST /api/v1/auth/token/refresh/ - Refresh access token
