@@ -46,14 +46,14 @@
   - Create authentication API endpoints
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
 
-- [-] 2.1 Create User model
+- [x] 2.1 Create User model
   - Create custom User model extending AbstractBaseUser
   - Add fields: id (UUID), phone, email, name, role, is_active
   - Implement custom UserManager
   - Create and run migrations
   - _Requirements: 1.2, 2.1, 2.2, 13.1, 13.5_
 
-- [ ] 2.2 Implement OTP functionality
+- [-] 2.2 Implement OTP functionality
   - Create OTPToken model with phone, code_hash, expiry, attempts
   - Implement OTPService with generate_otp(), verify_otp(), check_rate_limit()
   - Add OTP hashing using bcrypt
