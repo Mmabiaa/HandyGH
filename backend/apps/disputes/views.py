@@ -18,6 +18,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from core.permissions import IsAdmin
 from core.exceptions import HandyGHException
 from .models import Dispute
@@ -99,6 +101,17 @@ class DisputeViewSet(viewsets.GenericViewSet):
             return AddEvidenceSerializer
         return DisputeDetailSerializer
     
+    @swagger_auto_schema(
+        operation_description="Create a new dispute for a booking",
+        request_body=DisputeCreateSerializer,
+        responses={
+            201: DisputeDetailSerializer,
+            400: "Bad Request - Validation error or dispute window expired",
+            403: "Forbidden - Not a booking participant",
+            404: "Not Found - Booking not found"
+        },
+        tags=['Disputes']
+    )
     def create(self, request):
         """
         Create a new dispute.
