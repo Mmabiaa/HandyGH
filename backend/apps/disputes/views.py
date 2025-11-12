@@ -151,6 +151,36 @@ class DisputeViewSet(viewsets.GenericViewSet):
                 status=e.status_code
             )
     
+    @swagger_auto_schema(
+        operation_description="List disputes with filtering and ordering",
+        manual_parameters=[
+            openapi.Parameter(
+                'status',
+                openapi.IN_QUERY,
+                description="Filter by dispute status",
+                type=openapi.TYPE_STRING,
+                enum=['OPEN', 'INVESTIGATING', 'RESOLVED', 'CLOSED']
+            ),
+            openapi.Parameter(
+                'raised_by',
+                openapi.IN_QUERY,
+                description="Filter by user ID who raised the dispute",
+                type=openapi.TYPE_STRING
+            ),
+            openapi.Parameter(
+                'ordering',
+                openapi.IN_QUERY,
+                description="Order by field (prefix with - for descending)",
+                type=openapi.TYPE_STRING,
+                enum=['created_at', '-created_at', 'updated_at', '-updated_at', 'resolved_at', '-resolved_at']
+            ),
+        ],
+        responses={
+            200: DisputeListSerializer(many=True),
+            403: "Forbidden - Not authorized"
+        },
+        tags=['Disputes']
+    )
     def list(self, request):
         """
         List disputes.
