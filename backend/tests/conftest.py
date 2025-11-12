@@ -29,6 +29,9 @@ def user_data():
 @pytest.fixture
 def customer_user(db, user_data):
     """Create a customer user for testing."""
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    
     user = User.objects.create(
         phone=user_data['phone'],
         email=user_data['email'],
@@ -41,6 +44,9 @@ def customer_user(db, user_data):
 @pytest.fixture
 def provider_user(db):
     """Create a provider user for testing."""
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    
     user = User.objects.create(
         phone='+233241234568',
         email='provider@example.com',
@@ -53,6 +59,9 @@ def provider_user(db):
 @pytest.fixture
 def admin_user(db):
     """Create an admin user for testing."""
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    
     user = User.objects.create(
         phone='+233241234569',
         email='admin@example.com',
@@ -67,12 +76,18 @@ def admin_user(db):
 @pytest.fixture
 def valid_otp():
     """Generate a valid OTP code."""
+    from core.utils import generate_otp
     return generate_otp(length=6)
 
 
 @pytest.fixture
 def otp_token(db, user_data, valid_otp):
     """Create a valid OTP token for testing."""
+    from django.utils import timezone
+    from datetime import timedelta
+    from apps.authentication.models import OTPToken
+    from core.utils import hash_value
+    
     otp_hash = hash_value(valid_otp)
     expires_at = timezone.now() + timedelta(minutes=10)
     
@@ -90,6 +105,11 @@ def otp_token(db, user_data, valid_otp):
 @pytest.fixture
 def expired_otp_token(db, user_data):
     """Create an expired OTP token for testing."""
+    from django.utils import timezone
+    from datetime import timedelta
+    from apps.authentication.models import OTPToken
+    from core.utils import generate_otp, hash_value
+    
     otp_code = generate_otp(length=6)
     otp_hash = hash_value(otp_code)
     expires_at = timezone.now() - timedelta(minutes=1)
