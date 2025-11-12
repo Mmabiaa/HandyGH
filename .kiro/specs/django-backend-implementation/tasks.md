@@ -337,14 +337,14 @@
   - Create and run migrations
   - _Requirements: 8.1, 8.2, 13.1, 13.4_
 
-- [-] 8.2 Implement MessagingService
+- [x] 8.2 Implement MessagingService
   - Create send_message() method
   - Add get_booking_messages() with pagination
   - Implement access control (only booking participants)
   - Add attachment URL validation
   - _Requirements: 8.1, 8.2, 8.4_
 
-- [ ] 8.3 Create messaging API endpoints
+- [-] 8.3 Create messaging API endpoints
   - POST /api/v1/bookings/{id}/messages/ - Send message
   - GET /api/v1/bookings/{id}/messages/ - Get messages
   - Add permission checks for booking participants
