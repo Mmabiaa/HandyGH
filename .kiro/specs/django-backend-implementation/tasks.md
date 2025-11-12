@@ -280,7 +280,7 @@
   - Test payment flow integration with bookings
   - _Requirements: 14.3, 14.4_
 
-- [-] 7. Reviews and Ratings System
+- [x] 7. Reviews and Ratings System
   - Create reviews app for rating management
   - Implement review creation and validation
   - Add rating aggregation logic
@@ -315,7 +315,7 @@
   - Add pagination for review lists
   - _Requirements: 7.1, 7.4_
 
-- [-] 7.5 Write review tests
+- [x] 7.5 Write review tests
   - Unit tests for ReviewService validation
   - Unit tests for RatingAggregationService calculations
   - API tests for review endpoints
