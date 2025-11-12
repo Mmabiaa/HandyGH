@@ -449,7 +449,7 @@ class TestAddServiceEndpoint:
 class TestListProviderServicesEndpoint:
     """Test GET /api/v1/providers/{id}/services/ endpoint."""
     
-    def test_list_services(self, api_client, provider_with_profile, plumbing_category):
+    def test_list_services(self, authenticated_client, provider_with_profile, plumbing_category):
         """Test listing provider services."""
         # Create services
         ProviderService.objects.create(
@@ -474,13 +474,13 @@ class TestListProviderServicesEndpoint:
         # Use the correct URL - services are accessed via the provider detail endpoint
         url = f'/api/v1/providers/{provider_with_profile.id}/services/'
         
-        response = api_client.get(url)
+        response = authenticated_client.get(url)
         
         assert response.status_code == status.HTTP_200_OK
         assert response.data['success'] is True
         assert response.data['meta']['count'] == 2
     
-    def test_list_services_active_only(self, api_client, provider_with_profile, plumbing_category):
+    def test_list_services_active_only(self, authenticated_client, provider_with_profile, plumbing_category):
         """Test listing only active services."""
         # Create active and inactive services
         ProviderService.objects.create(
@@ -504,7 +504,7 @@ class TestListProviderServicesEndpoint:
         
         url = f'/api/v1/providers/{provider_with_profile.id}/services/'
         
-        response = api_client.get(url, {'active_only': 'true'})
+        response = authenticated_client.get(url, {'active_only': 'true'})
         
         assert response.status_code == status.HTTP_200_OK
         assert response.data['meta']['count'] == 1
