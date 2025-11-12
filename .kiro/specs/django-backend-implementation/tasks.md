@@ -308,7 +308,7 @@
   - Use database aggregation functions
   - _Requirements: 7.3_
 
-- [-] 7.4 Create review API endpoints
+- [x] 7.4 Create review API endpoints
   - POST /api/v1/bookings/{id}/reviews/ - Submit review
   - GET /api/v1/providers/{id}/reviews/ - Get provider reviews
   - GET /api/v1/reviews/{id}/ - Get review details
