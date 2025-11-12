@@ -174,7 +174,7 @@
   - Test distance calculation accuracy
   - _Requirements: 14.3, 14.4_
 
-- [-] 5. Booking System Implementation
+- [x] 5. Booking System Implementation
   - Create bookings app for booking management
   - Implement booking creation with validation
   - Add availability checking logic
@@ -221,7 +221,7 @@
   - Add role-based filtering and permissions
   - _Requirements: 5.1, 5.2, 5.3_
 
-- [-] 5.6 Write booking tests
+- [x] 5.6 Write booking tests
   - Unit tests for AvailabilityService (conflict detection)
   - Unit tests for BookingService (creation, validation)
   - Unit tests for BookingStateMachine (state transitions)
@@ -229,7 +229,7 @@
   - Test concurrent booking scenarios
   - _Requirements: 14.3, 14.4_
 
-- [ ] 6. Payment Processing System
+- [-] 6. Payment Processing System
   - Create payments app for transaction management
   - Implement payment initiation and processing
   - Add commission calculation
@@ -237,7 +237,7 @@
   - Implement manual payment confirmation
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
 
-- [ ] 6.1 Create Transaction model
+- [-] 6.1 Create Transaction model
   - Create Transaction model with booking, amount, status, txn_provider
   - Add Commission model for configuration
   - Create indexes on booking_id, status, txn_provider

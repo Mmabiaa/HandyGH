@@ -1,2 +1,5 @@
-"""Payments app"""
-default_app_config = 'apps.payments.apps.PaymentsConfig'
+"""
+Payments app for HandyGH.
+
+Handles payment processing, transaction management, and commission calculations.
+"""
