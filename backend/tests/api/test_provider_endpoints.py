@@ -332,18 +332,23 @@ class TestUpdateProviderEndpoint:
         
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
     
-    def test_update_provider_wrong_owner(self, provider_client, provider_with_profile):
+    def test_update_provider_wrong_owner(self, provider_client):
         """Test provider update by non-owner."""
-        # Provider belongs to different user
-        url = reverse('providers:provider-detail', kwargs={'pk': str(provider_with_profile.id)})
+        # Create a different provider user
+        other_user = User.objects.create(
+            phone='+233249999999',
+            role='PROVIDER'
+        )
+        other_provider = Provider.objects.create(
+            user=other_user,
+            business_name='Other Provider'
+        )
+        
+        url = reverse('providers:provider-detail', kwargs={'pk': str(other_provider.id)})
         data = {'business_name': 'Updated'}
         
         response = provider_client.patch(url, data, format='json')
         
-        # The view checks if user == provider.user, should return 403
-        # But if the check passes, it returns 200
-        # Since provider_with_profile belongs to provider_user (different from provider_client.user)
-        # it should return 403
         assert response.status_code == status.HTTP_403_FORBIDDEN
     
     def test_update_provider_not_found(self, provider_client):
@@ -398,9 +403,19 @@ class TestAddServiceEndpoint:
         
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
     
-    def test_add_service_wrong_owner(self, provider_client, provider_with_profile, plumbing_category):
+    def test_add_service_wrong_owner(self, provider_client, plumbing_category):
         """Test service addition by non-owner."""
-        url = reverse('providers:provider-add-service', kwargs={'pk': str(provider_with_profile.id)})
+        # Create a different provider user
+        other_user = User.objects.create(
+            phone='+233249999998',
+            role='PROVIDER'
+        )
+        other_provider = Provider.objects.create(
+            user=other_user,
+            business_name='Other Provider'
+        )
+        
+        url = reverse('providers:provider-add-service', kwargs={'pk': str(other_provider.id)})
         data = {
             'title': 'Test Service',
             'description': 'Test',
@@ -434,8 +449,12 @@ class TestAddServiceEndpoint:
 class TestListProviderServicesEndpoint:
     """Test GET /api/v1/providers/{id}/services/ endpoint."""
     
-    def test_list_services(self, api_client, provider_with_profile, plumbing_category):
+    def test_list_services(self, provider_client, provider_with_profile, plumbing_category):
         """Test listing provider services."""
+        # Ensure provider belongs to authenticated user
+        provider_with_profile.user = provider_client.user
+        provider_with_profile.save()
+        
         # Create services
         ProviderService.objects.create(
             provider=provider_with_profile,
@@ -458,14 +477,18 @@ class TestListProviderServicesEndpoint:
         
         url = reverse('providers:provider-list-services', kwargs={'pk': str(provider_with_profile.id)})
         
-        response = api_client.get(url)
+        response = provider_client.get(url)
         
         assert response.status_code == status.HTTP_200_OK
         assert response.data['success'] is True
         assert response.data['meta']['count'] == 2
     
-    def test_list_services_active_only(self, api_client, provider_with_profile, plumbing_category):
+    def test_list_services_active_only(self, provider_client, provider_with_profile, plumbing_category):
         """Test listing only active services."""
+        # Ensure provider belongs to authenticated user
+        provider_with_profile.user = provider_client.user
+        provider_with_profile.save()
+        
         # Create active and inactive services
         ProviderService.objects.create(
             provider=provider_with_profile,
@@ -488,7 +511,7 @@ class TestListProviderServicesEndpoint:
         
         url = reverse('providers:provider-list-services', kwargs={'pk': str(provider_with_profile.id)})
         
-        response = api_client.get(url, {'active_only': 'true'})
+        response = provider_client.get(url, {'active_only': 'true'})
         
         assert response.status_code == status.HTTP_200_OK
         assert response.data['meta']['count'] == 1
