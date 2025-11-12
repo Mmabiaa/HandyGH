@@ -409,27 +409,27 @@
   - Create admin API endpoints
   - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5_
 
-- [-] 10.1 Implement AdminReportService
+- [x] 10.1 Implement AdminReportService
   - Create get_dashboard_stats() for overview
   - Add get_user_statistics()
   - Implement get_booking_statistics()
   - Add get_transaction_statistics()
   - _Requirements: 10.1, 10.4_
 
-- [ ] 10.2 Implement UserModerationService
+- [x] 10.2 Implement UserModerationService
   - Create suspend_user() method
   - Add activate_user() method
   - Implement revoke_all_sessions()
   - _Requirements: 10.2_
 
-- [ ] 10.3 Implement DataExportService
+- [x] 10.3 Implement DataExportService
   - Create export_transactions_csv() method
   - Add export_bookings_csv()
   - Implement export_users_csv()
   - Add date range filtering
   - _Requirements: 10.4_
 
-- [ ] 10.4 Create admin API endpoints
+- [-] 10.4 Create admin API endpoints
   - GET /api/v1/admin/dashboard/stats/ - Dashboard statistics
   - GET /api/v1/admin/users/ - List all users
   - PATCH /api/v1/admin/users/{id}/suspend/ - Suspend user
