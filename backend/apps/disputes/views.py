@@ -300,7 +300,7 @@ class DisputeViewSet(viewsets.GenericViewSet):
                 status=e.status_code
             )
     
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], url_path='add-evidence')
     def add_evidence(self, request, pk=None):
         """
         Add evidence to a dispute.
