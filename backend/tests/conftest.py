@@ -257,3 +257,66 @@ def provider_token(db, provider_user):
     
     tokens = JWTService.create_tokens(provider_user)
     return tokens['access_token']
+
+
+# Payment-related fixtures
+
+@pytest.fixture
+def sample_provider(db, provider_user):
+    """Create a sample provider for payment tests."""
+    from apps.providers.models import Provider
+    
+    return Provider.objects.create(
+        user=provider_user,
+        business_name='Sample Provider',
+        categories=['plumbing'],
+        latitude=5.6037,
+        longitude=-0.1870,
+        address='Accra, Ghana',
+        verified=True,
+        is_active=True
+    )
+
+
+@pytest.fixture
+def sample_booking(db, customer_user, sample_provider):
+    """Create a sample booking for payment tests."""
+    from apps.bookings.models import Booking
+    from apps.providers.models import ServiceCategory, ProviderService
+    from django.utils import timezone
+    from datetime import timedelta
+    from decimal import Decimal
+    
+    # Create category and service
+    category = ServiceCategory.objects.create(
+        name='Plumbing',
+        slug='plumbing',
+        description='Plumbing services',
+        is_active=True
+    )
+    
+    service = ProviderService.objects.create(
+        provider=sample_provider,
+        category=category,
+        title='Test Service',
+        description='Test service description',
+        price_type='FIXED',
+        price_amount=Decimal('100.00'),
+        is_active=True
+    )
+    
+    scheduled_start = timezone.now() + timedelta(days=1)
+    scheduled_end = scheduled_start + timedelta(hours=2)
+    
+    return Booking.objects.create(
+        booking_ref='BK-PAY-TEST',
+        customer=customer_user,
+        provider=sample_provider,
+        provider_service=service,
+        status='CONFIRMED',
+        scheduled_start=scheduled_start,
+        scheduled_end=scheduled_end,
+        address='Test Address',
+        total_amount=Decimal('100.00'),
+        payment_status='PENDING'
+    )
