@@ -385,7 +385,7 @@
   - Implement close_dispute()
   - _Requirements: 9.3, 9.4_
 
-- [-] 9.4 Create dispute API endpoints
+- [x] 9.4 Create dispute API endpoints
   - POST /api/v1/disputes/ - Create dispute
   - GET /api/v1/disputes/ - List disputes
   - GET /api/v1/disputes/{id}/ - Get dispute details
@@ -393,7 +393,7 @@
   - POST /api/v1/disputes/{id}/resolve/ - Resolve dispute (admin)
   - _Requirements: 9.1, 9.3_
 
-- [ ] 9.5 Write dispute tests
+- [-] 9.5 Write dispute tests
   - Unit tests for DisputeService validation
   - Unit tests for DisputeResolutionService
   - API tests for dispute endpoints
