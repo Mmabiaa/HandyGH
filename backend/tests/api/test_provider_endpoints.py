@@ -570,10 +570,20 @@ class TestUpdateServiceEndpoint:
         assert response.status_code == status.HTTP_200_OK
         assert response.data['data']['title'] == 'New Title'
     
-    def test_update_service_wrong_owner(self, provider_client, provider_with_profile, plumbing_category):
+    def test_update_service_wrong_owner(self, provider_client, plumbing_category):
         """Test service update by non-owner."""
+        # Create a different provider user
+        other_user = User.objects.create(
+            phone='+233249999997',
+            role='PROVIDER'
+        )
+        other_provider = Provider.objects.create(
+            user=other_user,
+            business_name='Other Provider'
+        )
+        
         service = ProviderService.objects.create(
-            provider=provider_with_profile,
+            provider=other_provider,
             category=plumbing_category,
             title='Test Service',
             description='Description',
