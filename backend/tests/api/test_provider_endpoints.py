@@ -72,7 +72,7 @@ class TestServiceCategoryEndpoints:
     
     def test_list_categories(self, api_client, plumbing_category, electrical_category):
         """Test listing service categories."""
-        url = reverse('providers:servicecategory-list')
+        url = reverse('providers:category-list')
         
         response = api_client.get(url)
         
@@ -82,7 +82,7 @@ class TestServiceCategoryEndpoints:
     
     def test_get_category_detail(self, api_client, plumbing_category):
         """Test getting category details."""
-        url = reverse('providers:servicecategory-detail', kwargs={'pk': str(plumbing_category.id)})
+        url = reverse('providers:category-detail', kwargs={'pk': str(plumbing_category.id)})
         
         response = api_client.get(url)
         
@@ -99,7 +99,7 @@ class TestServiceCategoryEndpoints:
             is_active=False
         )
         
-        url = reverse('providers:servicecategory-list')
+        url = reverse('providers:category-list')
         response = api_client.get(url)
         
         assert len(response.data['data']) == 1
@@ -504,7 +504,7 @@ class TestServiceDetailEndpoint:
             price_amount=Decimal('100.00')
         )
         
-        url = reverse('providers:providerservice-detail', kwargs={'pk': str(service.id)})
+        url = reverse('providers:service-detail', kwargs={'pk': str(service.id)})
         
         response = api_client.get(url)
         
@@ -516,7 +516,7 @@ class TestServiceDetailEndpoint:
         """Test getting non-existent service."""
         import uuid
         fake_id = str(uuid.uuid4())
-        url = reverse('providers:providerservice-detail', kwargs={'pk': fake_id})
+        url = reverse('providers:service-detail', kwargs={'pk': fake_id})
         
         response = api_client.get(url)
         
