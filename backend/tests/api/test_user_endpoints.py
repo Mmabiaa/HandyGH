@@ -26,14 +26,14 @@ class TestUserMeEndpoint:
     
     def test_get_current_user_unauthenticated(self, api_client):
         """Test getting current user profile when not authenticated."""
-        url = reverse('users:me')
+        url = reverse('users:user-get-current-user')
         response = api_client.get(url)
         
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
     
     def test_update_current_user_name(self, authenticated_client):
         """Test updating current user name."""
-        url = reverse('users:me')
+        url = reverse('users:user-update-current-user')
         data = {'name': 'Updated Name'}
         
         response = authenticated_client.patch(url, data, format='json')
@@ -43,7 +43,7 @@ class TestUserMeEndpoint:
     
     def test_update_current_user_email(self, authenticated_client):
         """Test updating current user email."""
-        url = reverse('users:me')
+        url = reverse('users:user-update-current-user')
         data = {'email': 'newemail@example.com'}
         
         response = authenticated_client.patch(url, data, format='json')
@@ -53,7 +53,7 @@ class TestUserMeEndpoint:
     
     def test_update_current_user_profile(self, authenticated_client):
         """Test updating current user profile."""
-        url = reverse('users:me')
+        url = reverse('users:user-update-current-user')
         data = {
             'profile': {
                 'address': '123 Test Street',
