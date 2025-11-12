@@ -344,14 +344,14 @@
   - Add attachment URL validation
   - _Requirements: 8.1, 8.2, 8.4_
 
-- [-] 8.3 Create messaging API endpoints
+- [x] 8.3 Create messaging API endpoints
   - POST /api/v1/bookings/{id}/messages/ - Send message
   - GET /api/v1/bookings/{id}/messages/ - Get messages
   - Add permission checks for booking participants
   - Implement pagination
   - _Requirements: 8.1, 8.2_
 
-- [ ] 8.4 Write messaging tests
+- [-] 8.4 Write messaging tests
   - Unit tests for MessagingService
   - API tests for messaging endpoints
   - Test access control enforcement
