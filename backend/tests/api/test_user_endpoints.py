@@ -13,7 +13,7 @@ class TestUserMeEndpoint:
     
     def test_get_current_user_authenticated(self, authenticated_client):
         """Test getting current user profile when authenticated."""
-        url = reverse('users:me')
+        url = reverse('users:user-get-current-user')
         response = authenticated_client.get(url)
         
         assert response.status_code == status.HTTP_200_OK
