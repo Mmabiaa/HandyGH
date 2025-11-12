@@ -157,7 +157,7 @@
   - Optimize queries with select_related and prefetch_related
   - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
-- [-] 4.5 Create provider API endpoints
+- [x] 4.5 Create provider API endpoints
   - POST /api/v1/providers/ - Create provider profile
   - GET /api/v1/providers/ - Search providers with filters
   - GET /api/v1/providers/{id}/ - Get provider details
