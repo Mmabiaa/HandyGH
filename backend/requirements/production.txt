@@ -1,0 +1,11 @@
+# Include base requirements
+-r base.txt
+
+# Production server
+gunicorn==21.2.0
+
+# Monitoring and error tracking
+sentry-sdk==1.39.2
+
+# Performance monitoring
+django-silk==5.0.4

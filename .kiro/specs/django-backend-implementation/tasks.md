@@ -2,7 +2,7 @@
 
 ## Task List
 
-- [ ] 1. Project Setup and Core Infrastructure
+- [-] 1. Project Setup and Core Infrastructure
   - Initialize Django project with proper structure
   - Configure settings for multiple environments (dev, test, prod)
   - Set up database configuration with SQLite for development
@@ -10,7 +10,7 @@
   - Set up logging and error handling middleware
   - _Requirements: 1.1, 1.2, 11.1, 11.4, 12.1_
 
-- [ ] 1.1 Create Django project structure
+- [x] 1.1 Create Django project structure
   - Create `backend/` directory with `handygh/` project
   - Set up `apps/` directory for modular applications
   - Create `core/` directory for shared utilities
@@ -38,7 +38,7 @@
   - Set up exception handling
   - _Requirements: 11.1, 11.2, 11.3_
 
-- [ ] 2. Authentication System Implementation
+- [-] 2. Authentication System Implementation
   - Create authentication app with OTP and JWT functionality
   - Implement OTP generation, storage, and verification
   - Implement JWT token issuance and refresh mechanism
@@ -46,14 +46,14 @@
   - Create authentication API endpoints
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
 
-- [ ] 2.1 Create User model
+- [x] 2.1 Create User model
   - Create custom User model extending AbstractBaseUser
   - Add fields: id (UUID), phone, email, name, role, is_active
   - Implement custom UserManager
   - Create and run migrations
   - _Requirements: 1.2, 2.1, 2.2, 13.1, 13.5_
 
-- [ ] 2.2 Implement OTP functionality
+- [x] 2.2 Implement OTP functionality
   - Create OTPToken model with phone, code_hash, expiry, attempts
   - Implement OTPService with generate_otp(), verify_otp(), check_rate_limit()
   - Add OTP hashing using bcrypt
@@ -61,14 +61,14 @@
   - Add rate limiting (5 requests per hour per phone)
   - _Requirements: 1.1, 1.3, 1.4, 11.2_
 
-- [ ] 2.3 Implement JWT token management
+- [x] 2.3 Implement JWT token management
   - Create RefreshToken model to store refresh tokens
   - Implement JWTService with create_tokens(), refresh_tokens(), revoke_token()
   - Configure JWT settings (15min access, 7 days refresh)
   - Add token hashing before storage
   - _Requirements: 1.2, 1.5, 11.1, 11.3_
 
-- [ ] 2.4 Create authentication API endpoints
+- [x] 2.4 Create authentication API endpoints
   - POST /api/v1/auth/otp/request/ - Request OTP
   - POST /api/v1/auth/otp/verify/ - Verify OTP and issue tokens
   - POST /api/v1/auth/token/refresh/ - Refresh access token
