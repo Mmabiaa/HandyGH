@@ -130,7 +130,7 @@
   - Create provider API endpoints
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 4.1, 4.2, 4.3, 4.4, 4.5_
 
-- [-] 4.1 Create Provider and ProviderService models
+- [x] 4.1 Create Provider and ProviderService models
   - Create Provider model with business_name, categories, location, verified, rating_avg
   - Create ProviderService model with title, description, price_type, price_amount
   - Create ServiceCategory model for categorization
@@ -138,7 +138,7 @@
   - Create and run migrations
   - _Requirements: 3.1, 3.2, 3.3, 13.1, 13.2, 13.3_
 
-- [ ] 4.2 Implement ProviderService class
+- [-] 4.2 Implement ProviderService class
   - Create ProviderService with create_provider(), update_provider(), verify_provider()
   - Add validation for provider data
   - Implement provider verification logic
