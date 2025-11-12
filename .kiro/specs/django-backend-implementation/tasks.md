@@ -330,14 +330,14 @@
   - Create messaging API endpoints
   - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
 
-- [-] 8.1 Create Message model
+- [x] 8.1 Create Message model
   - Create Message model with booking, sender, content, attachments
   - Add created_at timestamp
   - Create indexes on booking_id, sender_id, created_at
   - Create and run migrations
   - _Requirements: 8.1, 8.2, 13.1, 13.4_
 
-- [ ] 8.2 Implement MessagingService
+- [-] 8.2 Implement MessagingService
   - Create send_message() method
   - Add get_booking_messages() with pagination
   - Implement access control (only booking participants)
