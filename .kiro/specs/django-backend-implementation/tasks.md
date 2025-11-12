@@ -2,7 +2,7 @@
 
 ## Task List
 
-- [-] 1. Project Setup and Core Infrastructure
+- [ ] 1. Project Setup and Core Infrastructure
   - Initialize Django project with proper structure
   - Configure settings for multiple environments (dev, test, prod)
   - Set up database configuration with SQLite for development
@@ -17,20 +17,20 @@
   - Configure `settings/` package with base, development, production, and test settings
   - _Requirements: 13.1, 13.2_
 
-- [ ] 1.2 Configure dependencies and requirements
+- [x] 1.2 Configure dependencies and requirements
   - Create `requirements/base.txt` with Django, DRF, and core dependencies
   - Create `requirements/development.txt` with dev tools (pytest, black, flake8)
   - Create `requirements/production.txt` with production dependencies (gunicorn, psycopg2)
   - Set up virtual environment and install dependencies
   - _Requirements: 13.1_
 
-- [ ] 1.3 Set up environment configuration
+- [x] 1.3 Set up environment configuration
   - Create `.env.example` with all required environment variables
   - Install python-decouple for environment variable management
   - Configure SECRET_KEY, DEBUG, DATABASE_URL, and JWT settings
   - _Requirements: 11.4, 11.5_
 
-- [ ] 1.4 Configure Django REST Framework
+- [x] 1.4 Configure Django REST Framework
   - Add DRF to INSTALLED_APPS
   - Configure authentication classes (JWT)
   - Set up default permission classes
@@ -84,14 +84,14 @@
   - Test rate limiting and security constraints
   - _Requirements: 14.3, 14.4_
 
-- [ ] 3. User Profile Management
+- [-] 3. User Profile Management
   - Create users app for profile management
   - Implement user CRUD operations
   - Add role-based permissions
   - Create user profile API endpoints
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
 
-- [ ] 3.1 Create UserProfile model
+- [-] 3.1 Create UserProfile model
   - Extend User model with additional profile fields
   - Add profile_picture_url, address, preferences
   - Create and run migrations
