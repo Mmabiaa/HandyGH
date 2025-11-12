@@ -23,7 +23,7 @@ class TestOTPRequestEndpoint:
     
     def test_request_otp_success(self, api_client):
         """Test successful OTP request."""
-        url = reverse('auth:otp-request')
+        url = reverse('authentication:otp-request')
         data = {'phone': '+233241234567'}
         
         response = api_client.post(url, data, format='json')
@@ -38,7 +38,7 @@ class TestOTPRequestEndpoint:
     
     def test_request_otp_local_format(self, api_client):
         """Test OTP request with local phone format."""
-        url = reverse('auth:otp-request')
+        url = reverse('authentication:otp-request')
         data = {'phone': '0241234567'}
         
         response = api_client.post(url, data, format='json')
@@ -51,7 +51,7 @@ class TestOTPRequestEndpoint:
     
     def test_request_otp_missing_phone(self, api_client):
         """Test OTP request without phone number."""
-        url = reverse('auth:otp-request')
+        url = reverse('authentication:otp-request')
         data = {}
         
         response = api_client.post(url, data, format='json')
@@ -60,7 +60,7 @@ class TestOTPRequestEndpoint:
     
     def test_request_otp_invalid_phone(self, api_client):
         """Test OTP request with invalid phone number."""
-        url = reverse('auth:otp-request')
+        url = reverse('authentication:otp-request')
         data = {'phone': 'invalid'}
         
         response = api_client.post(url, data, format='json')
@@ -69,7 +69,7 @@ class TestOTPRequestEndpoint:
     
     def test_request_otp_rate_limit(self, api_client):
         """Test OTP request rate limiting."""
-        url = reverse('auth:otp-request')
+        url = reverse('authentication:otp-request')
         phone = '+233241234567'
         
         # Make 5 requests (the limit)
@@ -92,7 +92,7 @@ class TestOTPVerifyEndpoint:
     
     def test_verify_otp_success(self, api_client, otp_token):
         """Test successful OTP verification."""
-        url = reverse('auth:otp-verify')
+        url = reverse('authentication:otp-verify')
         data = {
             'phone': otp_token.phone,
             'otp': otp_token.otp_code
@@ -123,7 +123,7 @@ class TestOTPVerifyEndpoint:
             expires_at=timezone.now() + timedelta(minutes=10)
         )
         
-        url = reverse('auth:otp-verify')
+        url = reverse('authentication:otp-verify')
         data = {'phone': phone, 'otp': otp_code}
         
         response = api_client.post(url, data, format='json')
@@ -136,7 +136,7 @@ class TestOTPVerifyEndpoint:
     
     def test_verify_otp_invalid_code(self, api_client, otp_token):
         """Test OTP verification with invalid code."""
-        url = reverse('auth:otp-verify')
+        url = reverse('authentication:otp-verify')
         data = {
             'phone': otp_token.phone,
             'otp': '999999'
@@ -149,7 +149,7 @@ class TestOTPVerifyEndpoint:
     
     def test_verify_otp_expired(self, api_client, expired_otp_token):
         """Test OTP verification with expired token."""
-        url = reverse('auth:otp-verify')
+        url = reverse('authentication:otp-verify')
         data = {
             'phone': expired_otp_token.phone,
             'otp': expired_otp_token.otp_code
@@ -161,7 +161,7 @@ class TestOTPVerifyEndpoint:
     
     def test_verify_otp_missing_fields(self, api_client):
         """Test OTP verification with missing fields."""
-        url = reverse('auth:otp-verify')
+        url = reverse('authentication:otp-verify')
         
         # Missing OTP
         response = api_client.post(url, {'phone': '+233241234567'}, format='json')
@@ -173,7 +173,7 @@ class TestOTPVerifyEndpoint:
     
     def test_verify_otp_non_numeric(self, api_client, otp_token):
         """Test OTP verification with non-numeric code."""
-        url = reverse('auth:otp-verify')
+        url = reverse('authentication:otp-verify')
         data = {
             'phone': otp_token.phone,
             'otp': 'abcdef'
@@ -195,7 +195,7 @@ class TestTokenRefreshEndpoint:
         # Create initial tokens
         tokens = JWTService.create_tokens(customer_user)
         
-        url = reverse('auth:token-refresh')
+        url = reverse('authentication:token-refresh')
         data = {'refresh_token': tokens['refresh_token']}
         
         response = api_client.post(url, data, format='json')
@@ -211,7 +211,7 @@ class TestTokenRefreshEndpoint:
     
     def test_refresh_token_invalid(self, api_client):
         """Test token refresh with invalid token."""
-        url = reverse('auth:token-refresh')
+        url = reverse('authentication:token-refresh')
         data = {'refresh_token': 'invalid_token'}
         
         response = api_client.post(url, data, format='json')
@@ -226,7 +226,7 @@ class TestTokenRefreshEndpoint:
         tokens = JWTService.create_tokens(customer_user)
         JWTService.revoke_token(tokens['refresh_token'])
         
-        url = reverse('auth:token-refresh')
+        url = reverse('authentication:token-refresh')
         data = {'refresh_token': tokens['refresh_token']}
         
         response = api_client.post(url, data, format='json')
@@ -235,7 +235,7 @@ class TestTokenRefreshEndpoint:
     
     def test_refresh_token_missing(self, api_client):
         """Test token refresh without token."""
-        url = reverse('auth:token-refresh')
+        url = reverse('authentication:token-refresh')
         data = {}
         
         response = api_client.post(url, data, format='json')
@@ -249,7 +249,7 @@ class TestLogoutEndpoint:
     
     def test_logout_success(self, authenticated_client):
         """Test successful logout."""
-        url = reverse('auth:logout')
+        url = reverse('authentication:logout')
         data = {'refresh_token': authenticated_client.refresh_token}
         
         response = authenticated_client.post(url, data, format='json')
@@ -264,7 +264,7 @@ class TestLogoutEndpoint:
     
     def test_logout_unauthenticated(self, api_client):
         """Test logout without authentication."""
-        url = reverse('auth:logout')
+        url = reverse('authentication:logout')
         data = {'refresh_token': 'some_token'}
         
         response = api_client.post(url, data, format='json')
@@ -273,7 +273,7 @@ class TestLogoutEndpoint:
     
     def test_logout_missing_token(self, authenticated_client):
         """Test logout without refresh token."""
-        url = reverse('auth:logout')
+        url = reverse('authentication:logout')
         data = {}
         
         response = authenticated_client.post(url, data, format='json')
@@ -293,7 +293,7 @@ class TestLogoutAllEndpoint:
         JWTService.create_tokens(customer_user)
         JWTService.create_tokens(customer_user)
         
-        url = reverse('auth:logout-all')
+        url = reverse('authentication:logout-all')
         
         response = authenticated_client.post(url, format='json')
         
@@ -310,7 +310,7 @@ class TestLogoutAllEndpoint:
     
     def test_logout_all_unauthenticated(self, api_client):
         """Test logout all without authentication."""
-        url = reverse('auth:logout-all')
+        url = reverse('authentication:logout-all')
         
         response = api_client.post(url, format='json')
         
@@ -327,7 +327,7 @@ class TestAuthenticationSecurity:
     
     def test_otp_not_exposed_in_response(self, api_client):
         """Test that OTP code is never exposed in API responses."""
-        url = reverse('auth:otp-request')
+        url = reverse('authentication:otp-request')
         data = {'phone': '+233241234567'}
         
         response = api_client.post(url, data, format='json')
@@ -352,7 +352,7 @@ class TestAuthenticationSecurity:
     
     def test_otp_stored_hashed(self, api_client):
         """Test that OTP codes are stored hashed."""
-        url = reverse('auth:otp-request')
+        url = reverse('authentication:otp-request')
         data = {'phone': '+233241234567'}
         
         api_client.post(url, data, format='json')
