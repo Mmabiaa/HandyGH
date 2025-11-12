@@ -272,7 +272,7 @@
   - Add webhook signature verification
   - _Requirements: 6.1, 6.2, 6.5_
 
-- [ ] 6.6 Write payment tests
+- [x] 6.6 Write payment tests
   - Unit tests for CommissionService calculations
   - Unit tests for PaymentService methods
   - Unit tests for webhook idempotency
