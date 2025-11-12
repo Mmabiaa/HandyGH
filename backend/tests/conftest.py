@@ -2,6 +2,13 @@
 Pytest configuration and fixtures for tests.
 """
 
+import os
+import django
+
+# Configure Django settings before importing models
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'handygh.settings.test')
+django.setup()
+
 import pytest
 from django.contrib.auth import get_user_model
 from django.utils import timezone
