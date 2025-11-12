@@ -36,13 +36,16 @@ def test_provider_endpoints():
     # Create test users
     print("\n1. Creating test users...")
     try:
+        # Delete existing test users if they exist
+        User.objects.filter(phone__in=['+233501234567', '+233501234568']).delete()
+        
         # Create provider user
         provider_user = User.objects.create_user(
             phone='+233501234567',
             name='Test Provider',
             role='PROVIDER'
         )
-        print(f"   ✓ Created provider user: {provider_user.phone}")
+        print(f"   [OK] Created provider user: {provider_user.phone}")
         
         # Create customer user
         customer_user = User.objects.create_user(
@@ -50,10 +53,10 @@ def test_provider_endpoints():
             name='Test Customer',
             role='CUSTOMER'
         )
-        print(f"   ✓ Created customer user: {customer_user.phone}")
+        print(f"   [OK] Created customer user: {customer_user.phone}")
         
     except Exception as e:
-        print(f"   ✗ Error creating users: {e}")
+        print(f"   [ERROR] Error creating users: {e}")
         return
     
     # Generate JWT tokens
