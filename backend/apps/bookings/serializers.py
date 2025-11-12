@@ -98,18 +98,37 @@ class BookingDetailSerializer(serializers.ModelSerializer):
 class BookingCreateSerializer(serializers.Serializer):
     """Serializer for creating bookings."""
     
-    provider_service_id = serializers.UUIDField(required=True)
-    scheduled_start = serializers.DateTimeField(required=True)
-    scheduled_end = serializers.DateTimeField(required=False, allow_null=True)
-    duration_hours = serializers.FloatField(required=False, allow_null=True, min_value=0.5, max_value=24)
-    address = serializers.CharField(required=True, max_length=500)
-    notes = serializers.CharField(required=False, allow_blank=True, max_length=1000)
-    
-    def validate_scheduled_start(self, value):
-        """Validate scheduled start time is in the future."""
-        if value < timezone.now():
-            raise serializers.ValidationError("Scheduled start time must be in the future")
-        return value
+    provider_service_id = serializers.UUIDField(
+        required=True,
+        help_text='UUID of the provider service to book'
+    )
+    scheduled_start = serializers.DateTimeField(
+        required=True,
+        validators=[validate_future_datetime],
+        help_text='Start date and time for the booking (must be in the future)'
+    )
+    scheduled_end = serializers.DateTimeField(
+        required=False,
+        allow_null=True,
+        help_text='End date and time for the booking (optional if duration_hours is provided)'
+    )
+    duration_hours = serializers.FloatField(
+        required=False,
+        allow_null=True,
+        validators=[validate_booking_duration],
+        help_text='Duration in hours (0.5 to 24 hours, optional if scheduled_end is provided)'
+    )
+    address = serializers.CharField(
+        required=True,
+        max_length=500,
+        help_text='Service location address'
+    )
+    notes = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=1000,
+        help_text='Additional notes or requirements for the booking'
+    )
     
     def validate(self, data):
         """Validate that either scheduled_end or duration_hours is provided."""
