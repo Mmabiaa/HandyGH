@@ -91,7 +91,7 @@
   - Create user profile API endpoints
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
 
-- [ ] 3.1 Create UserProfile model
+- [x] 3.1 Create UserProfile model
   - Extend User model with additional profile fields
   - Add profile_picture_url, address, preferences
   - Create and run migrations
