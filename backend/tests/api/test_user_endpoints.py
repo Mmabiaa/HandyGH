@@ -69,7 +69,7 @@ class TestUserMeEndpoint:
     
     def test_cannot_update_role(self, authenticated_client):
         """Test that role cannot be updated."""
-        url = reverse('users:me')
+        url = reverse('users:user-update-current-user')
         original_role = authenticated_client.user.role
         data = {'role': 'ADMIN'}
         
@@ -92,11 +92,11 @@ class TestUserDetailEndpoint:
         tokens = JWTService.create_tokens(admin_user)
         api_client.credentials(HTTP_AUTHORIZATION=f"Bearer {tokens['access_token']}")
         
-        url = reverse('users:user-detail', kwargs={'pk': customer_user.id})
+        url = reverse('users:user-detail', kwargs={'pk': str(customer_user.id)})
         response = api_client.get(url)
         
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['id'] == str(customer_user.id)
+        assert response.data['data']['id'] == str(customer_user.id)
     
     def test_get_user_by_id_as_customer(self, authenticated_client, provider_user):
         """Test getting user by ID as customer (should fail)."""
