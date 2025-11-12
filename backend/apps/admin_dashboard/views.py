@@ -362,6 +362,31 @@ def list_users(request):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(
+    method='patch',
+    operation_description="Suspend a user account and revoke all active sessions",
+    request_body=UserModerationSerializer,
+    responses={
+        200: openapi.Response(
+            description="User suspended successfully",
+            examples={
+                "application/json": {
+                    "success": True,
+                    "data": {
+                        "success": True,
+                        "message": "User suspended successfully",
+                        "tokens_revoked": 2
+                    }
+                }
+            }
+        ),
+        400: "Bad Request - User already suspended",
+        403: "Forbidden - Admin access required",
+        404: "Not Found - User not found",
+        500: "Internal Server Error"
+    },
+    tags=['Admin Dashboard']
+)
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated, IsAdmin])
 def suspend_user(request, user_id):
@@ -406,6 +431,29 @@ def suspend_user(request, user_id):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(
+    method='patch',
+    operation_description="Activate a suspended user account",
+    responses={
+        200: openapi.Response(
+            description="User activated successfully",
+            examples={
+                "application/json": {
+                    "success": True,
+                    "data": {
+                        "success": True,
+                        "message": "User activated successfully"
+                    }
+                }
+            }
+        ),
+        400: "Bad Request - User already active",
+        403: "Forbidden - Admin access required",
+        404: "Not Found - User not found",
+        500: "Internal Server Error"
+    },
+    tags=['Admin Dashboard']
+)
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated, IsAdmin])
 def activate_user(request, user_id):
