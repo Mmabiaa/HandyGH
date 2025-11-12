@@ -9,7 +9,7 @@ import json
 import sys
 
 BASE_URL = "http://localhost:8000/api/v1"
-PHONE = "+233241234567"
+PHONE = "+233599670295"
 
 
 def print_section(title):
