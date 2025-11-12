@@ -22,9 +22,10 @@ class TestUserService:
     def test_get_user_not_found(self):
         """Test getting non-existent user."""
         import uuid
-        user = UserService.get_user(uuid.uuid4())
+        from core.exceptions import NotFoundError
         
-        assert user is None
+        with pytest.raises(NotFoundError):
+            UserService.get_user(uuid.uuid4())
     
     def test_update_user_name(self, customer_user):
         """Test updating user name."""
@@ -51,19 +52,21 @@ class TestUserService:
         assert updated_user.email == new_email
     
     def test_update_user_profile(self, customer_user):
-        """Test updating user profile."""
+        """Test updating user profile via ProfileService."""
+        from apps.users.services import ProfileService
+        
         profile_data = {
             'address': '123 Test Street',
             'preferences': {'language': 'en'}
         }
         
-        updated_user = UserService.update_user(
+        updated_profile = ProfileService.update_profile(
             customer_user.id,
-            profile_data=profile_data
+            **profile_data
         )
         
-        assert updated_user.profile.address == profile_data['address']
-        assert updated_user.profile.preferences == profile_data['preferences']
+        assert updated_profile.address == profile_data['address']
+        assert updated_profile.preferences == profile_data['preferences']
     
     def test_deactivate_user(self, customer_user):
         """Test deactivating user."""
