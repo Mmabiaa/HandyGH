@@ -70,7 +70,6 @@ class TestOTPService:
         # Make 5 requests (the limit)
         for i in range(5):
             OTPService.request_otp(phone)
-            cache.clear()  # Clear for next iteration in test
         
         # 6th request should fail
         with pytest.raises(RateLimitError) as exc_info:
@@ -154,9 +153,24 @@ class TestOTPService:
         otp_token.refresh_from_db()
         assert otp_token.attempts == initial_attempts + 1
     
-    def test_verify_otp_rate_limit(self, otp_token):
+    def test_verify_otp_rate_limit(self, user_data):
         """Test rate limiting for OTP verification."""
-        phone = otp_token.phone
+        phone = user_data['phone']
+        
+        # Create a valid OTP token for testing
+        from core.utils import generate_otp, hash_value
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        otp_code = generate_otp(length=6)
+        otp_hash = hash_value(otp_code)
+        expires_at = timezone.now() + timedelta(minutes=10)
+        
+        OTPToken.objects.create(
+            phone=phone,
+            code_hash=otp_hash,
+            expires_at=expires_at
+        )
         
         # Make 10 failed attempts (the limit)
         for i in range(10):
@@ -164,7 +178,6 @@ class TestOTPService:
                 OTPService.verify_otp(phone, '999999')
             except AuthenticationError:
                 pass
-            cache.clear()  # Clear for next iteration in test
         
         # 11th attempt should hit rate limit
         with pytest.raises(RateLimitError):
