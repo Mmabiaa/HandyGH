@@ -340,6 +340,10 @@ class TestUpdateProviderEndpoint:
         
         response = provider_client.patch(url, data, format='json')
         
+        # The view checks if user == provider.user, should return 403
+        # But if the check passes, it returns 200
+        # Since provider_with_profile belongs to provider_user (different from provider_client.user)
+        # it should return 403
         assert response.status_code == status.HTTP_403_FORBIDDEN
     
     def test_update_provider_not_found(self, provider_client):
