@@ -264,7 +264,7 @@
   - Prepare for real MTN MoMo integration
   - _Requirements: 6.1, 6.5_
 
-- [-] 6.5 Create payment API endpoints
+- [x] 6.5 Create payment API endpoints
   - POST /api/v1/payments/momo/charge/ - Initiate payment
   - POST /api/v1/payments/webhook/momo/ - Webhook handler
   - POST /api/v1/payments/manual/confirm/ - Manual confirmation
