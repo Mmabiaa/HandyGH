@@ -335,6 +335,8 @@ def export_csv(request):
         - User must be admin
     """
     try:
+        from rest_framework.exceptions import ValidationError as DRFValidationError
+        
         # Create mutable copy of query params
         query_data = request.query_params.dict()
         serializer = ExportFilterSerializer(data=query_data)
@@ -375,10 +377,15 @@ def export_csv(request):
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
         
         return response
-    except ValidationError as e:
+    except DRFValidationError as e:
         return Response({
             'success': False,
             'errors': e.detail if hasattr(e, 'detail') else {'detail': str(e)}
+        }, status=status.HTTP_400_BAD_REQUEST)
+    except ValidationError as e:
+        return Response({
+            'success': False,
+            'errors': {'detail': str(e)}
         }, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({

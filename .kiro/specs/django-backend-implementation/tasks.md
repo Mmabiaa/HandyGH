@@ -401,7 +401,7 @@
   - Test dispute window validation
   - _Requirements: 14.3, 14.4_
 
-- [-] 10. Admin Dashboard Operations
+- [x] 10. Admin Dashboard Operations
   - Create admin_dashboard app for admin functionality
   - Implement user moderation features
   - Add reporting and analytics

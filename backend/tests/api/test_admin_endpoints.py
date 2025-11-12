@@ -73,15 +73,17 @@ class TestAdminDashboardEndpoints:
     def test_user_statistics_with_date_range(self, api_client, admin_user):
         """Test user statistics with date range parameters."""
         from apps.authentication.services import JWTService
+        from urllib.parse import quote
         
         tokens = JWTService.create_tokens(admin_user)
         api_client.credentials(HTTP_AUTHORIZATION=f"Bearer {tokens['access_token']}")
         
-        start_date = (timezone.now() - timedelta(days=7)).isoformat()
-        end_date = timezone.now().isoformat()
+        # Use URL-encoded ISO format dates
+        start_date = (timezone.now() - timedelta(days=7)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+        end_date = timezone.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
         
         response = api_client.get(
-            f'/api/v1/admin/reports/users/?start_date={start_date}&end_date={end_date}'
+            f'/api/v1/admin/reports/users/?start_date={quote(start_date)}&end_date={quote(end_date)}'
         )
         
         assert response.status_code == status.HTTP_200_OK
