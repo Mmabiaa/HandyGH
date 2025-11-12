@@ -14,7 +14,7 @@ A trustworthy, mobile-first web platform that connects customers with local serv
 ## Tech Stack
 
 - **Frontend**: React 18, Vite, TypeScript, Tailwind CSS, Redux Toolkit
-- **Backend**: Node.js, Express, TypeScript
+- **Backend**: Django, Python
 - **Database**: PostgreSQL with Prisma ORM
 - **Cache/Queue**: Redis, BullMQ
 - **Authentication**: JWT with OTP verification
