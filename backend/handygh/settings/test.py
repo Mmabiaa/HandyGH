@@ -30,10 +30,11 @@ PASSWORD_HASHERS = [
 # Email backend - Console for tests
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# Cache - Dummy cache for tests
+# Cache - Use LocMemCache for tests (needed for rate limiting tests)
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'test-cache',
     }
 }
 
