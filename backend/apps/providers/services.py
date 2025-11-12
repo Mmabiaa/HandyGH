@@ -556,10 +556,6 @@ class ProviderSearchService:
         if min_rating is not None:
             queryset = queryset.filter(rating_avg__gte=min_rating)
         
-        # Filter by category
-        if category:
-            queryset = queryset.filter(categories__contains=[category])
-        
         # Filter by location if provided (bounding box for performance)
         if latitude is not None and longitude is not None:
             # Calculate bounding box
@@ -580,6 +576,10 @@ class ProviderSearchService:
         # Execute query and build results with additional data
         results = []
         for provider in queryset:
+            # Filter by category (done here for SQLite compatibility)
+            # In production PostgreSQL, this can be done in the queryset filter
+            if category and category not in provider.categories:
+                continue
             # Calculate exact distance if location provided
             distance_km = None
             if latitude is not None and longitude is not None:
