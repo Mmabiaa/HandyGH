@@ -182,7 +182,7 @@
   - Create booking API endpoints
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-- [-] 5.1 Create Booking model
+- [x] 5.1 Create Booking model
   - Create Booking model with all required fields
   - Add status field with choices (REQUESTED, CONFIRMED, IN_PROGRESS, COMPLETED, CANCELLED, DISPUTED)
   - Create BookingStatusHistory model for audit trail
@@ -190,7 +190,7 @@
   - Create and run migrations
   - _Requirements: 5.1, 5.2, 13.1, 13.3, 13.4_
 
-- [ ] 5.2 Implement AvailabilityService
+- [-] 5.2 Implement AvailabilityService
   - Create check_availability() method
   - Implement conflict detection algorithm
   - Check for overlapping bookings with same provider
