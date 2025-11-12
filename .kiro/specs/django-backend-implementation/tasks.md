@@ -358,7 +358,7 @@
   - Test message ordering
   - _Requirements: 14.3, 14.4_
 
-- [-] 9. Dispute Management System
+- [x] 9. Dispute Management System
   - Create disputes app for dispute handling
   - Implement dispute creation with evidence
   - Add dispute resolution workflow
@@ -393,7 +393,7 @@
   - POST /api/v1/disputes/{id}/resolve/ - Resolve dispute (admin)
   - _Requirements: 9.1, 9.3_
 
-- [-] 9.5 Write dispute tests
+- [x] 9.5 Write dispute tests
   - Unit tests for DisputeService validation
   - Unit tests for DisputeResolutionService
   - API tests for dispute endpoints

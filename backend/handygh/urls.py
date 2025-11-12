@@ -62,7 +62,7 @@ api_v1_patterns = [
     path('payments/', include('apps.payments.urls')),
     path('reviews/', include('apps.reviews.urls')),
     path('', include('apps.messaging.urls')),  # Messaging URLs are nested under bookings
-    path('disputes/', include('apps.disputes.urls')),
+    path('', include('apps.disputes.urls')),  # Disputes URLs
     path('admin/', include('apps.admin_dashboard.urls')),
 ]
 
