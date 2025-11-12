@@ -3,7 +3,7 @@ Serializers for authentication app.
 """
 
 from rest_framework import serializers
-from core.validators import validate_ghana_phone
+from core.validators import validate_ghana_phone, validate_otp_code
 
 
 class OTPRequestSerializer(serializers.Serializer):
@@ -37,25 +37,9 @@ class OTPVerifySerializer(serializers.Serializer):
         required=True,
         min_length=6,
         max_length=6,
+        validators=[validate_otp_code],
         help_text='6-digit OTP code'
     )
-    
-    def validate_otp(self, value):
-        """
-        Validate OTP is numeric.
-        
-        Args:
-            value: OTP code
-            
-        Returns:
-            Validated OTP
-            
-        Raises:
-            ValidationError: If OTP is not numeric
-        """
-        if not value.isdigit():
-            raise serializers.ValidationError('OTP must be numeric')
-        return value
 
 
 class TokenRefreshSerializer(serializers.Serializer):
