@@ -362,3 +362,185 @@ class LogoutAllView(APIView):
             },
             'meta': {}
         }, status=status.HTTP_200_OK)
+
+
+
+class PasswordResetRequestView(APIView):
+    """
+    Request password reset OTP.
+    
+    Sends OTP to phone number for password reset.
+    """
+    
+    permission_classes = [AllowAny]
+    
+    @swagger_auto_schema(
+        operation_description="Request password reset OTP",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['phone'],
+            properties={
+                'phone': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description='Phone number'
+                )
+            }
+        ),
+        responses={
+            200: openapi.Response(
+                description="OTP sent (or user not found - same response for security)",
+                examples={
+                    "application/json": {
+                        "success": True,
+                        "data": {
+                            "message": "If this phone number is registered, you will receive an OTP",
+                            "expires_in_minutes": 10
+                        }
+                    }
+                }
+            ),
+            429: "Rate limit exceeded"
+        }
+    )
+    def post(self, request):
+        """Handle password reset request."""
+        from .password_reset_service import PasswordResetService
+        from .serializers import PasswordResetRequestSerializer
+        
+        serializer = PasswordResetRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        try:
+            result = PasswordResetService.request_password_reset(
+                phone=serializer.validated_data['phone']
+            )
+            
+            return Response({
+                'success': True,
+                'data': result,
+                'meta': {}
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({
+                'success': False,
+                'errors': {
+                    'message': str(e),
+                    'code': 'PASSWORD_RESET_FAILED'
+                },
+                'meta': {}
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class PasswordResetVerifyView(APIView):
+    """
+    Verify password reset OTP.
+    
+    Verifies OTP and returns reset token.
+    """
+    
+    permission_classes = [AllowAny]
+    
+    @swagger_auto_schema(
+        operation_description="Verify password reset OTP",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['phone', 'otp'],
+            properties={
+                'phone': openapi.Schema(type=openapi.TYPE_STRING),
+                'otp': openapi.Schema(type=openapi.TYPE_STRING)
+            }
+        ),
+        responses={
+            200: "OTP verified, reset token returned",
+            401: "Invalid OTP"
+        }
+    )
+    def post(self, request):
+        """Handle password reset OTP verification."""
+        from .password_reset_service import PasswordResetService
+        from .serializers import PasswordResetVerifySerializer
+        
+        serializer = PasswordResetVerifySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        try:
+            result = PasswordResetService.verify_reset_otp(
+                phone=serializer.validated_data['phone'],
+                otp_code=serializer.validated_data['otp']
+            )
+            
+            return Response({
+                'success': True,
+                'data': result,
+                'meta': {}
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({
+                'success': False,
+                'errors': {
+                    'message': str(e),
+                    'code': 'OTP_VERIFICATION_FAILED'
+                },
+                'meta': {}
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
+
+class PasswordResetConfirmView(APIView):
+    """
+    Confirm password reset with new password.
+    
+    Sets new password using reset token.
+    """
+    
+    permission_classes = [AllowAny]
+    
+    @swagger_auto_schema(
+        operation_description="Reset password with reset token",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['phone', 'reset_token', 'new_password', 'confirm_password'],
+            properties={
+                'phone': openapi.Schema(type=openapi.TYPE_STRING),
+                'reset_token': openapi.Schema(type=openapi.TYPE_STRING),
+                'new_password': openapi.Schema(type=openapi.TYPE_STRING),
+                'confirm_password': openapi.Schema(type=openapi.TYPE_STRING)
+            }
+        ),
+        responses={
+            200: "Password reset successful",
+            400: "Invalid data",
+            401: "Invalid reset token"
+        }
+    )
+    def post(self, request):
+        """Handle password reset confirmation."""
+        from .password_reset_service import PasswordResetService
+        from .serializers import PasswordResetConfirmSerializer
+        
+        serializer = PasswordResetConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        try:
+            result = PasswordResetService.reset_password(
+                phone=serializer.validated_data['phone'],
+                reset_token=serializer.validated_data['reset_token'],
+                new_password=serializer.validated_data['new_password']
+            )
+            
+            return Response({
+                'success': True,
+                'data': result,
+                'meta': {}
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({
+                'success': False,
+                'errors': {
+                    'message': str(e),
+                    'code': 'PASSWORD_RESET_FAILED'
+                },
+                'meta': {}
+            }, status=status.HTTP_400_BAD_REQUEST)
