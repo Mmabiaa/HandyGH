@@ -116,7 +116,7 @@
   - Apply permissions to user endpoints
   - _Requirements: 2.5, 11.1_
 
-- [ ] 3.5 Write user management tests
+- [-] 3.5 Write user management tests
   - Unit tests for UserService methods
   - API tests for user endpoints with different roles
   - Test permission enforcement
