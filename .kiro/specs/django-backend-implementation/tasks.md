@@ -280,14 +280,14 @@
   - Test payment flow integration with bookings
   - _Requirements: 14.3, 14.4_
 
-- [ ] 7. Reviews and Ratings System
+- [-] 7. Reviews and Ratings System
   - Create reviews app for rating management
   - Implement review creation and validation
   - Add rating aggregation logic
   - Create review API endpoints
   - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
 
-- [ ] 7.1 Create Review model
+- [-] 7.1 Create Review model
   - Create Review model with booking, customer, provider, rating, comment
   - Add unique constraint on booking_id
   - Add check constraint for rating (1-5)
