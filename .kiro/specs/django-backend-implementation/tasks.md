@@ -103,14 +103,14 @@
   - Implement role validation logic
   - _Requirements: 2.2, 2.3, 2.5_
 
-- [-] 3.3 Create user API endpoints
+- [x] 3.3 Create user API endpoints
   - GET /api/v1/users/me/ - Get current user profile
   - PATCH /api/v1/users/me/ - Update current user profile
   - GET /api/v1/users/{id}/ - Get user by ID (admin only)
   - Add serializers with role-based field visibility
   - _Requirements: 2.1, 2.2, 2.4_
 
-- [ ] 3.4 Implement custom permissions
+- [x] 3.4 Implement custom permissions
   - Create IsCustomer, IsProvider, IsAdmin permission classes
   - Create IsOwnerOrAdmin permission class
   - Apply permissions to user endpoints
@@ -122,7 +122,7 @@
   - Test permission enforcement
   - _Requirements: 14.3, 14.4_
 
-- [ ] 4. Provider Profile and Services
+- [-] 4. Provider Profile and Services
   - Create providers app for provider management
   - Implement provider profile CRUD
   - Add service management functionality
@@ -130,7 +130,7 @@
   - Create provider API endpoints
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 4.1, 4.2, 4.3, 4.4, 4.5_
 
-- [ ] 4.1 Create Provider and ProviderService models
+- [-] 4.1 Create Provider and ProviderService models
   - Create Provider model with business_name, categories, location, verified, rating_avg
   - Create ProviderService model with title, description, price_type, price_amount
   - Create ServiceCategory model for categorization
