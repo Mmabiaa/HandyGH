@@ -144,13 +144,13 @@
   - Implement provider verification logic
   - _Requirements: 3.1, 3.2, 3.4_
 
-- [ ] 4.3 Implement ServiceManagementService
+- [x] 4.3 Implement ServiceManagementService
   - Create ServiceManagementService with CRUD for provider services
   - Add add_service(), update_service(), deactivate_service()
   - Implement service validation
   - _Requirements: 3.2, 3.3, 3.5_
 
-- [ ] 4.4 Implement ProviderSearchService
+- [-] 4.4 Implement ProviderSearchService
   - Create search() method with category, location, radius, rating filters
   - Implement distance calculation using Haversine formula
   - Add sorting by rating, distance, price

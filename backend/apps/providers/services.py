@@ -426,7 +426,8 @@ class ProviderSearchService:
     """
     Service class for searching and filtering providers.
     
-    Implements geolocation-based search with various filters.
+    Implements geolocation-based search with various filters and sorting options.
+    Optimized with select_related and prefetch_related for performance.
     """
     
     @staticmethod
@@ -439,16 +440,26 @@ class ProviderSearchService:
         """
         Calculate distance between two points using Haversine formula.
         
+        The Haversine formula calculates the great-circle distance between
+        two points on a sphere given their longitudes and latitudes.
+        
         Args:
-            lat1: Latitude of point 1
-            lon1: Longitude of point 1
-            lat2: Latitude of point 2
-            lon2: Longitude of point 2
+            lat1: Latitude of point 1 in decimal degrees
+            lon1: Longitude of point 1 in decimal degrees
+            lat2: Latitude of point 2 in decimal degrees
+            lon2: Longitude of point 2 in decimal degrees
             
         Returns:
             Distance in kilometers
+            
+        Example:
+            >>> distance = ProviderSearchService.calculate_distance(
+            ...     Decimal('5.6037'), Decimal('-0.1870'),  # Accra
+            ...     Decimal('5.6500'), Decimal('-0.2000')   # Nearby location
+            ... )
+            >>> print(f"{distance:.2f} km")
         """
-        # Convert to radians
+        # Convert decimal degrees to radians
         lat1, lon1, lat2, lon2 = map(
             lambda x: radians(float(x)),
             [lat1, lon1, lat2, lon2]
@@ -473,30 +484,71 @@ class ProviderSearchService:
         radius_km: float = 5.0,
         min_rating: Optional[float] = None,
         verified_only: bool = False,
-        active_only: bool = True
-    ) -> QuerySet[Provider]:
+        active_only: bool = True,
+        sort_by: str = 'rating',
+        min_price: Optional[Decimal] = None,
+        max_price: Optional[Decimal] = None
+    ) -> List[Dict[str, Any]]:
         """
-        Search for providers with filters.
+        Search for providers with filters and sorting.
+        
+        This method performs a comprehensive search with:
+        - Category filtering
+        - Geolocation-based radius search
+        - Rating filtering
+        - Price range filtering
+        - Verification status filtering
+        - Multiple sorting options (rating, distance, price)
         
         Args:
-            category: Category slug to filter by
-            latitude: Search center latitude
-            longitude: Search center longitude
-            radius_km: Search radius in kilometers
-            min_rating: Minimum rating filter
-            verified_only: Only return verified providers
-            active_only: Only return active providers
+            category: Category slug to filter by (e.g., 'plumbing', 'electrical')
+            latitude: Search center latitude in decimal degrees
+            longitude: Search center longitude in decimal degrees
+            radius_km: Search radius in kilometers (default: 5.0)
+            min_rating: Minimum rating filter (0.0 to 5.0)
+            verified_only: Only return verified providers (default: False)
+            active_only: Only return active providers (default: True)
+            sort_by: Sort order - 'rating', 'distance', 'price' (default: 'rating')
+            min_price: Minimum price filter for services
+            max_price: Maximum price filter for services
             
         Returns:
-            QuerySet of Provider instances
+            List of dictionaries containing provider data with distance and price info
+            Each dict contains: provider object, distance_km, min_price, services
+            
+        Raises:
+            CustomValidationError: If invalid sort_by value provided
+            
+        Example:
+            >>> results = ProviderSearchService.search(
+            ...     category='plumbing',
+            ...     latitude=Decimal('5.6037'),
+            ...     longitude=Decimal('-0.1870'),
+            ...     radius_km=10.0,
+            ...     min_rating=4.0,
+            ...     sort_by='distance'
+            ... )
         """
-        queryset = Provider.objects.select_related('user').prefetch_related('services')
+        # Validate sort_by parameter
+        valid_sort_options = ['rating', 'distance', 'price']
+        if sort_by not in valid_sort_options:
+            raise CustomValidationError(
+                f"Invalid sort_by value. Must be one of: {', '.join(valid_sort_options)}"
+            )
+        
+        # Build optimized queryset with select_related and prefetch_related
+        queryset = Provider.objects.select_related(
+            'user'  # Fetch user data in same query to avoid N+1
+        ).prefetch_related(
+            'services',  # Prefetch all services for price calculations
+            'services__category'  # Prefetch service categories
+        )
         
         # Filter by active status
         if active_only:
             queryset = queryset.filter(is_active=True)
         
-        # Filter by verification
+        # Filter by verification status
         if verified_only:
             queryset = queryset.filter(verified=True)
         
@@ -508,11 +560,12 @@ class ProviderSearchService:
         if category:
             queryset = queryset.filter(categories__contains=[category])
         
-        # Filter by location if provided
+        # Filter by location if provided (bounding box for performance)
         if latitude is not None and longitude is not None:
-            # Simple bounding box filter for performance
-            # More accurate distance calculation can be done in Python
-            lat_delta = Decimal(radius_km / 111.0)  # 1 degree latitude ≈ 111 km
+            # Calculate bounding box
+            # 1 degree latitude ≈ 111 km
+            lat_delta = Decimal(radius_km / 111.0)
+            # 1 degree longitude varies by latitude
             lon_delta = Decimal(radius_km / (111.0 * float(cos(radians(float(latitude))))))
             
             queryset = queryset.filter(
@@ -524,4 +577,75 @@ class ProviderSearchService:
                 longitude__lte=longitude + lon_delta
             )
         
-        return queryset.order_by('-rating_avg', '-created_at')
+        # Execute query and build results with additional data
+        results = []
+        for provider in queryset:
+            # Calculate exact distance if location provided
+            distance_km = None
+            if latitude is not None and longitude is not None:
+                if provider.latitude and provider.longitude:
+                    distance_km = ProviderSearchService.calculate_distance(
+                        latitude, longitude,
+                        provider.latitude, provider.longitude
+                    )
+                    # Skip if outside radius (bounding box may include some outside)
+                    if distance_km > radius_km:
+                        continue
+            
+            # Get active services for price calculation
+            active_services = [s for s in provider.services.all() if s.is_active]
+            
+            # Calculate minimum price from active services
+            min_service_price = None
+            if active_services:
+                prices = [s.price_amount for s in active_services]
+                min_service_price = min(prices) if prices else None
+            
+            # Apply price filters if specified
+            if min_price is not None and min_service_price is not None:
+                if min_service_price < min_price:
+                    continue
+            
+            if max_price is not None and min_service_price is not None:
+                if min_service_price > max_price:
+                    continue
+            
+            # Build result dictionary
+            result = {
+                'provider': provider,
+                'distance_km': distance_km,
+                'min_price': min_service_price,
+                'services': active_services,
+                'service_count': len(active_services)
+            }
+            results.append(result)
+        
+        # Sort results based on sort_by parameter
+        if sort_by == 'rating':
+            # Sort by rating (descending), then by rating count (descending)
+            results.sort(
+                key=lambda x: (
+                    -float(x['provider'].rating_avg),
+                    -x['provider'].rating_count
+                )
+            )
+        elif sort_by == 'distance':
+            # Sort by distance (ascending), then by rating (descending)
+            # Providers without distance go to the end
+            results.sort(
+                key=lambda x: (
+                    x['distance_km'] if x['distance_km'] is not None else float('inf'),
+                    -float(x['provider'].rating_avg)
+                )
+            )
+        elif sort_by == 'price':
+            # Sort by price (ascending), then by rating (descending)
+            # Providers without price go to the end
+            results.sort(
+                key=lambda x: (
+                    float(x['min_price']) if x['min_price'] is not None else float('inf'),
+                    -float(x['provider'].rating_avg)
+                )
+            )
+        
+        return results
