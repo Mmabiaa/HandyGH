@@ -33,7 +33,7 @@ class TestBookingEndpoints:
             'notes': 'Please call before arriving'
         }
         
-        response = api_client.post('/api/v1/bookings/bookings/', data, format='json')
+        response = api_client.post('/api/v1/bookings/', data, format='json')
         
         assert response.status_code == status.HTTP_201_CREATED
         assert 'booking_ref' in response.data
