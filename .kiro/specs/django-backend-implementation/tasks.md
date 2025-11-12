@@ -190,28 +190,28 @@
   - Create and run migrations
   - _Requirements: 5.1, 5.2, 13.1, 13.3, 13.4_
 
-- [-] 5.2 Implement AvailabilityService
+- [x] 5.2 Implement AvailabilityService
   - Create check_availability() method
   - Implement conflict detection algorithm
   - Check for overlapping bookings with same provider
   - Use database transactions for race condition prevention
   - _Requirements: 5.4_
 
-- [ ] 5.3 Implement BookingService
+- [x] 5.3 Implement BookingService
   - Create create_booking() with availability check
   - Add generate_booking_ref() for unique references
   - Implement validate_booking_data()
   - Add calculate_booking_amount()
   - _Requirements: 5.1, 5.2, 5.4_
 
-- [ ] 5.4 Implement BookingStateMachine
+- [x] 5.4 Implement BookingStateMachine
   - Create state transition validation
   - Implement accept_booking(), decline_booking(), complete_booking()
   - Add status change logging to BookingStatusHistory
   - Validate allowed transitions
   - _Requirements: 5.3, 5.5_
 
-- [ ] 5.5 Create booking API endpoints
+- [-] 5.5 Create booking API endpoints
   - POST /api/v1/bookings/ - Create booking
   - GET /api/v1/bookings/ - List bookings (filtered by role)
   - GET /api/v1/bookings/{id}/ - Get booking details
