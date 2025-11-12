@@ -162,3 +162,205 @@ def validate_image_file(value):
                 _('File must be an image (JPEG, PNG, GIF, or WebP)'),
                 code='invalid_image'
             )
+
+
+def validate_email(value):
+    """
+    Validate email format with comprehensive checks.
+    
+    Args:
+        value: Email string
+        
+    Raises:
+        ValidationError: If email format is invalid
+    """
+    if not value:
+        return
+    
+    # Basic email regex pattern
+    email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    
+    if not re.match(email_pattern, value):
+        raise ValidationError(
+            _('Enter a valid email address'),
+            code='invalid_email'
+        )
+    
+    # Check for common typos
+    if '..' in value or value.startswith('.') or value.endswith('.'):
+        raise ValidationError(
+            _('Email address contains invalid characters'),
+            code='invalid_email'
+        )
+
+
+def validate_positive_decimal(value):
+    """
+    Validate that a decimal value is positive.
+    
+    Args:
+        value: Decimal or float value
+        
+    Raises:
+        ValidationError: If value is not positive
+    """
+    if value is not None and value <= 0:
+        raise ValidationError(
+            _('Value must be greater than zero'),
+            code='invalid_positive_value'
+        )
+
+
+def validate_future_datetime(value):
+    """
+    Validate that a datetime is in the future.
+    
+    Args:
+        value: Datetime object
+        
+    Raises:
+        ValidationError: If datetime is in the past
+    """
+    from django.utils import timezone
+    
+    if value and value <= timezone.now():
+        raise ValidationError(
+            _('Date and time must be in the future'),
+            code='invalid_future_datetime'
+        )
+
+
+def validate_booking_duration(value):
+    """
+    Validate booking duration is reasonable (between 0.5 and 24 hours).
+    
+    Args:
+        value: Duration in hours
+        
+    Raises:
+        ValidationError: If duration is out of range
+    """
+    if value is not None:
+        if value < 0.5:
+            raise ValidationError(
+                _('Booking duration must be at least 30 minutes'),
+                code='duration_too_short'
+            )
+        if value > 24:
+            raise ValidationError(
+                _('Booking duration cannot exceed 24 hours'),
+                code='duration_too_long'
+            )
+
+
+def validate_url(value):
+    """
+    Validate URL format.
+    
+    Args:
+        value: URL string
+        
+    Raises:
+        ValidationError: If URL format is invalid
+    """
+    if not value:
+        return
+    
+    url_pattern = r'^https?://[^\s/$.?#].[^\s]*$'
+    
+    if not re.match(url_pattern, value, re.IGNORECASE):
+        raise ValidationError(
+            _('Enter a valid URL starting with http:// or https://'),
+            code='invalid_url'
+        )
+
+
+def validate_otp_code(value):
+    """
+    Validate OTP code format (6 digits).
+    
+    Args:
+        value: OTP code string
+        
+    Raises:
+        ValidationError: If OTP format is invalid
+    """
+    if not value or not value.isdigit() or len(value) != 6:
+        raise ValidationError(
+            _('OTP must be a 6-digit code'),
+            code='invalid_otp'
+        )
+
+
+def validate_password_strength(value):
+    """
+    Validate password meets security requirements.
+    
+    Requirements:
+    - At least 8 characters
+    - Contains at least one uppercase letter
+    - Contains at least one lowercase letter
+    - Contains at least one digit
+    
+    Args:
+        value: Password string
+        
+    Raises:
+        ValidationError: If password doesn't meet requirements
+    """
+    if len(value) < 8:
+        raise ValidationError(
+            _('Password must be at least 8 characters long'),
+            code='password_too_short'
+        )
+    
+    if not re.search(r'[A-Z]', value):
+        raise ValidationError(
+            _('Password must contain at least one uppercase letter'),
+            code='password_no_uppercase'
+        )
+    
+    if not re.search(r'[a-z]', value):
+        raise ValidationError(
+            _('Password must contain at least one lowercase letter'),
+            code='password_no_lowercase'
+        )
+    
+    if not re.search(r'\d', value):
+        raise ValidationError(
+            _('Password must contain at least one digit'),
+            code='password_no_digit'
+        )
+
+
+def validate_business_name(value):
+    """
+    Validate business name format.
+    
+    Args:
+        value: Business name string
+        
+    Raises:
+        ValidationError: If business name is invalid
+    """
+    if not value:
+        return
+    
+    if len(value) < 2:
+        raise ValidationError(
+            _('Business name must be at least 2 characters long'),
+            code='business_name_too_short'
+        )
+    
+    if len(value) > 100:
+        raise ValidationError(
+            _('Business name cannot exceed 100 characters'),
+            code='business_name_too_long'
+        )
+    
+    # Check for valid characters (letters, numbers, spaces, and common punctuation)
+    if not re.match(r'^[a-zA-Z0-9\s\-\'&.,]+$', value):
+        raise ValidationError(
+            _('Business name contains invalid characters'),
+            code='invalid_business_name'
+        )
