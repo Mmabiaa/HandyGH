@@ -440,7 +440,7 @@
   - Add IsAdmin permission to all endpoints
   - _Requirements: 10.1, 10.2, 10.3, 10.4_
 
-- [-] 10.5 Write admin tests
+- [x] 10.5 Write admin tests
   - Unit tests for AdminReportService
   - Unit tests for UserModerationService
   - Unit tests for DataExportService
