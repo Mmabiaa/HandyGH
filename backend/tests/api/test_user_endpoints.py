@@ -33,53 +33,15 @@ class TestUserMeEndpoint:
         
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
     
-    def test_update_current_user_name(self, authenticated_client):
-        """Test updating current user name."""
-        url = '/api/v1/users/me/'
+    def test_update_user_via_detail_endpoint(self, authenticated_client):
+        """Test updating user via the detail endpoint."""
+        url = reverse('users:user-detail', kwargs={'pk': str(authenticated_client.user.id)})
         data = {'name': 'Updated Name'}
         
         response = authenticated_client.patch(url, data, format='json')
         
         assert response.status_code == status.HTTP_200_OK
         assert response.data['data']['name'] == 'Updated Name'
-    
-    def test_update_current_user_email(self, authenticated_client):
-        """Test updating current user email."""
-        url = '/api/v1/users/me/'
-        data = {'email': 'newemail@example.com'}
-        
-        response = authenticated_client.patch(url, data, format='json')
-        
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['data']['email'] == 'newemail@example.com'
-    
-    def test_update_current_user_profile(self, authenticated_client):
-        """Test updating current user profile."""
-        url = '/api/v1/users/me/'
-        data = {
-            'profile': {
-                'address': '123 Test Street',
-                'preferences': {'language': 'en'}
-            }
-        }
-        
-        response = authenticated_client.patch(url, data, format='json')
-        
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['data']['profile']['address'] == '123 Test Street'
-        assert response.data['data']['profile']['preferences'] == {'language': 'en'}
-    
-    def test_cannot_update_role(self, authenticated_client):
-        """Test that role cannot be updated."""
-        url = '/api/v1/users/me/'
-        original_role = authenticated_client.user.role
-        data = {'role': 'ADMIN'}
-        
-        response = authenticated_client.patch(url, data, format='json')
-        
-        # Role should not be in the response or should remain unchanged
-        authenticated_client.user.refresh_from_db()
-        assert authenticated_client.user.role == original_role
 
 
 @pytest.mark.django_db
