@@ -211,7 +211,7 @@
   - Validate allowed transitions
   - _Requirements: 5.3, 5.5_
 
-- [-] 5.5 Create booking API endpoints
+- [x] 5.5 Create booking API endpoints
   - POST /api/v1/bookings/ - Create booking
   - GET /api/v1/bookings/ - List bookings (filtered by role)
   - GET /api/v1/bookings/{id}/ - Get booking details
@@ -221,7 +221,7 @@
   - Add role-based filtering and permissions
   - _Requirements: 5.1, 5.2, 5.3_
 
-- [ ] 5.6 Write booking tests
+- [-] 5.6 Write booking tests
   - Unit tests for AvailabilityService (conflict detection)
   - Unit tests for BookingService (creation, validation)
   - Unit tests for BookingStateMachine (state transitions)
