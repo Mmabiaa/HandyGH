@@ -489,6 +489,59 @@ def activate_user(request, user_id):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(
+    method='get',
+    operation_description="Export data to CSV file (users, bookings, or transactions)",
+    manual_parameters=[
+        openapi.Parameter(
+            'export_type',
+            openapi.IN_QUERY,
+            description="Type of data to export",
+            type=openapi.TYPE_STRING,
+            enum=['users', 'bookings', 'transactions'],
+            required=True
+        ),
+        openapi.Parameter(
+            'start_date',
+            openapi.IN_QUERY,
+            description="Start date for filtering (ISO format: YYYY-MM-DD)",
+            type=openapi.TYPE_STRING,
+            format=openapi.FORMAT_DATE
+        ),
+        openapi.Parameter(
+            'end_date',
+            openapi.IN_QUERY,
+            description="End date for filtering (ISO format: YYYY-MM-DD)",
+            type=openapi.TYPE_STRING,
+            format=openapi.FORMAT_DATE
+        ),
+        openapi.Parameter(
+            'role',
+            openapi.IN_QUERY,
+            description="Filter by role (for users export only)",
+            type=openapi.TYPE_STRING,
+            enum=['CUSTOMER', 'PROVIDER', 'ADMIN']
+        ),
+        openapi.Parameter(
+            'is_active',
+            openapi.IN_QUERY,
+            description="Filter by active status (for users export only)",
+            type=openapi.TYPE_BOOLEAN
+        ),
+    ],
+    responses={
+        200: openapi.Response(
+            description="CSV file download",
+            schema=openapi.Schema(
+                type=openapi.TYPE_FILE
+            )
+        ),
+        400: "Bad Request - Invalid parameters",
+        403: "Forbidden - Admin access required",
+        500: "Internal Server Error"
+    },
+    tags=['Admin Dashboard']
+)
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, IsAdmin])
 def export_csv(request):
