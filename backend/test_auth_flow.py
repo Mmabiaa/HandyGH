@@ -18,7 +18,7 @@ import time
 import sys
 
 BASE_URL = "http://localhost:8000/api/v1"
-PHONE = "+233599"
+PHONE = "+233599670295"
 
 
 def print_section(title):
@@ -103,7 +103,7 @@ def test_otp_verify(otp):
         print("\n❌ OTP verification failed!")
         print("\nPossible reasons:")
         print("1. Incorrect OTP code")
-        print("2. OTP expired (valid for 10 minutes)")int("3. Too many attempts")
+        print("2. OTP expired (valid for 10 minutes)")
         sys.exit(1)
     
     data = response.json()['data']
