@@ -206,7 +206,7 @@ class OTPService:
         OTPService._check_rate_limit(
             phone,
             action='request',
-            limit=settings.RATE_LIMIT_OTP_REQUEST.split('/')[0],
+            limit=5,  # 5 requests per hour
             window=3600
         )
         
@@ -273,7 +273,7 @@ class OTPService:
         OTPService._check_rate_limit(
             phone,
             action='verify',
-            limit=settings.OTP_MAX_ATTEMPTS,
+            limit=10,  # 10 attempts per hour
             window=3600
         )
         
