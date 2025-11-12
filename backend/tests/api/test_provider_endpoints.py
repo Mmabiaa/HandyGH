@@ -449,12 +449,8 @@ class TestAddServiceEndpoint:
 class TestListProviderServicesEndpoint:
     """Test GET /api/v1/providers/{id}/services/ endpoint."""
     
-    def test_list_services(self, provider_client, provider_with_profile, plumbing_category):
+    def test_list_services(self, api_client, provider_with_profile, plumbing_category):
         """Test listing provider services."""
-        # Ensure provider belongs to authenticated user
-        provider_with_profile.user = provider_client.user
-        provider_with_profile.save()
-        
         # Create services
         ProviderService.objects.create(
             provider=provider_with_profile,
@@ -475,20 +471,17 @@ class TestListProviderServicesEndpoint:
             is_active=True
         )
         
-        url = reverse('providers:provider-list-services', kwargs={'pk': str(provider_with_profile.id)})
+        # Use the correct URL - services are accessed via the provider detail endpoint
+        url = f'/api/v1/providers/{provider_with_profile.id}/services/'
         
-        response = provider_client.get(url)
+        response = api_client.get(url)
         
         assert response.status_code == status.HTTP_200_OK
         assert response.data['success'] is True
         assert response.data['meta']['count'] == 2
     
-    def test_list_services_active_only(self, provider_client, provider_with_profile, plumbing_category):
+    def test_list_services_active_only(self, api_client, provider_with_profile, plumbing_category):
         """Test listing only active services."""
-        # Ensure provider belongs to authenticated user
-        provider_with_profile.user = provider_client.user
-        provider_with_profile.save()
-        
         # Create active and inactive services
         ProviderService.objects.create(
             provider=provider_with_profile,
@@ -509,9 +502,9 @@ class TestListProviderServicesEndpoint:
             is_active=False
         )
         
-        url = reverse('providers:provider-list-services', kwargs={'pk': str(provider_with_profile.id)})
+        url = f'/api/v1/providers/{provider_with_profile.id}/services/'
         
-        response = provider_client.get(url, {'active_only': 'true'})
+        response = api_client.get(url, {'active_only': 'true'})
         
         assert response.status_code == status.HTTP_200_OK
         assert response.data['meta']['count'] == 1
