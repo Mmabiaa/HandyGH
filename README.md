@@ -27,7 +27,7 @@ A trustworthy, mobile-first web platform that connects customers with local serv
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Python - Django 
 - PostgreSQL 14+
 - Redis 6+
 - npm or yarn
