@@ -1,3 +1,4 @@
+"""URL configuration for reviews app (placeholder)."""
 from django.urls import path
-app_name = 'reviews'
+
 urlpatterns = []

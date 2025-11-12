@@ -1,3 +1,4 @@
+"""URL configuration for messaging app (placeholder)."""
 from django.urls import path
-app_name = 'messaging'
+
 urlpatterns = []
