@@ -287,7 +287,7 @@
   - Create review API endpoints
   - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
 
-- [-] 7.1 Create Review model
+- [x] 7.1 Create Review model
   - Create Review model with booking, customer, provider, rating, comment
   - Add unique constraint on booking_id
   - Add check constraint for rating (1-5)
@@ -295,7 +295,7 @@
   - Create and run migrations
   - _Requirements: 7.1, 7.2, 7.5, 13.1, 13.5_
 
-- [ ] 7.2 Implement ReviewService
+- [-] 7.2 Implement ReviewService
   - Create create_review() with validation
   - Add validate_review_eligibility() (booking must be completed)
   - Implement prevent_duplicate_reviews()
