@@ -373,19 +373,19 @@
   - Create and run migrations
   - _Requirements: 9.1, 9.2, 13.1, 13.5_
 
-- [-] 9.2 Implement DisputeService
+- [x] 9.2 Implement DisputeService
   - Create create_dispute() method
   - Add validate_dispute_window() (within 7 days)
   - Implement add_evidence()
   - _Requirements: 9.1, 9.2_
 
-- [ ] 9.3 Implement DisputeResolutionService
+- [x] 9.3 Implement DisputeResolutionService
   - Create update_dispute_status() (admin only)
   - Add resolve_dispute() with resolution text
   - Implement close_dispute()
   - _Requirements: 9.3, 9.4_
 
-- [ ] 9.4 Create dispute API endpoints
+- [-] 9.4 Create dispute API endpoints
   - POST /api/v1/disputes/ - Create dispute
   - GET /api/v1/disputes/ - List disputes
   - GET /api/v1/disputes/{id}/ - Get dispute details
