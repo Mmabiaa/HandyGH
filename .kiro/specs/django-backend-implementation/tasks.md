@@ -365,7 +365,7 @@
   - Create dispute API endpoints
   - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5_
 
-- [-] 9.1 Create Dispute model
+- [x] 9.1 Create Dispute model
   - Create Dispute model with booking, reason, description, evidence, status
   - Add status choices (OPEN, INVESTIGATING, RESOLVED, CLOSED)
   - Add unique constraint on booking_id
@@ -373,7 +373,7 @@
   - Create and run migrations
   - _Requirements: 9.1, 9.2, 13.1, 13.5_
 
-- [ ] 9.2 Implement DisputeService
+- [-] 9.2 Implement DisputeService
   - Create create_dispute() method
   - Add validate_dispute_window() (within 7 days)
   - Implement add_evidence()
