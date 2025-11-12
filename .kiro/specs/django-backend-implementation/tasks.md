@@ -448,7 +448,7 @@
   - Test admin permission enforcement
   - _Requirements: 14.3, 14.4_
 
-- [-] 11. API Documentation and Validation
+- [x] 11. API Documentation and Validation
   - Set up OpenAPI/Swagger documentation
   - Add comprehensive API documentation
   - Implement request/response validation
@@ -476,7 +476,7 @@
   - Create clear error messages
   - _Requirements: 12.1, 12.2, 12.3_
 
-- [-] 11.4 Create API usage documentation
+- [x] 11.4 Create API usage documentation
   - Write README with API overview
   - Document authentication flow
   - Add endpoint usage examples
