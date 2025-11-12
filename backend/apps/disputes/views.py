@@ -200,6 +200,15 @@ class DisputeViewSet(viewsets.GenericViewSet):
             'data': serializer.data
         })
     
+    @swagger_auto_schema(
+        operation_description="Get dispute details by ID",
+        responses={
+            200: DisputeDetailSerializer,
+            403: "Forbidden - Not authorized to view this dispute",
+            404: "Not Found - Dispute not found"
+        },
+        tags=['Disputes']
+    )
     def retrieve(self, request, pk=None):
         """
         Get dispute details.
@@ -229,6 +238,17 @@ class DisputeViewSet(viewsets.GenericViewSet):
                 status=e.status_code
             )
     
+    @swagger_auto_schema(
+        operation_description="Update dispute status (admin only)",
+        request_body=DisputeUpdateSerializer,
+        responses={
+            200: DisputeDetailSerializer,
+            400: "Bad Request - Invalid status transition",
+            403: "Forbidden - Admin access required",
+            404: "Not Found - Dispute not found"
+        },
+        tags=['Disputes']
+    )
     def partial_update(self, request, pk=None):
         """
         Update dispute status (admin only).
@@ -277,6 +297,17 @@ class DisputeViewSet(viewsets.GenericViewSet):
                 status=e.status_code
             )
     
+    @swagger_auto_schema(
+        operation_description="Resolve a dispute with resolution text (admin only)",
+        request_body=DisputeResolveSerializer,
+        responses={
+            200: DisputeDetailSerializer,
+            400: "Bad Request - Dispute already resolved",
+            403: "Forbidden - Admin access required",
+            404: "Not Found - Dispute not found"
+        },
+        tags=['Disputes']
+    )
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated, IsAdmin])
     def resolve(self, request, pk=None):
         """
@@ -312,6 +343,16 @@ class DisputeViewSet(viewsets.GenericViewSet):
                 status=e.status_code
             )
     
+    @swagger_auto_schema(
+        operation_description="Close a resolved dispute (admin only)",
+        responses={
+            200: DisputeDetailSerializer,
+            400: "Bad Request - Dispute not resolved yet",
+            403: "Forbidden - Admin access required",
+            404: "Not Found - Dispute not found"
+        },
+        tags=['Disputes']
+    )
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated, IsAdmin])
     def close(self, request, pk=None):
         """
