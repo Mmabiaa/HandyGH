@@ -103,7 +103,7 @@
   - Implement role validation logic
   - _Requirements: 2.2, 2.3, 2.5_
 
-- [ ] 3.3 Create user API endpoints
+- [-] 3.3 Create user API endpoints
   - GET /api/v1/users/me/ - Get current user profile
   - PATCH /api/v1/users/me/ - Update current user profile
   - GET /api/v1/users/{id}/ - Get user by ID (admin only)
