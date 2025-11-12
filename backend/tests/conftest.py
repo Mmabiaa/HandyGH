@@ -259,6 +259,15 @@ def provider_token(db, provider_user):
     return tokens['access_token']
 
 
+@pytest.fixture
+def customer_user_token(db, customer_user):
+    """Create JWT token for customer_user."""
+    from apps.authentication.services import JWTService
+    
+    tokens = JWTService.create_tokens(customer_user)
+    return tokens['access_token']
+
+
 # Payment-related fixtures
 
 @pytest.fixture
