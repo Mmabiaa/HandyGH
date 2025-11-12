@@ -1,0 +1,767 @@
+{
+  "info": {
+    "name": "HandyGH API",
+    "description": "Complete API collection for HandyGH Local Services Marketplace",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "provider_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "booking_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Request OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+233241234567\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/otp/request/",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "otp", "request", ""]
+            }
+          }
+        },
+        {
+          "name": "Verify OTP",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('access_token', jsonData.data.access_token);",
+                  "    pm.collectionVariables.set('refresh_token', jsonData.data.refresh_token);",
+                  "    pm.collectionVariables.set('user_id', jsonData.data.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+233241234567\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/otp/verify/",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "otp", "verify", ""]
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('access_token', jsonData.data.access_token);",
+                  "    pm.collectionVariables.set('refresh_token', jsonData.data.refresh_token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/token/refresh/",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "token", "refresh", ""]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/logout/",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/users/me/",
+              "host": ["{{base_url}}"],
+              "path": ["users", "me", ""]
+            }
+          }
+        },
+        {
+          "name": "Update Current User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe Updated\",\n  \"email\": \"john.updated@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/me/",
+              "host": ["{{base_url}}"],
+              "path": ["users", "me", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Providers",
+      "item": [
+        {
+          "name": "Search Providers",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/providers/?category=plumber&latitude=5.6037&longitude=-0.1870&radius_km=5&min_rating=4.0&verified_only=true",
+              "host": ["{{base_url}}"],
+              "path": ["providers", ""],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "plumber"
+                },
+                {
+                  "key": "latitude",
+                  "value": "5.6037"
+                },
+                {
+                  "key": "longitude",
+                  "value": "-0.1870"
+                },
+                {
+                  "key": "radius_km",
+                  "value": "5"
+                },
+                {
+                  "key": "min_rating",
+                  "value": "4.0"
+                },
+                {
+                  "key": "verified_only",
+                  "value": "true"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Provider Details",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/providers/{{provider_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["providers", "{{provider_id}}", ""]
+            }
+          }
+        },
+        {
+          "name": "Create Provider Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('provider_id', jsonData.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"business_name\": \"Kofi's Plumbing Services\",\n  \"categories\": [\"plumber\"],\n  \"latitude\": \"5.6037\",\n  \"longitude\": \"-0.1870\",\n  \"address\": \"Accra, Ghana\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/providers/",
+              "host": ["{{base_url}}"],
+              "path": ["providers", ""]
+            }
+          }
+        },
+        {
+          "name": "Add Service",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Pipe Repair\",\n  \"description\": \"Professional pipe repair service\",\n  \"price_type\": \"FIXED\",\n  \"price_amount\": \"150.00\",\n  \"duration_estimate_min\": 120\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/providers/{{provider_id}}/services/",
+              "host": ["{{base_url}}"],
+              "path": ["providers", "{{provider_id}}", "services", ""]
+            }
+          }
+        },
+        {
+          "name": "List Provider Services",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/providers/{{provider_id}}/services/",
+              "host": ["{{base_url}}"],
+              "path": ["providers", "{{provider_id}}", "services", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "Create Booking",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('booking_id', jsonData.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"provider_service_id\": \"uuid\",\n  \"scheduled_start\": \"2025-01-20T10:00:00Z\",\n  \"duration_hours\": 2.0,\n  \"address\": \"123 Main St, Accra\",\n  \"notes\": \"Please bring necessary tools\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/bookings/",
+              "host": ["{{base_url}}"],
+              "path": ["bookings", ""]
+            }
+          }
+        },
+        {
+          "name": "List Bookings",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/bookings/?status=CONFIRMED",
+              "host": ["{{base_url}}"],
+              "path": ["bookings", ""],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "CONFIRMED"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Booking Details",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/bookings/{{booking_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["bookings", "{{booking_id}}", ""]
+            }
+          }
+        },
+        {
+          "name": "Accept Booking",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{base_url}}/bookings/{{booking_id}}/accept/",
+              "host": ["{{base_url}}"],
+              "path": ["bookings", "{{booking_id}}", "accept", ""]
+            }
+          }
+        },
+        {
+          "name": "Decline Booking",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Not available at that time\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/bookings/{{booking_id}}/decline/",
+              "host": ["{{base_url}}"],
+              "path": ["bookings", "{{booking_id}}", "decline", ""]
+            }
+          }
+        },
+        {
+          "name": "Update Booking Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"IN_PROGRESS\",\n  \"reason\": \"Started work\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/bookings/{{booking_id}}/status/",
+              "host": ["{{base_url}}"],
+              "path": ["bookings", "{{booking_id}}", "status", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Initiate MoMo Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"booking_id\": \"{{booking_id}}\",\n  \"phone\": \"+233241234567\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/payments/momo/charge/",
+              "host": ["{{base_url}}"],
+              "path": ["payments", "momo", "charge", ""]
+            }
+          }
+        },
+        {
+          "name": "Manual Payment Confirmation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"booking_id\": \"{{booking_id}}\",\n  \"transaction_ref\": \"MOMO-REF-123\",\n  \"amount\": \"300.00\",\n  \"payment_method\": \"MOMO\",\n  \"notes\": \"Paid via MTN MoMo\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/payments/manual/confirm/",
+              "host": ["{{base_url}}"],
+              "path": ["payments", "manual", "confirm", ""]
+            }
+          }
+        },
+        {
+          "name": "List Transactions",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/payments/transactions/",
+              "host": ["{{base_url}}"],
+              "path": ["payments", "transactions", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Submit Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 5,\n  \"comment\": \"Excellent service! Very professional and timely.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/bookings/{{booking_id}}/reviews/",
+              "host": ["{{base_url}}"],
+              "path": ["bookings", "{{booking_id}}", "reviews", ""]
+            }
+          }
+        },
+        {
+          "name": "Get Provider Reviews",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/providers/{{provider_id}}/reviews/",
+              "host": ["{{base_url}}"],
+              "path": ["providers", "{{provider_id}}", "reviews", ""]
+            }
+          }
+        },
+        {
+          "name": "Get Provider Rating Stats",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/providers/{{provider_id}}/rating-stats/",
+              "host": ["{{base_url}}"],
+              "path": ["providers", "{{provider_id}}", "rating-stats", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Messaging",
+      "item": [
+        {
+          "name": "Send Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Hello, I have a question about the booking.\",\n  \"attachments\": []\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/bookings/{{booking_id}}/messages/",
+              "host": ["{{base_url}}"],
+              "path": ["bookings", "{{booking_id}}", "messages", ""]
+            }
+          }
+        },
+        {
+          "name": "Get Booking Messages",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/bookings/{{booking_id}}/messages/?limit=50&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["bookings", "{{booking_id}}", "messages", ""],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Disputes",
+      "item": [
+        {
+          "name": "Create Dispute",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"booking_id\": \"{{booking_id}}\",\n  \"reason\": \"SERVICE_NOT_PROVIDED\",\n  \"description\": \"The provider did not show up for the appointment.\",\n  \"evidence\": []\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/disputes/",
+              "host": ["{{base_url}}"],
+              "path": ["disputes", ""]
+            }
+          }
+        },
+        {
+          "name": "List Disputes",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/disputes/?status=OPEN",
+              "host": ["{{base_url}}"],
+              "path": ["disputes", ""],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "OPEN"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Dispute Details",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/disputes/{{dispute_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["disputes", "{{dispute_id}}", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Get Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/admin/dashboard/stats/",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "dashboard", "stats", ""]
+            }
+          }
+        },
+        {
+          "name": "Get User Statistics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/admin/users/statistics/?start_date=2025-01-01&end_date=2025-01-31",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "users", "statistics", ""],
+              "query": [
+                {
+                  "key": "start_date",
+                  "value": "2025-01-01"
+                },
+                {
+                  "key": "end_date",
+                  "value": "2025-01-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List All Users",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/admin/users/?role=PROVIDER&is_active=true",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "users", ""],
+              "query": [
+                {
+                  "key": "role",
+                  "value": "PROVIDER"
+                },
+                {
+                  "key": "is_active",
+                  "value": "true"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Suspend User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Violation of terms of service\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/users/{{user_id}}/suspend/",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "users", "{{user_id}}", "suspend", ""]
+            }
+          }
+        },
+        {
+          "name": "Activate User",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{base_url}}/admin/users/{{user_id}}/activate/",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "users", "{{user_id}}", "activate", ""]
+            }
+          }
+        },
+        {
+          "name": "Export CSV",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/admin/export/csv/?export_type=transactions&start_date=2025-01-01&end_date=2025-01-31",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "export", "csv", ""],
+              "query": [
+                {
+                  "key": "export_type",
+                  "value": "transactions"
+                },
+                {
+                  "key": "start_date",
+                  "value": "2025-01-01"
+                },
+                {
+                  "key": "end_date",
+                  "value": "2025-01-31"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
