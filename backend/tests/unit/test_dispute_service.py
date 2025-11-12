@@ -104,8 +104,14 @@ class TestDisputeService:
         """Test dispute creation outside allowed window."""
         # Set booking to completed 8 days ago
         booking.status = 'COMPLETED'
-        booking.updated_at = timezone.now() - timedelta(days=8)
         booking.save()
+        
+        # Manually update the updated_at field using update to bypass auto_now
+        from apps.bookings.models import Booking
+        Booking.objects.filter(id=booking.id).update(
+            updated_at=timezone.now() - timedelta(days=8)
+        )
+        booking.refresh_from_db()
         
         with pytest.raises(ValidationError) as exc_info:
             DisputeService.create_dispute(
@@ -129,6 +135,13 @@ class TestDisputeService:
             reason='First dispute',
             description='This is the first dispute for this booking'
         )
+        
+        # Refresh booking to get updated status
+        booking.refresh_from_db()
+        
+        # Reset booking status to COMPLETED for second attempt
+        booking.status = 'COMPLETED'
+        booking.save()
         
         # Try to create second dispute
         with pytest.raises(ValidationError) as exc_info:
@@ -183,8 +196,14 @@ class TestDisputeService:
     def test_validate_dispute_window_outside_window(self, booking):
         """Test dispute window validation outside allowed time."""
         booking.status = 'COMPLETED'
-        booking.updated_at = timezone.now() - timedelta(days=10)
         booking.save()
+        
+        # Manually update the updated_at field using update to bypass auto_now
+        from apps.bookings.models import Booking
+        Booking.objects.filter(id=booking.id).update(
+            updated_at=timezone.now() - timedelta(days=10)
+        )
+        booking.refresh_from_db()
         
         with pytest.raises(ValidationError) as exc_info:
             DisputeService.validate_dispute_window(booking)
