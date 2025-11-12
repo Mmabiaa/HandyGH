@@ -3,12 +3,6 @@ Pytest configuration and fixtures for tests.
 """
 
 import pytest
-from django.contrib.auth import get_user_model
-from django.utils import timezone
-from datetime import timedelta
-
-# Import pytest_django plugin
-pytest_plugins = ['pytest_django']
 
 
 @pytest.fixture(scope='session')
@@ -19,13 +13,6 @@ def django_db_setup():
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': ':memory:',
     }
-
-
-# Import after Django is configured
-from apps.authentication.models import OTPToken, RefreshToken
-from core.utils import hash_value, generate_otp
-
-User = get_user_model()
 
 
 @pytest.fixture
