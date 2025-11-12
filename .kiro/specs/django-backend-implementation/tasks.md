@@ -53,7 +53,7 @@
   - Create and run migrations
   - _Requirements: 1.2, 2.1, 2.2, 13.1, 13.5_
 
-- [-] 2.2 Implement OTP functionality
+- [x] 2.2 Implement OTP functionality
   - Create OTPToken model with phone, code_hash, expiry, attempts
   - Implement OTPService with generate_otp(), verify_otp(), check_rate_limit()
   - Add OTP hashing using bcrypt
