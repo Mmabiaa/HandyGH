@@ -38,7 +38,7 @@
   - Set up exception handling
   - _Requirements: 11.1, 11.2, 11.3_
 
-- [-] 2. Authentication System Implementation
+- [x] 2. Authentication System Implementation
   - Create authentication app with OTP and JWT functionality
   - Implement OTP generation, storage, and verification
   - Implement JWT token issuance and refresh mechanism
@@ -84,7 +84,7 @@
   - Test rate limiting and security constraints
   - _Requirements: 14.3, 14.4_
 
-- [-] 3. User Profile Management
+- [ ] 3. User Profile Management
   - Create users app for profile management
   - Implement user CRUD operations
   - Add role-based permissions
