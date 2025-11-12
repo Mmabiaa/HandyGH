@@ -55,7 +55,7 @@ class TestBookingEndpoints:
             'address': '123 Test Street, Accra'
         }
         
-        response = api_client.post('/api/v1/bookings/bookings/', data, format='json')
+        response = api_client.post('/api/v1/bookings/', data, format='json')
         
         assert response.status_code == status.HTTP_403_FORBIDDEN
     
@@ -70,7 +70,7 @@ class TestBookingEndpoints:
             'address': '123 Test Street, Accra'
         }
         
-        response = api_client.post('/api/v1/bookings/bookings/', data, format='json')
+        response = api_client.post('/api/v1/bookings/', data, format='json')
         
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
     
@@ -80,7 +80,7 @@ class TestBookingEndpoints:
         """Test listing bookings as customer."""
         api_client.credentials(HTTP_AUTHORIZATION=f'Bearer {customer_token}')
         
-        response = api_client.get('/api/v1/bookings/bookings/')
+        response = api_client.get('/api/v1/bookings/')
         
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data['results']) >= 1
@@ -91,7 +91,7 @@ class TestBookingEndpoints:
         """Test listing bookings as provider."""
         api_client.credentials(HTTP_AUTHORIZATION=f'Bearer {provider_token}')
         
-        response = api_client.get('/api/v1/bookings/bookings/')
+        response = api_client.get('/api/v1/bookings/')
         
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data['results']) >= 1
@@ -102,7 +102,7 @@ class TestBookingEndpoints:
         """Test filtering bookings by status."""
         api_client.credentials(HTTP_AUTHORIZATION=f'Bearer {customer_token}')
         
-        response = api_client.get('/api/v1/bookings/bookings/?status=REQUESTED')
+        response = api_client.get('/api/v1/bookings/?status=REQUESTED')
         
         assert response.status_code == status.HTTP_200_OK
         for result in response.data['results']:
@@ -114,7 +114,7 @@ class TestBookingEndpoints:
         """Test retrieving booking details."""
         api_client.credentials(HTTP_AUTHORIZATION=f'Bearer {customer_token}')
         
-        response = api_client.get(f'/api/v1/bookings/bookings/{booking.id}/')
+        response = api_client.get(f'/api/v1/bookings/{booking.id}/')
         
         assert response.status_code == status.HTTP_200_OK
         assert response.data['id'] == str(booking.id)
@@ -130,7 +130,7 @@ class TestBookingEndpoints:
         booking.status = 'REQUESTED'
         booking.save()
         
-        response = api_client.patch(f'/api/v1/bookings/bookings/{booking.id}/accept/')
+        response = api_client.patch(f'/api/v1/bookings/{booking.id}/accept/')
         
         assert response.status_code == status.HTTP_200_OK
         assert response.data['status'] == 'CONFIRMED'
@@ -144,7 +144,7 @@ class TestBookingEndpoints:
         booking.status = 'REQUESTED'
         booking.save()
         
-        response = api_client.patch(f'/api/v1/bookings/bookings/{booking.id}/accept/')
+        response = api_client.patch(f'/api/v1/bookings/{booking.id}/accept/')
         
         assert response.status_code == status.HTTP_403_FORBIDDEN
     
@@ -159,7 +159,7 @@ class TestBookingEndpoints:
         
         data = {'reason': 'Not available at that time'}
         response = api_client.patch(
-            f'/api/v1/bookings/bookings/{booking.id}/decline/',
+            f'/api/v1/bookings/{booking.id}/decline/',
             data,
             format='json'
         )
@@ -181,7 +181,7 @@ class TestBookingEndpoints:
             'reason': 'Service started'
         }
         response = api_client.patch(
-            f'/api/v1/bookings/bookings/{booking.id}/status/',
+            f'/api/v1/bookings/{booking.id}/status/',
             data,
             format='json'
         )
@@ -203,7 +203,7 @@ class TestBookingEndpoints:
             'reason': 'Service completed successfully'
         }
         response = api_client.patch(
-            f'/api/v1/bookings/bookings/{booking.id}/status/',
+            f'/api/v1/bookings/{booking.id}/status/',
             data,
             format='json'
         )
@@ -225,7 +225,7 @@ class TestBookingEndpoints:
             'reason': 'Invalid transition'
         }
         response = api_client.patch(
-            f'/api/v1/bookings/bookings/{booking.id}/status/',
+            f'/api/v1/bookings/{booking.id}/status/',
             data,
             format='json'
         )
@@ -246,7 +246,7 @@ class TestBookingEndpoints:
             'reason': 'Changed my mind'
         }
         response = api_client.patch(
-            f'/api/v1/bookings/bookings/{booking.id}/status/',
+            f'/api/v1/bookings/{booking.id}/status/',
             data,
             format='json'
         )
