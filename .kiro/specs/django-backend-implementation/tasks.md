@@ -237,14 +237,14 @@
   - Implement manual payment confirmation
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
 
-- [-] 6.1 Create Transaction model
+- [x] 6.1 Create Transaction model
   - Create Transaction model with booking, amount, status, txn_provider
   - Add Commission model for configuration
   - Create indexes on booking_id, status, txn_provider
   - Create and run migrations
   - _Requirements: 6.1, 6.2, 13.1, 13.3_
 
-- [ ] 6.2 Implement CommissionService
+- [-] 6.2 Implement CommissionService
   - Create calculate_commission() method
   - Add get_commission_rate() with configurable rates
   - Implement commission calculation logic
