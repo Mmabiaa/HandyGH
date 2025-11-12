@@ -35,7 +35,7 @@ class TestUserMeEndpoint:
     
     def test_update_current_user_name(self, authenticated_client):
         """Test updating current user name."""
-        url = reverse('users:user-update-current-user')
+        url = '/api/v1/users/me/'
         data = {'name': 'Updated Name'}
         
         response = authenticated_client.patch(url, data, format='json')
@@ -45,17 +45,17 @@ class TestUserMeEndpoint:
     
     def test_update_current_user_email(self, authenticated_client):
         """Test updating current user email."""
-        url = reverse('users:user-update-current-user')
+        url = '/api/v1/users/me/'
         data = {'email': 'newemail@example.com'}
         
         response = authenticated_client.patch(url, data, format='json')
         
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['email'] == 'newemail@example.com'
+        assert response.data['data']['email'] == 'newemail@example.com'
     
     def test_update_current_user_profile(self, authenticated_client):
         """Test updating current user profile."""
-        url = reverse('users:user-update-current-user')
+        url = '/api/v1/users/me/'
         data = {
             'profile': {
                 'address': '123 Test Street',
@@ -66,12 +66,12 @@ class TestUserMeEndpoint:
         response = authenticated_client.patch(url, data, format='json')
         
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['profile']['address'] == '123 Test Street'
-        assert response.data['profile']['preferences'] == {'language': 'en'}
+        assert response.data['data']['profile']['address'] == '123 Test Street'
+        assert response.data['data']['profile']['preferences'] == {'language': 'en'}
     
     def test_cannot_update_role(self, authenticated_client):
         """Test that role cannot be updated."""
-        url = reverse('users:user-update-current-user')
+        url = '/api/v1/users/me/'
         original_role = authenticated_client.user.role
         data = {'role': 'ADMIN'}
         
