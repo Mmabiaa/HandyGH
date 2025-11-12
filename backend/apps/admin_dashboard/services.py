@@ -182,9 +182,9 @@ class AdminReportService:
         
         # Booking amounts
         booking_amounts = queryset.aggregate(
-            total_amount=Sum('total_amount'),
-            avg_amount=Avg('total_amount'),
-            total_commission=Sum('commission_amount')
+            total_booking_amount=Sum('total_amount'),
+            avg_booking_amount=Avg('total_amount'),
+            total_booking_commission=Sum('commission_amount')
         )
         
         # Bookings by payment status
