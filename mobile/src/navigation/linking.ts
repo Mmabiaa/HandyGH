@@ -20,17 +20,17 @@ export const linking: LinkingOptions<RootStackParamList> = {
       Customer: {
         screens: {
           Home: 'home',
-          Bookings: 'bookings',
+          Bookings: 'customer/bookings',
           Messages: 'messages',
-          Profile: 'profile',
+          Profile: 'customer/profile',
         },
       },
       Provider: {
         screens: {
           Dashboard: 'dashboard',
-          Bookings: 'bookings',
+          Bookings: 'provider/bookings',
           Services: 'services',
-          Profile: 'profile',
+          Profile: 'provider/profile',
         },
       },
       ProviderDetail: 'provider/:providerId',
