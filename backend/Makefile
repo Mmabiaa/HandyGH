@@ -75,12 +75,14 @@ makemigrations:
 
 # Install pre-commit hooks
 pre-commit:
-	pre-commit install
+	@echo "Installing pre-commit hooks from repository root..."
+	cd .. && pre-commit install
 	@echo "Pre-commit hooks installed successfully!"
 
 # Run pre-commit on all files
 pre-commit-all:
-	pre-commit run --all-files
+	@echo "Running pre-commit on all files..."
+	cd .. && pre-commit run --all-files
 
 # Security check with bandit
 security:

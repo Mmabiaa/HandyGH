@@ -2,15 +2,17 @@
 URL configuration for disputes app.
 """
 
-from django.urls import path, include
+from django.urls import include, path
+
 from rest_framework.routers import DefaultRouter
+
 from .views import DisputeViewSet
 
-app_name = 'disputes'
+app_name = "disputes"
 
 router = DefaultRouter()
-router.register(r'disputes', DisputeViewSet, basename='dispute')
+router.register(r"disputes", DisputeViewSet, basename="dispute")
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path("", include(router.urls)),
 ]

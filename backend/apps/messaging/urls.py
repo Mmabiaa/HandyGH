@@ -11,15 +11,16 @@ Routes:
 """
 
 from django.urls import path
+
 from .views import BookingMessagesView
 
-app_name = 'messaging'
+app_name = "messaging"
 
 urlpatterns = [
     # Booking messages
     path(
-        'bookings/<uuid:booking_id>/messages/',
+        "bookings/<uuid:booking_id>/messages/",
         BookingMessagesView.as_view(),
-        name='booking-messages'
+        name="booking-messages",
     ),
 ]

@@ -2,6 +2,7 @@
 Verification script for code quality tool configurations.
 This script checks that all configuration files are present and valid.
 """
+
 import os
 import sys
 from pathlib import Path
@@ -21,7 +22,8 @@ def check_yaml_valid(filepath):
     """Check if YAML file is valid."""
     try:
         import yaml
-        with open(filepath, 'r') as f:
+
+        with open(filepath, "r") as f:
             yaml.safe_load(f)
         return True
     except ImportError:
@@ -36,14 +38,16 @@ def check_toml_valid(filepath):
     """Check if TOML file is valid."""
     try:
         import tomli
-        with open(filepath, 'rb') as f:
+
+        with open(filepath, "rb") as f:
             tomli.load(f)
         return True
     except ImportError:
         # Try tomllib (Python 3.11+)
         try:
             import tomllib
-            with open(filepath, 'rb') as f:
+
+            with open(filepath, "rb") as f:
                 tomllib.load(f)
             return True
         except ImportError:
