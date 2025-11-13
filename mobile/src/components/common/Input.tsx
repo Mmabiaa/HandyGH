@@ -3,7 +3,7 @@ import { TextInput, TextInputProps, HelperText } from 'react-native-paper';
 import { View, StyleSheet } from 'react-native';
 import { colors, spacing } from '@/constants/theme';
 
-interface InputProps extends Omit<TextInputProps, 'theme'> {
+interface InputProps extends Omit<TextInputProps, 'theme' | 'error'> {
   error?: string;
   helperText?: string;
 }
