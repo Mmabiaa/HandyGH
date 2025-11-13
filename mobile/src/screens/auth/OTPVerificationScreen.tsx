@@ -173,8 +173,8 @@ export const OTPVerificationScreen: React.FC<Props> = ({ navigation, route }) =>
                 ref={(ref) => (inputRefs.current[index] = ref)}
                 style={[
                   styles.otpInput,
-                  digit && styles.otpInputFilled,
-                  error && styles.otpInputError,
+                  digit ? styles.otpInputFilled : null,
+                  error ? styles.otpInputError : null,
                 ]}
                 value={digit}
                 onChangeText={(value) => handleOTPChange(value, index)}
