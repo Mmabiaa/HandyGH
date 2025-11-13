@@ -1,0 +1,92 @@
+# Pre-commit hooks configuration
+# See https://pre-commit.com for more information
+
+repos:
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: ^.*\.(md|rst)$
+      - id: end-of-file-fixer
+        exclude: ^.*\.(md|rst)$
+      - id: check-yaml
+        args: ['--unsafe']
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-json
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: detect-private-key
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+
+  # Python code formatting with black
+  - repo: https://github.com/psf/black
+    rev: 24.1.1
+    hooks:
+      - id: black
+        args: ['--config', 'backend/pyproject.toml']
+        exclude: ^.*\b(migrations)\b.*$
+        files: ^backend/
+
+  # Import sorting with isort
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: ['--settings-path', 'backend/pyproject.toml']
+        exclude: ^.*\b(migrations)\b.*$
+        files: ^backend/
+
+  # Linting with flake8
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        args: ['--config', 'backend/.flake8']
+        exclude: ^.*\b(migrations)\b.*$
+        files: ^backend/
+        additional_dependencies:
+          - flake8-bugbear
+          - flake8-comprehensions
+          - flake8-simplify
+
+  # Django-specific checks
+  - repo: https://github.com/adamchainz/django-upgrade
+    rev: 1.15.0
+    hooks:
+      - id: django-upgrade
+        args: ['--target-version', '4.2']
+        exclude: ^.*\b(migrations)\b.*$
+        files: ^backend/
+
+  # Security checks
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.6
+    hooks:
+      - id: bandit
+        args: ['-c', 'backend/pyproject.toml']
+        additional_dependencies: ['bandit[toml]']
+        exclude: ^.*\b(tests|migrations)\b.*$
+        files: ^backend/
+
+# Configuration
+default_language_version:
+  python: python3
+
+# Exclude patterns
+exclude: |
+  (?x)^(
+      .*\b(migrations)\b.*|
+      .*\b(staticfiles)\b.*|
+      .*\b(media)\b.*|
+      .*\b(__pycache__)\b.*|
+      .*\b(\.venv)\b.*|
+      .*\b(venv)\b.*|
+      .*\b(htmlcov)\b.*|
+      .*\b(\.pytest_cache)\b.*|
+      .*\b(\.coverage)\b.*|
+      .*\.egg-info.*
+  )$

@@ -1,0 +1,25 @@
+[Unit]
+Description=HandyGH Gunicorn Application Server
+After=network.target postgresql.service redis.service
+Requires=postgresql.service
+
+[Service]
+Type=notify
+User=handygh
+Group=handygh
+WorkingDirectory=/opt/handygh/backend
+Environment="PATH=/opt/handygh/venv/bin"
+Environment="DJANGO_SETTINGS_MODULE=handygh.settings.production"
+EnvironmentFile=/opt/handygh/.env
+ExecStart=/opt/handygh/venv/bin/gunicorn \
+    -c /opt/handygh/backend/gunicorn_config.py \
+    handygh.wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+PrivateTmp=true
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

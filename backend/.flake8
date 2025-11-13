@@ -1,0 +1,81 @@
+[flake8]
+# Maximum line length
+max-line-length = 100
+
+# Exclude directories
+exclude =
+    .git,
+    __pycache__,
+    .pytest_cache,
+    .venv,
+    venv,
+    env,
+    migrations,
+    staticfiles,
+    media,
+    htmlcov,
+    .coverage,
+    *.egg-info,
+    build,
+    dist
+
+# Ignore specific errors
+ignore =
+    # E203: whitespace before ':' (conflicts with black)
+    E203,
+    # W503: line break before binary operator (conflicts with black)
+    W503,
+    # W504: line break after binary operator (conflicts with black)
+    W504,
+    # E501: line too long (handled by black)
+    E501,
+    # E226: missing whitespace around arithmetic operator (minor style)
+    E226,
+    # E402: module level import not at top (sometimes needed for Django setup)
+    E402,
+    # E722: bare except (acceptable in some test/script contexts)
+    E722,
+    # F401: imported but unused (sometimes needed for type hints, __init__.py)
+    F401,
+    # F403: unable to detect undefined names (star imports in settings)
+    F403,
+    # F405: may be undefined from star imports (Django settings pattern)
+    F405,
+    # F541: f-string without placeholders (sometimes intentional)
+    F541,
+    # F821: undefined name (type hints in quotes)
+    F821,
+    # F841: local variable assigned but never used (sometimes intentional in tests)
+    F841,
+    # B001: bare except (duplicate of E722)
+    B001,
+    # B007: loop variable not used (acceptable in tests)
+    B007,
+    # C901: function too complex (refactor later)
+    C901,
+    # C417: unnecessary map usage (minor optimization)
+    C417,
+    # SIM102: nested if statements (sometimes more readable)
+    SIM102,
+    # SIM105: use contextlib.suppress (minor style preference)
+    SIM105,
+    # SIM201: comparison style (minor preference)
+    SIM201
+
+# Maximum complexity
+max-complexity = 10
+
+# Per-file ignores
+per-file-ignores =
+    __init__.py:F401,F403
+    settings/*.py:E501
+    */migrations/*.py:E501
+
+# Show source code for errors
+show-source = True
+
+# Show statistics
+statistics = True
+
+# Count errors
+count = True

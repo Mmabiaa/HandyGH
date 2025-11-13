@@ -1,2 +1,5 @@
-"""Disputes app"""
-default_app_config = 'apps.disputes.apps.DisputesConfig'
+"""
+Disputes app for HandyGH.
+
+Handles dispute creation, management, and resolution.
+"""

@@ -11,24 +11,25 @@ Design Decisions:
 - Separate URL includes for each app for modularity
 """
 
-from django.contrib import admin
-from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from rest_framework import permissions
-from drf_yasg.views import get_schema_view
+from django.contrib import admin
+from django.urls import include, path
+
 from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+from rest_framework import permissions
 
 # Swagger/OpenAPI Schema
 schema_view = get_schema_view(
     openapi.Info(
         title="HandyGH API",
-        default_version='v1',
+        default_version="v1",
         description="""
         HandyGH Local Services Marketplace API
-        
+
         A comprehensive REST API for connecting customers with local service providers.
-        
+
         ## Features
         - OTP-based authentication with JWT tokens
         - Provider search and discovery
@@ -38,7 +39,7 @@ schema_view = get_schema_view(
         - In-app messaging
         - Dispute resolution
         - Admin dashboard operations
-        
+
         ## Authentication
         Most endpoints require authentication using JWT tokens.
         1. Request OTP: POST /api/v1/auth/otp/request/
@@ -55,31 +56,28 @@ schema_view = get_schema_view(
 
 # API URL patterns
 api_v1_patterns = [
-    path('auth/', include('apps.authentication.urls')),
-    path('users/', include('apps.users.urls')),
-    path('providers/', include('apps.providers.urls')),
-    path('bookings/', include('apps.bookings.urls')),
-    path('payments/', include('apps.payments.urls')),
-    path('reviews/', include('apps.reviews.urls')),
-    path('messages/', include('apps.messaging.urls')),
-    path('disputes/', include('apps.disputes.urls')),
-    path('admin/', include('apps.admin_dashboard.urls')),
+    path("auth/", include("apps.authentication.urls")),
+    path("users/", include("apps.users.urls")),
+    path("providers/", include("apps.providers.urls")),
+    path("bookings/", include("apps.bookings.urls")),
+    path("payments/", include("apps.payments.urls")),
+    path("reviews/", include("apps.reviews.urls")),
+    path("", include("apps.messaging.urls")),  # Messaging URLs are nested under bookings
+    path("", include("apps.disputes.urls")),  # Disputes URLs
+    path("admin/", include("apps.admin_dashboard.urls")),
 ]
 
 urlpatterns = [
     # Admin panel
-    path(settings.ADMIN_URL if hasattr(settings, 'ADMIN_URL') else 'admin/', admin.site.urls),
-    
+    path(settings.ADMIN_URL if hasattr(settings, "ADMIN_URL") else "admin/", admin.site.urls),
     # API Documentation
-    path('api/docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('api/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    path('api/schema/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-    
+    path("api/docs/", schema_view.with_ui("swagger", cache_timeout=0), name="schema-swagger-ui"),
+    path("api/redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
+    path("api/schema/", schema_view.without_ui(cache_timeout=0), name="schema-json"),
     # API v1
-    path('api/v1/', include(api_v1_patterns)),
-    
+    path("api/v1/", include(api_v1_patterns)),
     # Health check endpoint
-    path('health/', include('core.urls')),
+    path("health/", include("core.urls")),
 ]
 
 # Serve media files in development

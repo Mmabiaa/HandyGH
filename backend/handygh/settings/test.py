@@ -12,46 +12,40 @@ from .base import *
 
 # Use in-memory SQLite for tests
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ':memory:',
-        'ATOMIC_REQUESTS': True,
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": ":memory:",
+        "ATOMIC_REQUESTS": True,
     }
 }
 
 # Faster password hashing for tests
 PASSWORD_HASHERS = [
-    'django.contrib.auth.hashers.MD5PasswordHasher',
+    "django.contrib.auth.hashers.MD5PasswordHasher",
 ]
 
-# Disable migrations for faster test database creation
-class DisableMigrations:
-    def __contains__(self, item):
-        return True
-
-    def __getitem__(self, item):
-        return None
-
-MIGRATION_MODULES = DisableMigrations()
+# Enable migrations for tests (needed for proper database setup)
+# MIGRATION_MODULES can be disabled for faster tests if needed
 
 # Email backend - Console for tests
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-# Cache - Dummy cache for tests
+# Cache - Use LocMemCache for tests (needed for rate limiting tests)
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "test-cache",
     }
 }
 
 # Logging - Minimal logging in tests
-LOGGING['handlers']['console']['level'] = 'ERROR'
-LOGGING['loggers']['django']['level'] = 'ERROR'
-LOGGING['loggers']['apps']['level'] = 'ERROR'
+LOGGING["handlers"]["console"]["level"] = "ERROR"
+LOGGING["loggers"]["django"]["level"] = "ERROR"
+LOGGING["loggers"]["apps"]["level"] = "ERROR"
 
 # Disable throttling in tests
-REST_FRAMEWORK['DEFAULT_THROTTLE_CLASSES'] = []
+REST_FRAMEWORK["DEFAULT_THROTTLE_CLASSES"] = []
 
 # Shorter JWT tokens for tests
-SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'] = timedelta(minutes=5)
-SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'] = timedelta(minutes=30)
+SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"] = timedelta(minutes=5)
+SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"] = timedelta(minutes=30)

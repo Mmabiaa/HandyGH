@@ -6,6 +6,7 @@ Automatically creates UserProfile when User is created.
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
 from .models import User, UserProfile
 
 
@@ -13,7 +14,7 @@ from .models import User, UserProfile
 def create_user_profile(sender, instance, created, **kwargs):
     """
     Create UserProfile automatically when User is created.
-    
+
     Args:
         sender: User model class
         instance: User instance
@@ -28,11 +29,11 @@ def create_user_profile(sender, instance, created, **kwargs):
 def save_user_profile(sender, instance, **kwargs):
     """
     Save UserProfile when User is saved.
-    
+
     Args:
         sender: User model class
         instance: User instance
         **kwargs: Additional keyword arguments
     """
-    if hasattr(instance, 'profile'):
+    if hasattr(instance, "profile"):
         instance.profile.save()

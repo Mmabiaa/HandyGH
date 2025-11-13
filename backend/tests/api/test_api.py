@@ -11,9 +11,10 @@ Tests the authentication flow:
 Run: python test_api.py
 """
 
-import requests
 import json
 import time
+
+import requests
 
 BASE_URL = "http://localhost:8000/api/v1"
 PHONE = "+233241234567"
@@ -31,93 +32,85 @@ def print_response(title, response):
 
 def test_authentication_flow():
     """Test complete authentication flow."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("  HandyGH API Test")
-    print("="*60)
-    
+    print("=" * 60)
+
     # 1. Request OTP
     print("\n1. Requesting OTP...")
-    response = requests.post(
-        f"{BASE_URL}/auth/otp/request/",
-        json={"phone": PHONE}
-    )
+    response = requests.post(f"{BASE_URL}/auth/otp/request/", json={"phone": PHONE})
     print_response("OTP Request", response)
-    
+
     if response.status_code != 200:
         print("\n✗ OTP request failed!")
         return
-    
+
     # Get OTP from console (in real scenario, from SMS)
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     otp = input("Enter OTP code from console: ")
-    
+
     # 2. Verify OTP
     print("\n2. Verifying OTP...")
-    response = requests.post(
-        f"{BASE_URL}/auth/otp/verify/",
-        json={"phone": PHONE, "otp": otp}
-    )
+    response = requests.post(f"{BASE_URL}/auth/otp/verify/", json={"phone": PHONE, "otp": otp})
     print_response("OTP Verification", response)
-    
+
     if response.status_code != 200:
         print("\n✗ OTP verification failed!")
         return
-    
-    data = response.json()['data']
-    access_token = data['access_token']
-    refresh_token = data['refresh_token']
-    
+
+    data = response.json()["data"]
+    access_token = data["access_token"]
+    refresh_token = data["refresh_token"]
+
     print(f"\n✓ Authentication successful!")
     print(f"User: {data['user']['name'] or data['user']['phone']}")
     print(f"Role: {data['user']['role']}")
-    
+
     # 3. Test authenticated endpoint
     print("\n3. Testing authenticated endpoint...")
     response = requests.get(
-        f"{BASE_URL}/users/me/",
-        headers={"Authorization": f"Bearer {access_token}"}
+        f"{BASE_URL}/users/me/", headers={"Authorization": f"Bearer {access_token}"}
     )
     print_response("Get Current User", response)
-    
+
     # 4. Refresh token
     print("\n4. Refreshing token...")
     response = requests.post(
-        f"{BASE_URL}/auth/token/refresh/",
-        json={"refresh_token": refresh_token}
+        f"{BASE_URL}/auth/token/refresh/", json={"refresh_token": refresh_token}
     )
     print_response("Token Refresh", response)
-    
+
     if response.status_code == 200:
-        new_refresh_token = response.json()['data']['refresh_token']
+        new_refresh_token = response.json()["data"]["refresh_token"]
         print("\n✓ Token refreshed successfully!")
     else:
         new_refresh_token = refresh_token
-    
+
     # 5. Logout
     print("\n5. Logging out...")
     response = requests.post(
         f"{BASE_URL}/auth/logout/",
         headers={"Authorization": f"Bearer {access_token}"},
-        json={"refresh_token": new_refresh_token}
+        json={"refresh_token": new_refresh_token},
     )
     print_response("Logout", response)
-    
+
     # 6. Test health check
     print("\n6. Testing health check...")
     response = requests.get("http://localhost:8000/health/")
     print_response("Health Check", response)
-    
-    print("\n" + "="*60)
+
+    print("\n" + "=" * 60)
     print("  Test Complete!")
-    print("="*60)
+    print("=" * 60)
     print("\n✓ All tests passed!")
     print("\nNext steps:")
     print("1. Visit http://localhost:8000/api/docs/ for full API documentation")
     print("2. Visit http://localhost:8000/admin/ for admin panel")
-    print("\n" + "="*60 + "\n")
+    print("\n" + "=" * 60 + "\n")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         test_authentication_flow()
     except requests.exceptions.ConnectionError:
