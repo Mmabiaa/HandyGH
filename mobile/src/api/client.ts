@@ -1,14 +1,10 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Constants from 'expo-constants';
-
-// API Configuration
-const API_BASE_URL = Constants.expoConfig?.extra?.apiBaseUrl || 'http://localhost:8000/api/v1';
-const API_TIMEOUT = 30000;
+import * as SecureStore from 'expo-secure-store';
+import { Config } from '@/constants/config';
 
 // Storage keys
-const TOKEN_KEY = '@handygh:access_token';
-const REFRESH_TOKEN_KEY = '@handygh:refresh_token';
+const TOKEN_KEY = 'handygh_access_token';
+const REFRESH_TOKEN_KEY = 'handygh_refresh_token';
 
 /**
  * API Client Configuration
@@ -23,8 +19,8 @@ class APIClient {
 
   constructor() {
     this.client = axios.create({
-      baseURL: API_BASE_URL,
-      timeout: API_TIMEOUT,
+      baseURL: Config.API_BASE_URL,
+      timeout: Config.API_TIMEOUT,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -40,7 +36,7 @@ class APIClient {
     // Request interceptor - Add auth token
     this.client.interceptors.request.use(
       async (config) => {
-        const token = await AsyncStorage.getItem(TOKEN_KEY);
+        const token = await SecureStore.getItemAsync(TOKEN_KEY);
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
@@ -76,21 +72,21 @@ class APIClient {
           this.isRefreshing = true;
 
           try {
-            const refreshToken = await AsyncStorage.getItem(REFRESH_TOKEN_KEY);
+            const refreshToken = await SecureStore.getItemAsync(REFRESH_TOKEN_KEY);
             if (!refreshToken) {
               throw new Error('No refresh token available');
             }
 
             // Attempt to refresh the token
-            const response = await axios.post(`${API_BASE_URL}/auth/token/refresh/`, {
+            const response = await axios.post(`${Config.API_BASE_URL}/auth/token/refresh/`, {
               refresh_token: refreshToken,
             });
 
             const { access_token, refresh_token: newRefreshToken } = response.data.data;
 
             // Store new tokens
-            await AsyncStorage.setItem(TOKEN_KEY, access_token);
-            await AsyncStorage.setItem(REFRESH_TOKEN_KEY, newRefreshToken);
+            await SecureStore.setItemAsync(TOKEN_KEY, access_token);
+            await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, newRefreshToken);
 
             // Update authorization header
             this.client.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
@@ -127,8 +123,8 @@ class APIClient {
    * Set authentication tokens
    */
   async setTokens(accessToken: string, refreshToken: string) {
-    await AsyncStorage.setItem(TOKEN_KEY, accessToken);
-    await AsyncStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+    await SecureStore.setItemAsync(TOKEN_KEY, accessToken);
+    await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, refreshToken);
     this.client.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
   }
 
@@ -136,8 +132,8 @@ class APIClient {
    * Clear authentication tokens
    */
   async clearTokens() {
-    await AsyncStorage.removeItem(TOKEN_KEY);
-    await AsyncStorage.removeItem(REFRESH_TOKEN_KEY);
+    await SecureStore.deleteItemAsync(TOKEN_KEY);
+    await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
     delete this.client.defaults.headers.common['Authorization'];
   }
 
@@ -145,7 +141,14 @@ class APIClient {
    * Get access token
    */
   async getAccessToken(): Promise<string | null> {
-    return await AsyncStorage.getItem(TOKEN_KEY);
+    return await SecureStore.getItemAsync(TOKEN_KEY);
+  }
+
+  /**
+   * Get refresh token
+   */
+  async getRefreshToken(): Promise<string | null> {
+    return await SecureStore.getItemAsync(REFRESH_TOKEN_KEY);
   }
 
   /**
