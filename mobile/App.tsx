@@ -9,6 +9,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { store, persistor } from '@/store';
 import AppNavigator from '@/navigation/AppNavigator';
 import { theme } from '@/constants/theme';
+import { ErrorBoundary } from '@/components/common';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -51,15 +52,17 @@ export default function App() {
   }
 
   return (
-    <ReduxProvider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <PaperProvider theme={theme}>
-          <SafeAreaProvider>
-            <AppNavigator />
-            <StatusBar style="auto" />
-          </SafeAreaProvider>
-        </PaperProvider>
-      </PersistGate>
-    </ReduxProvider>
+    <ErrorBoundary>
+      <ReduxProvider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <PaperProvider theme={theme}>
+            <SafeAreaProvider>
+              <AppNavigator />
+              <StatusBar style="auto" />
+            </SafeAreaProvider>
+          </PaperProvider>
+        </PersistGate>
+      </ReduxProvider>
+    </ErrorBoundary>
   );
 }
