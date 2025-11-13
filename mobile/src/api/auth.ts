@@ -9,10 +9,17 @@ export const authAPI = {
    * Request OTP for phone number
    */
   requestOTP: async (phone: string): Promise<APIResponse<{ message: string }>> => {
-    const response = await apiClient.post<APIResponse<{ message: string }>>('/auth/otp/request/', {
-      phone,
-    });
-    return response.data;
+    console.log('authAPI.requestOTP called with phone:', phone);
+    try {
+      const response = await apiClient.post<APIResponse<{ message: string }>>('/auth/otp/request/', {
+        phone,
+      });
+      console.log('authAPI.requestOTP response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('authAPI.requestOTP error:', error);
+      throw error;
+    }
   },
 
   /**

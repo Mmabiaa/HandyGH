@@ -1,11 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { ProviderTabScreenProps } from '@/navigation/types';
 import { colors, spacing, typography } from '@/constants/theme';
 
-type Props = ProviderTabScreenProps<'Dashboard'>;
-
-export const DashboardScreen: React.FC<Props> = () => {
+export const DashboardScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Provider Dashboard</Text>

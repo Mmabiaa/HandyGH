@@ -21,6 +21,13 @@ export interface PaginatedResponse<T> {
  * Authentication Types
  */
 
+export interface SignupData {
+  name: string;
+  email?: string;
+  phone: string;
+  role: 'CUSTOMER' | 'PROVIDER';
+}
+
 export interface OTPRequestData {
   phone: string;
 }
@@ -37,6 +44,8 @@ export interface AuthResponse {
   access_token: string;
   refresh_token: string;
   user: User;
+  token_type?: string;
+  expires_in?: number;
 }
 
 /**

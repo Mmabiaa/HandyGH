@@ -8,6 +8,10 @@ Design Decisions:
 - Rate limiting via DRF throttling
 """
 
+from datetime import timedelta
+
+from django.utils import timezone
+
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
@@ -15,15 +19,404 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.users.models import User
 from core.exceptions import AuthenticationError, RateLimitError, ValidationError
+from core.utils import normalize_phone_number
 
+from .models import PendingUser
 from .serializers import (
+    LoginRequestSerializer,
+    LoginVerifySerializer,
     LogoutSerializer,
     OTPRequestSerializer,
     OTPVerifySerializer,
+    SignupRequestSerializer,
+    SignupVerifySerializer,
     TokenRefreshSerializer,
 )
 from .services import JWTService, OTPService
+
+
+class SignupRequestView(APIView):
+    """
+    Request signup with user details and send OTP.
+
+    Creates PendingUser record and sends OTP for verification.
+    """
+
+    permission_classes = [AllowAny]
+    throttle_scope = "signup_request"
+
+    @swagger_auto_schema(
+        operation_description="Initiate signup process with user details",
+        request_body=SignupRequestSerializer,
+        responses={
+            200: openapi.Response(
+                description="Signup initiated, OTP sent",
+                examples={
+                    "application/json": {
+                        "success": True,
+                        "data": {
+                            "message": "OTP sent successfully",
+                            "expires_in_minutes": 10,
+                            "pending_user_id": "uuid",
+                        },
+                        "meta": {},
+                    }
+                },
+            ),
+            400: "Invalid data or phone already exists",
+            429: "Rate limit exceeded",
+        },
+    )
+    def post(self, request):
+        """
+        Handle signup request.
+
+        Args:
+            request: HTTP request with name, email, phone, role
+
+        Returns:
+            Response with success status and pending_user_id
+        """
+        serializer = SignupRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            phone = normalize_phone_number(serializer.validated_data["phone"])
+
+            # Create or update PendingUser
+            pending_user, created = PendingUser.objects.update_or_create(
+                phone=phone,
+                defaults={
+                    "name": serializer.validated_data["name"],
+                    "email": serializer.validated_data.get("email", ""),
+                    "role": serializer.validated_data["role"],
+                    "status": "pending_verification",
+                    "expires_at": timezone.now() + timedelta(hours=24),
+                },
+            )
+
+            # Generate and send OTP
+            result = OTPService.request_otp(phone)
+
+            return Response(
+                {
+                    "success": True,
+                    "data": {**result, "pending_user_id": str(pending_user.id)},
+                    "meta": {},
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        except RateLimitError as e:
+            return Response(
+                {
+                    "success": False,
+                    "errors": {"message": str(e), "code": "RATE_LIMIT_EXCEEDED"},
+                    "meta": {},
+                },
+                status=status.HTTP_429_TOO_MANY_REQUESTS,
+            )
+
+        except Exception as e:
+            return Response(
+                {
+                    "success": False,
+                    "errors": {"message": "Failed to initiate signup", "code": "SIGNUP_FAILED"},
+                    "meta": {},
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+class SignupVerifyView(APIView):
+    """
+    Verify OTP and create user account from PendingUser.
+
+    Completes signup process by verifying OTP and creating active user.
+    """
+
+    permission_classes = [AllowAny]
+    throttle_scope = "signup_verify"
+
+    @swagger_auto_schema(
+        operation_description="Verify OTP and complete signup",
+        request_body=SignupVerifySerializer,
+        responses={
+            200: openapi.Response(
+                description="Signup completed successfully",
+                examples={
+                    "application/json": {
+                        "success": True,
+                        "data": {
+                            "access_token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+                            "refresh_token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+                            "token_type": "Bearer",
+                            "expires_in": 900,
+                            "user": {
+                                "id": "uuid",
+                                "phone": "+233241234567",
+                                "name": "John Doe",
+                                "email": "john@example.com",
+                                "role": "CUSTOMER",
+                            },
+                        },
+                        "meta": {},
+                    }
+                },
+            ),
+            400: "Invalid data or no pending signup found",
+            401: "Invalid or expired OTP",
+            429: "Too many attempts",
+        },
+    )
+    def post(self, request):
+        """
+        Handle signup verification.
+
+        Args:
+            request: HTTP request with phone and OTP
+
+        Returns:
+            Response with JWT tokens and user data
+        """
+        serializer = SignupVerifySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            phone = normalize_phone_number(serializer.validated_data["phone"])
+            otp = serializer.validated_data["otp"]
+
+            # Verify OTP (validates but doesn't create user)
+            OTPService.verify_otp_code(phone, otp)
+
+            # Get PendingUser
+            try:
+                pending_user = PendingUser.objects.get(phone=phone, status="pending_verification")
+            except PendingUser.DoesNotExist:
+                raise ValidationError("No pending signup found for this phone number.")
+
+            # Check if expired
+            if pending_user.is_expired():
+                pending_user.delete()
+                raise ValidationError("Signup session expired. Please start again.")
+
+            # Create actual User
+            user = User.objects.create(
+                phone=phone,
+                name=pending_user.name,
+                email=pending_user.email if pending_user.email else "",
+                role=pending_user.role,
+            )
+
+            # Delete PendingUser
+            pending_user.delete()
+
+            # Generate tokens
+            tokens = JWTService.create_tokens(user, request)
+
+            return Response(
+                {"success": True, "data": tokens, "meta": {}}, status=status.HTTP_200_OK
+            )
+
+        except AuthenticationError as e:
+            return Response(
+                {
+                    "success": False,
+                    "errors": {"message": str(e), "code": "AUTHENTICATION_FAILED"},
+                    "meta": {},
+                },
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        except ValidationError as e:
+            return Response(
+                {
+                    "success": False,
+                    "errors": {"message": str(e), "code": "VALIDATION_ERROR"},
+                    "meta": {},
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        except RateLimitError as e:
+            return Response(
+                {
+                    "success": False,
+                    "errors": {"message": str(e), "code": "RATE_LIMIT_EXCEEDED"},
+                    "meta": {},
+                },
+                status=status.HTTP_429_TOO_MANY_REQUESTS,
+            )
+
+
+class LoginRequestView(APIView):
+    """
+    Request OTP for existing user login.
+
+    Sends OTP to existing user's phone number.
+    """
+
+    permission_classes = [AllowAny]
+    throttle_scope = "login_request"
+
+    @swagger_auto_schema(
+        operation_description="Request OTP for login",
+        request_body=LoginRequestSerializer,
+        responses={
+            200: openapi.Response(
+                description="OTP sent successfully",
+                examples={
+                    "application/json": {
+                        "success": True,
+                        "data": {
+                            "message": "OTP sent successfully",
+                            "expires_in_minutes": 10,
+                            "user_exists": True,
+                        },
+                        "meta": {},
+                    }
+                },
+            ),
+            400: "User not found",
+            429: "Rate limit exceeded",
+        },
+    )
+    def post(self, request):
+        """
+        Handle login OTP request.
+
+        Args:
+            request: HTTP request with phone number
+
+        Returns:
+            Response with success status
+        """
+        serializer = LoginRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            phone = normalize_phone_number(serializer.validated_data["phone"])
+
+            # Generate and send OTP
+            result = OTPService.request_otp(phone)
+
+            return Response(
+                {
+                    "success": True,
+                    "data": {**result, "user_exists": True},
+                    "meta": {},
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        except RateLimitError as e:
+            return Response(
+                {
+                    "success": False,
+                    "errors": {"message": str(e), "code": "RATE_LIMIT_EXCEEDED"},
+                    "meta": {},
+                },
+                status=status.HTTP_429_TOO_MANY_REQUESTS,
+            )
+
+        except Exception as e:
+            return Response(
+                {
+                    "success": False,
+                    "errors": {"message": "Failed to send OTP", "code": "OTP_SEND_FAILED"},
+                    "meta": {},
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+class LoginVerifyView(APIView):
+    """
+    Verify OTP and log in existing user.
+
+    Authenticates user and returns JWT tokens.
+    """
+
+    permission_classes = [AllowAny]
+    throttle_scope = "login_verify"
+
+    @swagger_auto_schema(
+        operation_description="Verify OTP and log in",
+        request_body=LoginVerifySerializer,
+        responses={
+            200: openapi.Response(
+                description="Login successful",
+                examples={
+                    "application/json": {
+                        "success": True,
+                        "data": {
+                            "access_token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+                            "refresh_token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+                            "token_type": "Bearer",
+                            "expires_in": 900,
+                            "user": {
+                                "id": "uuid",
+                                "phone": "+233241234567",
+                                "name": "John Doe",
+                                "role": "CUSTOMER",
+                            },
+                        },
+                        "meta": {},
+                    }
+                },
+            ),
+            401: "Invalid or expired OTP",
+            429: "Too many attempts",
+        },
+    )
+    def post(self, request):
+        """
+        Handle login verification.
+
+        Args:
+            request: HTTP request with phone and OTP
+
+        Returns:
+            Response with JWT tokens and user data
+        """
+        serializer = LoginVerifySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            phone = normalize_phone_number(serializer.validated_data["phone"])
+            otp = serializer.validated_data["otp"]
+
+            # Verify OTP and get user
+            user = OTPService.verify_otp_and_get_user(phone, otp)
+
+            # Generate tokens
+            tokens = JWTService.create_tokens(user, request)
+
+            return Response(
+                {"success": True, "data": tokens, "meta": {}}, status=status.HTTP_200_OK
+            )
+
+        except AuthenticationError as e:
+            return Response(
+                {
+                    "success": False,
+                    "errors": {"message": str(e), "code": "AUTHENTICATION_FAILED"},
+                    "meta": {},
+                },
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        except RateLimitError as e:
+            return Response(
+                {
+                    "success": False,
+                    "errors": {"message": str(e), "code": "RATE_LIMIT_EXCEEDED"},
+                    "meta": {},
+                },
+                status=status.HTTP_429_TOO_MANY_REQUESTS,
+            )
 
 
 class OTPRequestView(APIView):

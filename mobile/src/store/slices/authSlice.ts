@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { authAPI } from '@/api/auth';
 import { User, OTPVerifyData } from '@/types/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as SecureStore from 'expo-secure-store';
+import secureStorage from '@/utils/secureStorage';
 
 interface AuthState {
   user: User | null;
@@ -60,8 +60,8 @@ export const verifyOTP = createAsyncThunk(
       const response = await authAPI.verifyOTP(data);
       if (response.success && response.data) {
         // Store tokens securely
-        await SecureStore.setItemAsync(TOKEN_KEY, response.data.access_token);
-        await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, response.data.refresh_token);
+        await secureStorage.setItem(TOKEN_KEY, response.data.access_token);
+        await secureStorage.setItem(REFRESH_TOKEN_KEY, response.data.refresh_token);
 
         // Store user data in AsyncStorage
         await AsyncStorage.setItem(USER_KEY, JSON.stringify(response.data.user));
@@ -95,8 +95,8 @@ export const logout = createAsyncThunk(
       }
 
       // Clear all stored data
-      await SecureStore.deleteItemAsync(TOKEN_KEY);
-      await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
+      await secureStorage.deleteItem(TOKEN_KEY);
+      await secureStorage.deleteItem(REFRESH_TOKEN_KEY);
       await AsyncStorage.removeItem(USER_KEY);
 
       return null;
@@ -112,8 +112,8 @@ export const loadStoredAuth = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       // Load tokens from secure storage
-      const accessToken = await SecureStore.getItemAsync(TOKEN_KEY);
-      const refreshToken = await SecureStore.getItemAsync(REFRESH_TOKEN_KEY);
+      const accessToken = await secureStorage.getItem(TOKEN_KEY);
+      const refreshToken = await secureStorage.getItem(REFRESH_TOKEN_KEY);
 
       // Load user data from AsyncStorage
       const userJson = await AsyncStorage.getItem(USER_KEY);

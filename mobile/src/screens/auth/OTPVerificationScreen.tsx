@@ -13,15 +13,14 @@ import {
 import { AuthStackScreenProps } from '@/navigation/types';
 import { colors, spacing, typography } from '@/constants/theme';
 import { Button } from '@/components/common/Button';
-import { useAppDispatch, useAppSelector } from '@/store';
-import { verifyOTP, requestOTP, clearError } from '@/store/slices/authSlice';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import { Config } from '@/constants/config';
+import { error } from 'console';
 
 type Props = AuthStackScreenProps<'OTPVerification'>;
 
 export const OTPVerificationScreen: React.FC<Props> = ({ navigation, route }) => {
-  const dispatch = useAppDispatch();
-  const { isLoading, error, user } = useAppSelector((state) => state.auth);
+  const { verifyOTP, requestOTP, isVerifyingOTP, isRequestingOTP, user, biometric } = useAuth();
   const { phone } = route.params;
 
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -73,7 +72,7 @@ export const OTPVerificationScreen: React.FC<Props> = ({ navigation, route }) =>
   };
 
   // Verify OTP
-  const handleVerifyOTP = async (otpCode?: string) => {
+  const handleVerifyOTP = (otpCode?: string) => {
     const otpValue = otpCode || otp.join('');
 
     if (otpValue.length !== 6) {
@@ -81,61 +80,85 @@ export const OTPVerificationScreen: React.FC<Props> = ({ navigation, route }) =>
       return;
     }
 
-    dispatch(clearError());
+    // Verify OTP using React Query mutation
+    verifyOTP(
+      { phone, otp: otpValue },
+      {
+        onSuccess: async (data) => {
+          // Check if biometric is available and prompt setup
+          const biometricAvailable = await biometric.checkAvailability();
 
-    try {
-      const result = await dispatch(
-        verifyOTP({
-          phone,
-          otp: otpValue,
-        })
-      ).unwrap();
-
-      // Check if user needs to select role
-      if (!result.user.role || result.user.role === 'ADMIN') {
-        // Navigate to role selection
-        navigation.replace('RoleSelection');
-      } else {
-        // User already has a role, navigation will be handled by AppNavigator
-        // The AppNavigator will detect isAuthenticated and navigate to appropriate screen
-      }
-    } catch (err: any) {
-      Alert.alert('Verification Failed', err || 'Invalid OTP. Please try again.', [
-        {
-          text: 'OK',
-          onPress: () => {
-            // Clear OTP inputs
-            setOtp(['', '', '', '', '', '']);
-            inputRefs.current[0]?.focus();
-          },
+          if (biometricAvailable) {
+            Alert.alert(
+              'Enable Biometric Login?',
+              'Would you like to use Face ID/Touch ID for faster login?',
+              [
+                {
+                  text: 'Not Now',
+                  style: 'cancel',
+                  onPress: () => navigateAfterAuth(data.user),
+                },
+                {
+                  text: 'Enable',
+                  onPress: async () => {
+                    await biometric.enableBiometric();
+                    navigateAfterAuth(data.user);
+                  },
+                },
+              ]
+            );
+          } else {
+            navigateAfterAuth(data.user);
+          }
         },
-      ]);
+        onError: (err: any) => {
+          Alert.alert('Verification Failed', err?.message || 'Invalid OTP. Please try again.', [
+            {
+              text: 'OK',
+              onPress: () => {
+                // Clear OTP inputs
+                setOtp(['', '', '', '', '', '']);
+                inputRefs.current[0]?.focus();
+              },
+            },
+          ]);
+        },
+      }
+    );
+  };
+
+  // Navigate after successful authentication
+  const navigateAfterAuth = (user: any) => {
+    // Check if user needs to select role
+    if (!user.role || user.role === 'ADMIN') {
+      navigation.replace('RoleSelection');
     }
+    // Otherwise, AppNavigator will handle navigation based on isAuthenticated
   };
 
   // Resend OTP
-  const handleResendOTP = async () => {
+  const handleResendOTP = () => {
     if (!canResend) {
       return;
     }
 
-    dispatch(clearError());
+    // Request new OTP using React Query mutation
+    requestOTP(phone, {
+      onSuccess: () => {
+        Alert.alert('OTP Sent', 'A new verification code has been sent to your phone.');
 
-    try {
-      await dispatch(requestOTP(phone)).unwrap();
+        // Reset timer
+        setResendTimer(Config.OTP_RESEND_TIMEOUT);
+        setCanResend(false);
 
-      Alert.alert('OTP Sent', 'A new verification code has been sent to your phone.');
-
-      // Reset timer
-      setResendTimer(Config.OTP_RESEND_TIMEOUT);
-      setCanResend(false);
-
-      // Clear OTP inputs
-      setOtp(['', '', '', '', '', '']);
-      inputRefs.current[0]?.focus();
-    } catch (err: any) {
-      Alert.alert('Error', err || 'Failed to resend OTP. Please try again.');
-    }
+        // Clear OTP inputs
+        setOtp(['', '', '', '', '', '']);
+        inputRefs.current[0]?.focus();
+      },
+      onError: (err: any) => {
+        Alert.alert('Error', err?.message || 'Failed to resend OTP. Please try again.');
+      },
+    });
   };
 
   // Format phone number for display
@@ -182,21 +205,18 @@ export const OTPVerificationScreen: React.FC<Props> = ({ navigation, route }) =>
                 keyboardType="number-pad"
                 maxLength={1}
                 selectTextOnFocus
-                editable={!isLoading}
+                editable={!isVerifyingOTP}
                 autoFocus={index === 0}
               />
             ))}
           </View>
 
-          {/* Error Message */}
-          {error && <Text style={styles.errorText}>{error}</Text>}
-
           {/* Verify Button */}
           <Button
-            title={isLoading ? 'Verifying...' : 'Verify OTP'}
+            title={isVerifyingOTP ? 'Verifying...' : 'Verify OTP'}
             onPress={() => handleVerifyOTP()}
-            loading={isLoading}
-            disabled={isLoading || otp.some((digit) => !digit)}
+            loading={isVerifyingOTP}
+            disabled={isVerifyingOTP || otp.some((digit) => !digit)}
             fullWidth
             style={styles.button}
           />
@@ -205,8 +225,10 @@ export const OTPVerificationScreen: React.FC<Props> = ({ navigation, route }) =>
           <View style={styles.resendContainer}>
             <Text style={styles.resendText}>Didn't receive the code?</Text>
             {canResend ? (
-              <TouchableOpacity onPress={handleResendOTP} disabled={isLoading}>
-                <Text style={styles.resendLink}>Resend OTP</Text>
+              <TouchableOpacity onPress={handleResendOTP} disabled={isRequestingOTP || isVerifyingOTP}>
+                <Text style={styles.resendLink}>
+                  {isRequestingOTP ? 'Sending...' : 'Resend OTP'}
+                </Text>
               </TouchableOpacity>
             ) : (
               <Text style={styles.resendTimer}>
@@ -218,7 +240,7 @@ export const OTPVerificationScreen: React.FC<Props> = ({ navigation, route }) =>
           {/* Change Phone Number */}
           <TouchableOpacity
             onPress={() => navigation.goBack()}
-            disabled={isLoading}
+            disabled={isVerifyingOTP}
             style={styles.changePhoneButton}
           >
             <Text style={styles.changePhoneText}>Change Phone Number</Text>
@@ -286,12 +308,6 @@ const styles = StyleSheet.create({
   },
   otpInputError: {
     borderColor: colors.error,
-  },
-  errorText: {
-    ...typography.body2,
-    color: colors.error,
-    textAlign: 'center',
-    marginBottom: spacing.md,
   },
   button: {
     marginBottom: spacing.lg,

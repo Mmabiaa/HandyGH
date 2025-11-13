@@ -1,11 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { CustomerTabScreenProps } from '@/navigation/types';
 import { colors, spacing, typography } from '@/constants/theme';
 
-type Props = CustomerTabScreenProps<'Home'>;
-
-export const HomeScreen: React.FC<Props> = () => {
+export const HomeScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Customer Home</Text>

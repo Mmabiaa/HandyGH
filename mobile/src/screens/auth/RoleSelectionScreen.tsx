@@ -10,9 +10,7 @@ import {
 import { AuthStackScreenProps } from '@/navigation/types';
 import { colors, spacing, typography } from '@/constants/theme';
 import { Button } from '@/components/common/Button';
-import { useAppDispatch, useAppSelector } from '@/store';
-import { setUser } from '@/store/slices/authSlice';
-import apiClient from '@/api/client';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 
 type Props = AuthStackScreenProps<'RoleSelection'>;
 
@@ -56,50 +54,33 @@ const roleOptions: RoleOption[] = [
 ];
 
 export const RoleSelectionScreen: React.FC<Props> = ({ navigation }) => {
-  const dispatch = useAppDispatch();
-  const { user, isLoading } = useAppSelector((state) => state.auth);
+  const { updateRole, isUpdatingRole } = useAuth();
   const [selectedRole, setSelectedRole] = useState<RoleType | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleRoleSelect = (role: RoleType) => {
     setSelectedRole(role);
   };
 
-  const handleContinue = async () => {
+  const handleContinue = () => {
     if (!selectedRole) {
       Alert.alert('Select a Role', 'Please select how you want to use HandyGH');
       return;
     }
 
-    setIsSubmitting(true);
-
-    try {
-      // Update user role via API
-      const response = await apiClient.patch('/users/me/', {
-        role: selectedRole,
-      });
-
-      if (response.data.success && response.data.data) {
-        // Update user in Redux store
-        dispatch(setUser(response.data.data));
-
+    // Update role using React Query mutation
+    updateRole(selectedRole, {
+      onSuccess: () => {
         // Navigation will be handled by AppNavigator based on the updated role
         // The AppNavigator will detect the role change and navigate appropriately
-      } else {
-        throw new Error('Failed to update role');
-      }
-    } catch (error: any) {
-      console.error('Role update error:', error);
-      Alert.alert(
-        'Error',
-        error.response?.data?.error ||
-        error.response?.data?.message ||
-        'Failed to update your role. Please try again.',
-        [{ text: 'OK' }]
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
+      },
+      onError: (error: any) => {
+        Alert.alert(
+          'Error',
+          error?.message || 'Failed to update your role. Please try again.',
+          [{ text: 'OK' }]
+        );
+      },
+    });
   };
 
   return (
@@ -123,7 +104,7 @@ export const RoleSelectionScreen: React.FC<Props> = ({ navigation }) => {
                 selectedRole === option.type && styles.roleCardSelected,
               ]}
               onPress={() => handleRoleSelect(option.type)}
-              disabled={isSubmitting}
+              disabled={isUpdatingRole}
               activeOpacity={0.7}
             >
               {/* Icon */}
@@ -159,10 +140,10 @@ export const RoleSelectionScreen: React.FC<Props> = ({ navigation }) => {
 
         {/* Continue Button */}
         <Button
-          title={isSubmitting ? 'Setting up...' : 'Continue'}
+          title={isUpdatingRole ? 'Setting up...' : 'Continue'}
           onPress={handleContinue}
-          loading={isSubmitting}
-          disabled={!selectedRole || isSubmitting}
+          loading={isUpdatingRole}
+          disabled={!selectedRole || isUpdatingRole}
           fullWidth
           style={styles.button}
         />

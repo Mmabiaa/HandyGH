@@ -4,8 +4,7 @@ import { AuthStackScreenProps } from '@/navigation/types';
 import { colors, spacing, typography } from '@/constants/theme';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
-import { useAppDispatch, useAppSelector } from '@/store';
-import { requestOTP, clearError } from '@/store/slices/authSlice';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 
 type Props = AuthStackScreenProps<'PhoneInput'>;
 
@@ -13,10 +12,9 @@ type Props = AuthStackScreenProps<'PhoneInput'>;
 const GHANA_PHONE_REGEX = /^\+233[0-9]{9}$/;
 
 export const PhoneInputScreen: React.FC<Props> = ({ navigation }) => {
-  const dispatch = useAppDispatch();
-  const { isLoading, error, otpRequested } = useAppSelector((state) => state.auth);
+  const { requestOTP, isRequestingOTP, error } = useAuth();
 
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState('+233');
   const [phoneError, setPhoneError] = useState('');
 
   // Validate phone number format
@@ -66,40 +64,38 @@ export const PhoneInputScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   // Handle OTP request
-  const handleRequestOTP = async () => {
-    // Clear any previous errors
-    dispatch(clearError());
-
+  const handleRequestOTP = () => {
     // Validate phone number
     if (!validatePhone(phone)) {
       return;
     }
 
-    try {
-      const result = await dispatch(requestOTP(phone)).unwrap();
-
-      // Show success message
-      Alert.alert(
-        'OTP Sent',
-        'A verification code has been sent to your phone number.',
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              // Navigate to OTP verification screen
-              navigation.navigate('OTPVerification', { phone });
+    // Request OTP using React Query mutation
+    requestOTP(phone, {
+      onSuccess: () => {
+        // Show success message and navigate
+        Alert.alert(
+          'OTP Sent',
+          'A verification code has been sent to your phone number.',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                navigation.navigate('OTPVerification', { phone, flow: 'signup' });
+              },
             },
-          },
-        ]
-      );
-    } catch (err: any) {
-      // Error is handled by Redux, but we can show an alert
-      Alert.alert(
-        'Error',
-        err || 'Failed to send OTP. Please try again.',
-        [{ text: 'OK' }]
-      );
-    }
+          ]
+        );
+      },
+      onError: (err: any) => {
+        // Show error alert
+        Alert.alert(
+          'Error',
+          err?.message || 'Failed to send OTP. Please try again.',
+          [{ text: 'OK' }]
+        );
+      },
+    });
   };
 
   return (
@@ -132,7 +128,7 @@ export const PhoneInputScreen: React.FC<Props> = ({ navigation }) => {
               autoComplete="tel"
               textContentType="telephoneNumber"
               maxLength={13}
-              disabled={isLoading}
+              disabled={isRequestingOTP}
               left={<Text style={styles.countryCode}>🇬🇭</Text>}
             />
 
@@ -143,10 +139,10 @@ export const PhoneInputScreen: React.FC<Props> = ({ navigation }) => {
 
           {/* Submit Button */}
           <Button
-            title={isLoading ? 'Sending...' : 'Send OTP'}
+            title={isRequestingOTP ? 'Sending...' : 'Send OTP'}
             onPress={handleRequestOTP}
-            loading={isLoading}
-            disabled={isLoading || !phone}
+            loading={isRequestingOTP}
+            disabled={isRequestingOTP || phone.length < 4}
             fullWidth
             style={styles.button}
           />

@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
-import * as SecureStore from 'expo-secure-store';
 import { Config } from '@/constants/config';
+import secureStorage from '@/utils/secureStorage';
 
 // Storage keys
 const TOKEN_KEY = 'handygh_access_token';
@@ -36,7 +36,7 @@ class APIClient {
     // Request interceptor - Add auth token
     this.client.interceptors.request.use(
       async (config) => {
-        const token = await SecureStore.getItemAsync(TOKEN_KEY);
+        const token = await secureStorage.getItem(TOKEN_KEY);
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
@@ -72,7 +72,7 @@ class APIClient {
           this.isRefreshing = true;
 
           try {
-            const refreshToken = await SecureStore.getItemAsync(REFRESH_TOKEN_KEY);
+            const refreshToken = await secureStorage.getItem(REFRESH_TOKEN_KEY);
             if (!refreshToken) {
               throw new Error('No refresh token available');
             }
@@ -85,8 +85,8 @@ class APIClient {
             const { access_token, refresh_token: newRefreshToken } = response.data.data;
 
             // Store new tokens
-            await SecureStore.setItemAsync(TOKEN_KEY, access_token);
-            await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, newRefreshToken);
+            await secureStorage.setItem(TOKEN_KEY, access_token);
+            await secureStorage.setItem(REFRESH_TOKEN_KEY, newRefreshToken);
 
             // Update authorization header
             this.client.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
@@ -123,8 +123,8 @@ class APIClient {
    * Set authentication tokens
    */
   async setTokens(accessToken: string, refreshToken: string) {
-    await SecureStore.setItemAsync(TOKEN_KEY, accessToken);
-    await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, refreshToken);
+    await secureStorage.setItem(TOKEN_KEY, accessToken);
+    await secureStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
     this.client.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
   }
 
@@ -132,8 +132,8 @@ class APIClient {
    * Clear authentication tokens
    */
   async clearTokens() {
-    await SecureStore.deleteItemAsync(TOKEN_KEY);
-    await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
+    await secureStorage.deleteItem(TOKEN_KEY);
+    await secureStorage.deleteItem(REFRESH_TOKEN_KEY);
     delete this.client.defaults.headers.common['Authorization'];
   }
 
@@ -141,14 +141,14 @@ class APIClient {
    * Get access token
    */
   async getAccessToken(): Promise<string | null> {
-    return await SecureStore.getItemAsync(TOKEN_KEY);
+    return await secureStorage.getItem(TOKEN_KEY);
   }
 
   /**
    * Get refresh token
    */
   async getRefreshToken(): Promise<string | null> {
-    return await SecureStore.getItemAsync(REFRESH_TOKEN_KEY);
+    return await secureStorage.getItem(REFRESH_TOKEN_KEY);
   }
 
   /**

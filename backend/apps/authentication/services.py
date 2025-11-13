@@ -296,6 +296,99 @@ class OTPService:
 
         return user
 
+    @staticmethod
+    def verify_otp_code(phone, otp_code):
+        """
+        Verify OTP code without creating or returning user.
+
+        Used for signup flow where user creation happens separately.
+        This method only validates the OTP is correct.
+
+        Args:
+            phone: Phone number
+            otp_code: OTP code to verify
+
+        Returns:
+            Boolean indicating successful verification
+
+        Raises:
+            ValidationError: If OTP is invalid
+            RateLimitError: If too many attempts
+            AuthenticationError: If verification fails
+        """
+        # Normalize phone number
+        phone = normalize_phone_number(phone)
+
+        # Check rate limit (10 attempts per hour)
+        OTPService._check_rate_limit(
+            phone, action="verify", limit=10, window=3600  # 10 attempts per hour
+        )
+
+        # Hash the provided OTP
+        otp_hash = hash_value(otp_code)
+
+        # Find valid OTP token
+        try:
+            otp_token = OTPToken.objects.filter(
+                phone=phone, code_hash=otp_hash, verified=False
+            ).latest("created_at")
+        except OTPToken.DoesNotExist:
+            # Increment rate limit even for invalid OTP
+            OTPService._increment_rate_limit(phone, action="verify")
+            raise AuthenticationError("Invalid OTP code")
+
+        # Check if OTP is expired
+        if otp_token.is_expired():
+            raise AuthenticationError("OTP code has expired")
+
+        # Check attempt limit for this specific token
+        if otp_token.attempts >= settings.OTP_MAX_ATTEMPTS:
+            raise RateLimitError("Too many verification attempts for this OTP")
+
+        # Increment attempts
+        otp_token.increment_attempts()
+
+        # Mark OTP as verified
+        otp_token.mark_verified()
+
+        logger.info(f"OTP verified successfully for {phone}")
+
+        return True
+
+    @staticmethod
+    def verify_otp_and_get_user(phone, otp_code):
+        """
+        Verify OTP and return existing user.
+
+        Used for login flow where user must already exist.
+        This method validates OTP and retrieves the user.
+
+        Args:
+            phone: Phone number
+            otp_code: OTP code to verify
+
+        Returns:
+            User instance if verification successful
+
+        Raises:
+            ValidationError: If OTP is invalid
+            RateLimitError: If too many attempts
+            AuthenticationError: If verification fails or user not found
+        """
+        # Verify the OTP code
+        OTPService.verify_otp_code(phone, otp_code)
+
+        # Normalize phone number
+        phone = normalize_phone_number(phone)
+
+        # Get existing user
+        try:
+            user = User.objects.get(phone=phone)
+            logger.info(f"Existing user authenticated: {phone}")
+            return user
+        except User.DoesNotExist:
+            raise AuthenticationError("User not found")
+
 
 class JWTService:
     """

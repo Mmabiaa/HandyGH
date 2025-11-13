@@ -12,6 +12,17 @@ import { AuthNavigator } from './AuthNavigator';
 import { CustomerNavigator } from './CustomerNavigator';
 import { ProviderNavigator } from './ProviderNavigator';
 
+// Modal Screens
+import { BookingCreateScreen } from '@/screens/booking/BookingCreateScreen';
+import { DateTimeSelectionScreen } from '@/screens/booking/DateTimeSelectionScreen';
+import { LocationSelectionScreen } from '@/screens/booking/LocationSelectionScreen';
+import { ServiceCustomizationScreen } from '@/screens/booking/ServiceCustomizationScreen';
+import { BookingSummaryScreen } from '@/screens/booking/BookingSummaryScreen';
+import { PaymentMethodScreen } from '@/screens/booking/PaymentMethodScreen';
+import { MobileMoneyPaymentScreen } from '@/screens/booking/MobileMoneyPaymentScreen';
+import { ManualPaymentScreen } from '@/screens/booking/ManualPaymentScreen';
+import { BookingConfirmationScreen } from '@/screens/booking/BookingConfirmationScreen';
+
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
@@ -45,8 +56,62 @@ const AppNavigator = () => {
           // Auth Stack
           <Stack.Screen name="Auth" component={AuthNavigator} />
         ) : user?.role === 'CUSTOMER' ? (
-          // Customer Stack
-          <Stack.Screen name="Customer" component={CustomerNavigator} />
+          <>
+            {/* Customer Main Stack */}
+            <Stack.Screen name="Customer" component={CustomerNavigator} />
+
+            {/* Customer Modal Screens */}
+            <Stack.Group screenOptions={{ presentation: 'modal', headerShown: true }}>
+              <Stack.Screen
+                name="BookingCreate"
+                component={BookingCreateScreen}
+                options={{ title: 'Create Booking' }}
+              />
+              <Stack.Screen
+                name="DateTimeSelection"
+                component={DateTimeSelectionScreen}
+                options={{ title: 'Select Date & Time' }}
+              />
+              <Stack.Screen
+                name="LocationSelection"
+                component={LocationSelectionScreen}
+                options={{ title: 'Select Location' }}
+              />
+              <Stack.Screen
+                name="ServiceCustomization"
+                component={ServiceCustomizationScreen}
+                options={{ title: 'Customize Service' }}
+              />
+              <Stack.Screen
+                name="BookingSummary"
+                component={BookingSummaryScreen}
+                options={{ title: 'Booking Summary' }}
+              />
+              <Stack.Screen
+                name="PaymentMethod"
+                component={PaymentMethodScreen}
+                options={{ title: 'Payment Method' }}
+              />
+              <Stack.Screen
+                name="MobileMoneyPayment"
+                component={MobileMoneyPaymentScreen}
+                options={{ title: 'Mobile Money Payment' }}
+              />
+              <Stack.Screen
+                name="ManualPayment"
+                component={ManualPaymentScreen}
+                options={{ title: 'Manual Payment' }}
+              />
+              <Stack.Screen
+                name="BookingConfirmation"
+                component={BookingConfirmationScreen}
+                options={{
+                  title: 'Booking Confirmed',
+                  headerLeft: () => null, // Prevent going back
+                }}
+              />
+            </Stack.Group>
+          </>
         ) : user?.role === 'PROVIDER' ? (
           // Provider Stack
           <Stack.Screen name="Provider" component={ProviderNavigator} />

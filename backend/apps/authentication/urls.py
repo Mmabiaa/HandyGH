@@ -10,7 +10,13 @@ from . import views
 app_name = "authentication"
 
 urlpatterns = [
-    # OTP Authentication
+    # Signup Flow
+    path("signup/request/", views.SignupRequestView.as_view(), name="signup-request"),
+    path("signup/verify/", views.SignupVerifyView.as_view(), name="signup-verify"),
+    # Login Flow
+    path("login/request/", views.LoginRequestView.as_view(), name="login-request"),
+    path("login/verify/", views.LoginVerifyView.as_view(), name="login-verify"),
+    # OTP Authentication (Legacy - kept for backward compatibility)
     path("otp/request/", views.OTPRequestView.as_view(), name="otp-request"),
     path("otp/verify/", views.OTPVerifyView.as_view(), name="otp-verify"),
     # Token Management
