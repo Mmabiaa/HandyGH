@@ -158,10 +158,23 @@ HandyGH provides a comprehensive platform for:
    python manage.py migrate
    ```
 
-2. **Create a superuser (optional)**
+2. **Create an admin/superuser**
+   
+   **Quick method (development):**
+   ```bash
+   python create_admin.py
+   ```
+   
+   This creates an admin with:
+   - Phone: `+233241234567`
+   - Password: `admin123`
+   
+   **Manual method:**
    ```bash
    python manage.py createsuperuser
    ```
+   
+   See [ADMIN_ACCESS.md](ADMIN_ACCESS.md) for detailed instructions.
 
 3. **Load initial data (optional)**
    ```bash
