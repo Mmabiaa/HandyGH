@@ -1,342 +1,129 @@
-# HandyGH Mobile App
+# HandyGH Mobile Application
 
-React Native mobile application for the HandyGH local services marketplace platform.
+A cross-platform React Native mobile application connecting customers with verified service providers in Ghana.
 
-## 📱 Overview
+## Technology Stack
 
-HandyGH Mobile is a cross-platform mobile application (iOS & Android) that connects customers with local service providers in Ghana. Built with React Native and Expo for rapid development and deployment.
-
-## ✨ Features
-
-### Customer Features
-- 🔐 Phone-based OTP authentication
-- 🔍 Search and discover local service providers
-- 📍 Location-based provider search
-- 📅 Book services with scheduling
-- 💳 Mobile Money payment integration
-- 💬 In-app messaging with providers
-- ⭐ Rate and review services
-- 📱 Push notifications for booking updates
-- 🎫 Booking history and management
-
-### Provider Features
-- 📝 Provider profile management
-- 🛠️ Service catalog management
-- 📊 Booking management dashboard
-- ✅ Accept/decline booking requests
-- 💰 Earnings and transaction history
-- 📨 Customer communication
-- 📸 Service photo uploads
-- 📈 Performance analytics
-
-## 🛠 Technology Stack
-
-- **Framework**: React Native + Expo
-- **Language**: TypeScript
-- **Navigation**: React Navigation v6
-- **State Management**: Redux Toolkit + RTK Query
-- **UI Components**: React Native Paper
-- **Forms**: React Hook Form + Zod
-- **Maps**: React Native Maps
-- **Notifications**: Expo Notifications
-- **Storage**: AsyncStorage
+- **Framework**: React Native 0.76.5 with Hermes engine
+- **Language**: TypeScript 5.7+ with strict mode
+- **Navigation**: React Navigation 6.x
+- **State Management**: Zustand (global state) + React Query (server state)
+- **Animations**: React Native Reanimated 3.x
+- **Storage**: React Native MMKV + React Native Keychain
 - **API Client**: Axios
-- **Date/Time**: date-fns
-- **Icons**: React Native Vector Icons
 
-## 📋 Prerequisites
-
-- Node.js 18+ and npm/yarn
-- Expo CLI (`npm install -g expo-cli`)
-- iOS Simulator (Mac only) or Android Studio
-- Expo Go app on physical device (for testing)
-
-## 🚀 Getting Started
-
-### 1. Install Dependencies
-
-```bash
-cd mobile
-npm install
-```
-
-### 2. Configure Environment
-
-Copy the example environment file:
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` with your configuration:
-
-```env
-# API Configuration
-API_BASE_URL=http://localhost:8000/api/v1
-API_TIMEOUT=30000
-
-# App Configuration
-APP_NAME=HandyGH
-APP_VERSION=1.0.0
-
-# Feature Flags
-ENABLE_PUSH_NOTIFICATIONS=true
-ENABLE_ANALYTICS=false
-
-# Development
-DEBUG_MODE=true
-```
-
-### 3. Start Development Server
-
-```bash
-npm start
-```
-
-This will start the Expo development server. You can then:
-- Press `i` to open iOS simulator
-- Press `a` to open Android emulator
-- Scan QR code with Expo Go app on your phone
-
-### 4. Run on Specific Platform
-
-```bash
-# iOS
-npm run ios
-
-# Android
-npm run android
-
-# Web (for testing)
-npm run web
-```
-
-## 📁 Project Structure
+## Project Structure
 
 ```
 mobile/
 ├── src/
-│   ├── api/                    # API client and endpoints
-│   │   ├── client.ts          # Axios configuration
-│   │   ├── auth.ts            # Authentication endpoints
-│   │   ├── providers.ts       # Provider endpoints
-│   │   ├── bookings.ts        # Booking endpoints
-│   │   └── payments.ts        # Payment endpoints
-│   │
-│   ├── components/            # Reusable components
-│   │   ├── common/           # Common UI components
-│   │   ├── auth/             # Auth-related components
-│   │   ├── booking/          # Booking components
-│   │   └── provider/         # Provider components
-│   │
-│   ├── screens/              # Screen components
-│   │   ├── auth/            # Authentication screens
-│   │   ├── customer/        # Customer screens
-│   │   ├── provider/        # Provider screens
-│   │   └── shared/          # Shared screens
-│   │
-│   ├── navigation/           # Navigation configuration
-│   │   ├── AppNavigator.tsx # Main navigator
-│   │   ├── AuthNavigator.tsx # Auth flow
-│   │   ├── CustomerNavigator.tsx # Customer flow
-│   │   └── ProviderNavigator.tsx # Provider flow
-│   │
-│   ├── store/               # Redux store
-│   │   ├── index.ts        # Store configuration
-│   │   ├── slices/         # Redux slices
-│   │   └── api/            # RTK Query APIs
-│   │
-│   ├── hooks/              # Custom React hooks
-│   │   ├── useAuth.ts     # Authentication hook
-│   │   ├── useLocation.ts # Location hook
-│   │   └── useNotifications.ts # Notifications hook
-│   │
-│   ├── utils/              # Utility functions
-│   │   ├── validation.ts  # Form validation
-│   │   ├── formatting.ts  # Data formatting
-│   │   └── storage.ts     # AsyncStorage helpers
-│   │
-│   ├── constants/          # App constants
-│   │   ├── colors.ts      # Color palette
-│   │   ├── typography.ts  # Typography styles
-│   │   └── config.ts      # App configuration
-│   │
-│   ├── types/              # TypeScript types
-│   │   ├── api.ts         # API types
-│   │   ├── models.ts      # Data models
-│   │   └── navigation.ts  # Navigation types
-│   │
-│   └── assets/             # Static assets
-│       ├── images/        # Images
-│       ├── icons/         # Icons
-│       └── fonts/         # Custom fonts
-│
-├── App.tsx                 # App entry point
-├── app.json               # Expo configuration
-├── package.json           # Dependencies
-├── tsconfig.json          # TypeScript config
-└── .env.example           # Environment template
+│   ├── core/           # Core infrastructure
+│   │   ├── api/        # API client and services
+│   │   ├── navigation/ # Navigation configuration
+│   │   ├── storage/    # Storage utilities
+│   │   └── theme/      # Theme and design system
+│   ├── features/       # Feature modules
+│   │   ├── auth/       # Authentication
+│   │   ├── booking/    # Booking management
+│   │   ├── customer/   # Customer features
+│   │   └── provider/   # Provider features
+│   └── shared/         # Shared resources
+│       ├── components/ # Reusable UI components
+│       ├── hooks/      # Custom hooks
+│       ├── utils/      # Utility functions
+│       └── types/      # TypeScript types
+├── android/            # Android native code
+├── ios/                # iOS native code
+└── App.tsx             # Root component
 ```
 
-## 🎨 Design System
+## Getting Started
 
-### Colors
-```typescript
-const colors = {
-  primary: '#2563EB',      // Blue
-  secondary: '#10B981',    // Green
-  accent: '#F59E0B',       // Amber
-  error: '#EF4444',        // Red
-  success: '#10B981',      // Green
-  warning: '#F59E0B',      // Amber
-  background: '#FFFFFF',
-  surface: '#F9FAFB',
-  text: '#111827',
-  textSecondary: '#6B7280',
-};
-```
+### Prerequisites
 
-### Typography
-- **Headings**: Inter Bold
-- **Body**: Inter Regular
-- **Captions**: Inter Medium
+- Node.js >= 18
+- npm or yarn
+- For iOS: Xcode 14+ and CocoaPods
+- For Android: Android Studio and JDK 17
 
-## 🔐 Authentication Flow
+### Installation
 
-1. **Phone Input** → User enters phone number
-2. **OTP Request** → Backend sends OTP via SMS
-3. **OTP Verification** → User enters OTP code
-4. **Token Storage** → JWT tokens stored securely
-5. **Auto-login** → Refresh token for seamless experience
-
-## 📱 Key Screens
-
-### Customer App
-1. **Onboarding** - Welcome and intro
-2. **Auth** - Phone + OTP login
-3. **Home** - Search and browse providers
-4. **Provider Details** - View provider profile and services
-5. **Booking** - Create and manage bookings
-6. **Payment** - Mobile Money payment
-7. **Messages** - Chat with providers
-8. **Profile** - User profile and settings
-
-### Provider App
-1. **Dashboard** - Overview of bookings and earnings
-2. **Bookings** - Manage booking requests
-3. **Services** - Manage service catalog
-4. **Earnings** - Transaction history
-5. **Profile** - Provider profile management
-6. **Messages** - Customer communication
-
-## 🔌 API Integration
-
-The app connects to your Django backend:
-
-```typescript
-// Example API call
-import { api } from '@/api/client';
-
-const searchProviders = async (params) => {
-  const response = await api.get('/providers/', { params });
-  return response.data;
-};
-```
-
-## 🧪 Testing
-
+1. Install dependencies:
 ```bash
-# Run tests
+npm install
+```
+
+2. For iOS, install CocoaPods dependencies:
+```bash
+cd ios && pod install && cd ..
+```
+
+### Running the App
+
+#### iOS
+```bash
+npm run ios
+```
+
+#### Android
+```bash
+npm run android
+```
+
+### Development
+
+#### Start Metro bundler
+```bash
+npm start
+```
+
+#### Run tests
+```bash
 npm test
-
-# Run tests with coverage
-npm run test:coverage
-
-# Run E2E tests
-npm run test:e2e
 ```
 
-## 📦 Building for Production
-
-### Android
-
+#### Type checking
 ```bash
-# Build APK
-expo build:android -t apk
-
-# Build AAB (for Play Store)
-expo build:android -t app-bundle
+npm run typecheck
 ```
 
-### iOS
-
+#### Linting
 ```bash
-# Build for App Store
-expo build:ios -t archive
+npm run lint
 ```
 
-## 🚀 Deployment
+## Configuration
 
-### Expo Updates (OTA)
+### TypeScript
+- Strict mode enabled for maximum type safety
+- Path aliases configured for clean imports:
+  - `@/*` → `src/*`
+  - `@features/*` → `src/features/*`
+  - `@shared/*` → `src/shared/*`
+  - `@core/*` → `src/core/*`
 
-```bash
-# Publish update
-expo publish
-```
+### Metro Bundler
+- Inline requires enabled for better performance
+- Optimized for code splitting
 
-### App Stores
+### Hermes Engine
+- Enabled by default for optimal performance
+- Provides faster startup times and reduced memory usage
 
-1. **Google Play Store**
-   - Build AAB
-   - Upload to Play Console
-   - Submit for review
+## Performance Requirements
 
-2. **Apple App Store**
-   - Build IPA
-   - Upload to App Store Connect
-   - Submit for review
+- 60fps animations using Reanimated worklets
+- Screen load time < 500ms
+- Time to interactive < 2 seconds
+- Peak memory usage < 100MB
 
-## 🔧 Development Tips
+## Code Quality
 
-### Hot Reload
-- Shake device or press `Cmd+D` (iOS) / `Cmd+M` (Android)
-- Enable Fast Refresh in settings
+- ESLint with React Native config
+- Prettier for code formatting
+- Jest for unit testing with 90% coverage target
+- TypeScript strict mode enforced
 
-### Debugging
-- Use React Native Debugger
-- Enable Remote JS Debugging
-- Use Flipper for advanced debugging
+## Next Steps
 
-### Performance
-- Use `React.memo` for expensive components
-- Implement virtualized lists with `FlatList`
-- Optimize images with proper sizing
-- Use `useMemo` and `useCallback` appropriately
-
-## 📚 Documentation
-
-- [React Native Docs](https://reactnative.dev/)
-- [Expo Docs](https://docs.expo.dev/)
-- [React Navigation](https://reactnavigation.org/)
-- [Redux Toolkit](https://redux-toolkit.js.org/)
-
-## 🤝 Contributing
-
-1. Create a feature branch
-2. Make your changes
-3. Write/update tests
-4. Submit a pull request
-
-## 📄 License
-
-MIT License - see LICENSE file for details
-
-## 🆘 Support
-
-- Email: support@handygh.com
-- Documentation: [Full Docs](../docs/)
-- Issues: [GitHub Issues](https://github.com/yourusername/handygh/issues)
-
----
-
-**Built with ❤️ for the Ghanaian local services community**
+Refer to `.kiro/specs/react-native-mobile-app/tasks.md` for the complete implementation plan.

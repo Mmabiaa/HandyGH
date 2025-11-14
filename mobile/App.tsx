@@ -1,68 +1,113 @@
-import React, { useEffect, useState } from 'react';
-import { StatusBar } from 'expo-status-bar';
+/**
+ * App Root Component
+ *
+ * Main entry point for the HandyGH Mobile Application.
+ * Sets up navigation container, theme provider, deep linking, and app lock.
+ */
+
+import React from 'react';
+import { StatusBar, View, Text, StyleSheet } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { Provider as PaperProvider } from 'react-native-paper';
-import { Provider as ReduxProvider } from 'react-redux';
-import { PersistGate } from 'redux-persist/integration/react';
-import * as SplashScreen from 'expo-splash-screen';
+import { ThemeProvider } from './src/core/theme/ThemeProvider';
+import { RootNavigator, navigationRef, linking } from './src/core/navigation';
+import { useAppLock } from './src/core/security';
+import { AppLockScreen } from './src/features/shared/screens';
+import { ConnectionStatusBanner, ErrorBoundary } from './src/shared/components';
+// Note: Toast is not rendered here for Expo Go compatibility
+// Toast messages will use Alert fallback
 
-import { store, persistor } from '@/store';
-import AppNavigator from '@/navigation/AppNavigator';
-import { theme } from '@/constants/theme';
-import { ErrorBoundary } from '@/components/common';
+// App Content Component with App Lock
+const AppContent: React.FC = () => {
+  const { isLocked, unlock } = useAppLock();
 
-// Keep the splash screen visible while we fetch resources
-SplashScreen.preventAutoHideAsync();
-
-export default function App() {
-  const [appIsReady, setAppIsReady] = useState(false);
-
-  useEffect(() => {
-    async function prepare() {
-      try {
-        // Pre-load fonts, make any API calls you need to do here
-        // TODO: Add custom fonts when available
-        // await Font.loadAsync({
-        //   'Inter-Regular': require('./assets/fonts/Inter-Regular.ttf'),
-        //   'Inter-Medium': require('./assets/fonts/Inter-Medium.ttf'),
-        //   'Inter-Bold': require('./assets/fonts/Inter-Bold.ttf'),
-        // });
-
-        // Small delay to ensure everything is ready
-        await new Promise(resolve => setTimeout(resolve, 500));
-      } catch (e) {
-        console.warn(e);
-      } finally {
-        // Tell the application to render
-        setAppIsReady(true);
-      }
-    }
-
-    prepare();
-  }, []);
-
-  useEffect(() => {
-    if (appIsReady) {
-      SplashScreen.hideAsync();
-    }
-  }, [appIsReady]);
-
-  if (!appIsReady) {
-    return null;
+  if (isLocked) {
+    return <AppLockScreen onUnlock={unlock} />;
   }
 
   return (
-    <ErrorBoundary>
-      <ReduxProvider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
-          <PaperProvider theme={theme}>
-            <SafeAreaProvider>
-              <AppNavigator />
-              <StatusBar style="auto" />
-            </SafeAreaProvider>
-          </PaperProvider>
-        </PersistGate>
-      </ReduxProvider>
-    </ErrorBoundary>
+    <NavigationContainer
+      ref={navigationRef}
+      linking={linking}
+      onReady={() => {
+        console.log('[App] Navigation is ready');
+      }}
+      onStateChange={() => {
+        console.log('[App] Navigation state changed');
+      }}
+      fallback={
+        <View style={styles.loadingContainer}>
+          <Text>Loading...</Text>
+        </View>
+      }
+    >
+      <StatusBar
+        barStyle="dark-content"
+        backgroundColor="#FFFFFF"
+      />
+      <RootNavigator />
+      <ConnectionStatusBanner />
+    </NavigationContainer>
   );
+};
+
+function App(): React.JSX.Element {
+  console.log('[App] Component rendering...');
+
+  try {
+    return (
+      <ErrorBoundary>
+        <SafeAreaProvider>
+          <ThemeProvider>
+            <AppContent />
+          </ThemeProvider>
+        </SafeAreaProvider>
+      </ErrorBoundary>
+    );
+  } catch (error) {
+    console.error('[App] Error during render:', error);
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorTitle}>App Error</Text>
+        <Text style={styles.errorMessage}>
+          {error instanceof Error ? error.message : 'Unknown error'}
+        </Text>
+      </View>
+    );
+  }
 }
+
+const styles = StyleSheet.create({
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  errorTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#d32f2f',
+  },
+  errorMessage: {
+    fontSize: 16,
+    marginBottom: 10,
+    textAlign: 'center',
+    color: '#333',
+  },
+  errorStack: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 10,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+});
+
+export default App;

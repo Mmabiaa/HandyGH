@@ -16,8 +16,154 @@ import uuid
 from datetime import timedelta
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
+
+
+class PendingUser(models.Model):
+    """
+    Model to store temporary user data during signup verification.
+
+    Stores user information while waiting for OTP verification.
+    Automatically expires after 24 hours to prevent database clutter.
+    Allows users to resume incomplete signups.
+
+    Attributes:
+        id: UUID primary key
+        phone: Phone number (unique)
+        name: User's full name
+        email: User's email (optional)
+        role: User role (CUSTOMER or PROVIDER)
+        status: Verification status
+        created_at: When the pending user was created
+        expires_at: When the pending user expires (24 hours from creation)
+    """
+
+    STATUS_CHOICES = [
+        ("pending_verification", "Pending Verification"),
+        ("verified", "Verified"),
+        ("expired", "Expired"),
+    ]
+
+    ROLE_CHOICES = [
+        ("CUSTOMER", "Customer"),
+        ("PROVIDER", "Provider"),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    phone = models.CharField(
+        max_length=20,
+        unique=True,
+        db_index=True,
+        help_text="Phone number in international format (+233XXXXXXXXX)",
+    )
+
+    name = models.CharField(max_length=255, help_text="User's full name")
+
+    email = models.EmailField(blank=True, null=True, help_text="User's email address (optional)")
+
+    role = models.CharField(
+        max_length=20, choices=ROLE_CHOICES, help_text="User role (CUSTOMER or PROVIDER)"
+    )
+
+    status = models.CharField(
+        max_length=30,
+        choices=STATUS_CHOICES,
+        default="pending_verification",
+        help_text="Verification status",
+    )
+
+    created_at = models.DateTimeField(
+        default=timezone.now, help_text="When the pending user was created"
+    )
+
+    expires_at = models.DateTimeField(help_text="When the pending user expires")
+
+    class Meta:
+        db_table = "pending_users"
+        verbose_name = "Pending User"
+        verbose_name_plural = "Pending Users"
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["phone", "status"]),
+            models.Index(fields=["expires_at"]),
+            models.Index(fields=["status"]),
+        ]
+
+    def __str__(self):
+        """String representation of pending user."""
+        return f"Pending user: {self.name} ({self.phone})"
+
+    def save(self, *args, **kwargs):
+        """
+        Override save to auto-set expires_at if not provided.
+
+        Sets expiration to 24 hours from creation.
+        """
+        if not self.expires_at:
+            self.expires_at = timezone.now() + timedelta(hours=24)
+        super().save(*args, **kwargs)
+
+    def is_expired(self):
+        """
+        Check if pending user has expired.
+
+        Returns:
+            Boolean indicating if pending user is expired
+        """
+        return timezone.now() > self.expires_at
+
+    def is_valid(self):
+        """
+        Check if pending user is valid (not expired and pending verification).
+
+        Returns:
+            Boolean indicating if pending user is valid
+        """
+        return not self.is_expired() and self.status == "pending_verification"
+
+    def mark_verified(self):
+        """Mark the pending user as verified."""
+        self.status = "verified"
+        self.save(update_fields=["status"])
+
+    def mark_expired(self):
+        """Mark the pending user as expired."""
+        self.status = "expired"
+        self.save(update_fields=["status"])
+
+    @classmethod
+    def cleanup_expired(cls):
+        """
+        Delete expired pending users.
+
+        Should be run periodically (e.g., via cron job or celery task).
+
+        Returns:
+            Number of deleted pending users
+        """
+        expired = cls.objects.filter(expires_at__lt=timezone.now())
+        count = expired.count()
+        expired.delete()
+        return count
+
+    @classmethod
+    def get_or_none(cls, phone):
+        """
+        Get pending user by phone or return None.
+
+        Args:
+            phone: Phone number to search for
+
+        Returns:
+            PendingUser instance or None
+        """
+        try:
+            return cls.objects.get(phone=phone, status="pending_verification")
+        except cls.DoesNotExist:
+            return None
 
 
 class OTPToken(models.Model):

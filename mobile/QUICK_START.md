@@ -1,215 +1,143 @@
-# Quick Start Guide - HandyGH Mobile
+# Quick Start Guide - Testing on Expo Go
 
-## ✅ Installation Complete!
+## The Issue
+You're seeing: `ERROR src\features\provider\components\PeriodFilter.tsx: Error while parsing JSON - Unexpected end of JSON input`
 
-Your dependencies are installed. Follow these steps to run the app:
+This is a **Metro bundler cache issue**, not a code problem.
 
-## Step 1: Find Your Computer's IP Address
+## Quick Fix (3 Steps)
 
-The mobile app needs to connect to your Django backend. You need your computer's IP address (not localhost).
+### Step 1: Stop Current Server
+Press `Ctrl+C` in your terminal to stop the current Expo server.
+
+### Step 2: Clear Cache and Restart
+Run this command:
+```bash
+cd mobile
+npx expo start --clear --tunnel
+```
+
+### Step 3: Scan QR Code
+1. Open **Expo Go** app on your iPhone
+2. Scan the QR code from the terminal
+3. Wait for the app to load
+
+## That's It!
+
+The app should now load successfully on your iPhone.
+
+---
+
+## If You Still See Errors
+
+### Option A: Full Clean (Recommended)
+```bash
+cd mobile
+
+# Delete cache folders
+rm -rf .expo
+rm -rf node_modules/.cache
+
+# Restart with clean cache
+npx expo start --clear --tunnel
+```
+
+### Option B: Nuclear Option (If Option A fails)
+```bash
+cd mobile
+
+# Delete everything and reinstall
+rm -rf node_modules
+rm -rf .expo
+npm install
+
+# Start fresh
+npx expo start --clear --tunnel
+```
+
+---
+
+## What Changed?
+
+✅ **Installed packages**: `react-native-toast-message` and `react-native-restart`
+✅ **Updated imports**: Removed mock implementations
+✅ **Fixed Toast config**: Now uses real Toast components
+✅ **All TypeScript errors resolved**
+
+---
+
+## Testing the New Features
+
+Once the app loads, you can test:
+
+1. **Error Handling**: Try invalid form inputs to see validation errors
+2. **Success Messages**: Complete any action to see success toasts
+3. **Network Errors**: Turn off WiFi to see network error handling
+4. **Offline Mode**: Test with airplane mode
+
+---
+
+## Alternative: Use the Scripts
+
+### On Mac/Linux:
+```bash
+cd mobile
+chmod +x test-expo.sh
+./test-expo.sh
+```
 
 ### On Windows:
-
-1. Open Command Prompt
-2. Type: `ipconfig`
-3. Look for "IPv4 Address" under your active network adapter
-4. Example: `192.168.1.100`
-
-### Quick Command:
 ```bash
-ipconfig | findstr /i "IPv4"
+cd mobile
+test-expo.bat
 ```
 
-## Step 2: Update .env File
+---
 
-Open `mobile/.env` and update the API_BASE_URL:
+## Common Issues
 
-```env
-# Change this:
-API_BASE_URL=http://localhost:8000/api/v1
-
-# To this (use YOUR IP address):
-API_BASE_URL=http://192.168.1.100:8000/api/v1
-```
-
-**Important**: Replace `192.168.1.100` with YOUR actual IP address!
-
-## Step 3: Start Django Backend
-
-Open a **new terminal** and run:
-
+### "Cannot find module 'react-native-toast-message'"
+The packages are already installed. Just clear the cache:
 ```bash
-cd backend
-python manage.py runserver 0.0.0.0:8000
+npx expo start --clear
 ```
 
-**Note**: The `0.0.0.0` is important - it allows connections from your network.
-
-## Step 4: Start Mobile App
-
-In the mobile directory, run:
-
+### "Tunnel connection failed"
+Try without tunnel:
 ```bash
-npm start
+npx expo start --clear
 ```
+Then use the LAN connection instead.
 
-Or simply double-click `start.bat`
-
-## Step 5: Run on Device
-
-Once Expo starts, you have 3 options:
-
-### Option 1: Physical Device (Recommended)
-1. Install **Expo Go** app from App Store or Play Store
-2. Scan the QR code shown in terminal
-3. App will load on your phone
-
-### Option 2: Android Emulator
-1. Install Android Studio
-2. Create an Android Virtual Device (AVD)
-3. Start the emulator
-4. Press `a` in the Expo terminal
-
-### Option 3: iOS Simulator (Mac only)
-1. Install Xcode
-2. Press `i` in the Expo terminal
-
-## Troubleshooting
-
-### "Network request failed"
-
-**Problem**: App can't reach backend
-
-**Solutions**:
-1. Check `.env` has correct IP address
-2. Verify backend is running on `0.0.0.0:8000`
-3. Ensure phone and computer are on same WiFi
-4. Check Windows Firewall isn't blocking port 8000
-
-**Test backend is accessible**:
+### "App keeps crashing"
+Check the error in Expo Go. If it's about missing modules, try:
 ```bash
-# On your phone's browser, visit:
-http://YOUR_IP:8000/api/docs/
+npm install
+npx expo start --clear
 ```
 
-### "Unable to resolve module"
+---
 
-**Problem**: Missing dependencies
+## Need More Help?
 
-**Solution**:
-```bash
-npm install --legacy-peer-deps
-```
+Check these files:
+- `TESTING_INSTRUCTIONS.md` - Detailed testing guide
+- `DEPENDENCIES_NEEDED.md` - Package installation info
+- `src/shared/errors/README.md` - Error handling documentation
 
-### "Expo Go app shows error"
+---
 
-**Problem**: Metro bundler issue
-
-**Solution**:
-```bash
-# Clear cache and restart
-npm start -- --clear
-```
-
-### Port 8000 already in use
-
-**Problem**: Another process using port 8000
-
-**Solution**:
-```bash
-# Find and kill the process
-netstat -ano | findstr :8000
-taskkill /PID <PID_NUMBER> /F
-```
-
-## Testing the Setup
-
-### 1. Test Backend API
-
-Open browser and visit:
-```
-http://YOUR_IP:8000/api/docs/
-```
-
-You should see the Swagger API documentation.
-
-### 2. Test Mobile Connection
-
-Once the app loads on your device:
-1. You should see "HandyGH Home Screen"
-2. No network errors in console
-
-## Next Steps
-
-Now that setup is complete, you can:
-
-1. **Build Authentication Screens**
-   - Phone input screen
-   - OTP verification screen
-
-2. **Test OTP Flow**
-   - Request OTP
-   - Verify OTP
-   - Login
-
-3. **Build Home Screen**
-   - Provider search
-   - Category browsing
-
-## Useful Commands
+## Quick Commands Cheat Sheet
 
 ```bash
-# Start development server
-npm start
+# Clear cache and start
+npx expo start --clear --tunnel
 
-# Start with cache cleared
-npm start -- --clear
+# Full clean restart
+rm -rf .expo node_modules/.cache && npx expo start --clear
 
-# Run on Android
-npm run android
-
-# Run on iOS (Mac only)
-npm run ios
-
-# Check TypeScript
-npm run type-check
-
-# Lint code
-npm run lint
+# Nuclear option
+rm -rf node_modules .expo && npm install && npx expo start --clear
 ```
 
-## Development Workflow
-
-1. **Make changes** to code in `src/`
-2. **Save file** - app will hot reload automatically
-3. **Check console** for errors
-4. **Test on device** - shake device for dev menu
-
-## Project Structure
-
-```
-mobile/
-├── src/
-│   ├── api/          # API calls (✅ Ready)
-│   ├── store/        # Redux state (✅ Ready)
-│   ├── types/        # TypeScript types (✅ Ready)
-│   ├── constants/    # Theme & config (✅ Ready)
-│   ├── screens/      # Build screens here
-│   ├── components/   # Build components here
-│   └── navigation/   # Navigation setup
-├── App.tsx           # Entry point
-└── .env              # Configuration
-```
-
-## Getting Help
-
-- **Setup Issues**: Check this guide
-- **API Issues**: See `backend/API_DOCUMENTATION.md`
-- **React Native**: https://reactnative.dev/
-- **Expo**: https://docs.expo.dev/
-
-## Ready to Code! 🚀
-
-Your mobile app is set up and ready for development!
-
-**Next**: Start building the authentication screens or ask for help with any specific feature.
+**Pro Tip**: The `--tunnel` flag is important for testing on iPhone when you're not on the same network!
