@@ -119,7 +119,7 @@ export const PaymentMethodScreen: React.FC = () => {
         {/* Saved Payment Methods */}
         {paymentMethods && paymentMethods.length > 0 && (
           <View style={styles.section}>
-            <Text variant="subtitle" style={styles.sectionTitle}>
+            <Text variant="h3" style={styles.sectionTitle}>
               Saved Methods
             </Text>
             {paymentMethods.map((method) => (
@@ -139,7 +139,7 @@ export const PaymentMethodScreen: React.FC = () => {
 
         {/* Quick Payment Options */}
         <View style={styles.section}>
-          <Text variant="subtitle" style={styles.sectionTitle}>
+          <Text variant="h3" style={styles.sectionTitle}>
             Quick Payment Options
           </Text>
 
@@ -186,7 +186,7 @@ export const PaymentMethodScreen: React.FC = () => {
         <View style={[styles.summaryCard, { backgroundColor: theme.colors.surface }]}>
           <View style={styles.summaryRow}>
             <Text variant="body">Service Total</Text>
-            <Text variant="subtitle">
+            <Text variant="h3">
               GHS {state.bookingData.totalAmount?.toFixed(2) || '0.00'}
             </Text>
           </View>
@@ -253,7 +253,7 @@ const PaymentMethodCard: React.FC<PaymentMethodCardProps> = ({
       </View>
 
       <View style={styles.methodInfo}>
-        <Text variant="subtitle" style={styles.methodLabel}>
+        <Text variant="h3" style={styles.methodLabel}>
           {getLabel(method)}
         </Text>
         {getDescription(method) && (

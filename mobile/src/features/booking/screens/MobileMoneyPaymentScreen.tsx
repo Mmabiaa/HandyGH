@@ -15,11 +15,10 @@ import { useBookingFlowContext } from '../context/BookingFlowContext';
 import { useMutation } from '@tanstack/react-query';
 import { PaymentService } from '../../../core/api/services/PaymentService';
 import { BookingService } from '../../../core/api/services/BookingService';
-import { MoMoPaymentRequest, PaymentStatus } from '../../../core/api/types';
+import { MoMoPaymentRequest } from '../../../core/api/types';
 import { Ionicons } from '@expo/vector-icons';
-import { validatePhoneNumber } from '../../auth/utils/phoneValidation';
+import { validateGhanaPhoneNumber } from '../../auth/utils/phoneValidation';
 import {
-  parsePaymentError,
   formatPaymentErrorAlert,
   PAYMENT_TIMEOUTS,
   hasPaymentVerificationTimedOut,
@@ -68,7 +67,7 @@ export const MobileMoneyPaymentScreen: React.FC = () => {
         scheduledTime: state.scheduledTime,
         location: state.location,
         locationNotes: state.locationNotes,
-        addOnIds: state.selectedAddOnIds,
+        addOns: state.selectedAddOnIds,
       });
     },
   });
@@ -87,7 +86,7 @@ export const MobileMoneyPaymentScreen: React.FC = () => {
 
     const formattedPhone = phone.startsWith('+233') ? phone : `+233${phone.replace(/^0/, '')}`;
 
-    if (!validatePhoneNumber(formattedPhone)) {
+    if (!validateGhanaPhoneNumber(formattedPhone)) {
       setPhoneError('Please enter a valid Ghana phone number');
       return false;
     }
@@ -232,7 +231,7 @@ export const MobileMoneyPaymentScreen: React.FC = () => {
 
         {/* Provider Selection */}
         <View style={styles.section}>
-          <Text variant="subtitle" style={styles.sectionTitle}>
+          <Text variant="h3" style={styles.sectionTitle}>
             Select Provider
           </Text>
           <View style={styles.providerGrid}>
@@ -286,7 +285,7 @@ export const MobileMoneyPaymentScreen: React.FC = () => {
 
         {/* Payment Summary */}
         <View style={[styles.summaryCard, { backgroundColor: theme.colors.surface }]}>
-          <Text variant="subtitle" style={styles.summaryTitle}>
+          <Text variant="h3" style={styles.summaryTitle}>
             Payment Summary
           </Text>
           <View style={styles.summaryRow}>
@@ -301,7 +300,7 @@ export const MobileMoneyPaymentScreen: React.FC = () => {
         {isProcessing && (
           <View style={[styles.statusCard, { backgroundColor: theme.colors.surface }]}>
             <ActivityIndicator size="large" color={theme.colors.primary} />
-            <Text variant="subtitle" style={styles.statusText}>
+            <Text variant="h3" style={styles.statusText}>
               {paymentStatus === 'processing' && 'Initiating payment...'}
               {paymentStatus === 'verifying' && 'Verifying payment...'}
             </Text>
@@ -317,7 +316,7 @@ export const MobileMoneyPaymentScreen: React.FC = () => {
           <View style={[styles.instructionsCard, { backgroundColor: theme.colors.surface }]}>
             <View style={styles.instructionHeader}>
               <Ionicons name="information-circle-outline" size={24} color={theme.colors.primary} />
-              <Text variant="subtitle" style={styles.instructionTitle}>
+              <Text variant="h3" style={styles.instructionTitle}>
                 How it works
               </Text>
             </View>
@@ -365,7 +364,6 @@ interface ProviderButtonProps {
 }
 
 const ProviderButton: React.FC<ProviderButtonProps> = ({
-  provider,
   label,
   logo,
   isSelected,
