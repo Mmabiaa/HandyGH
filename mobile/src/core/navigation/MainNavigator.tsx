@@ -11,7 +11,7 @@ import type { MainStackParamList } from './types';
 
 // Tab navigators
 import CustomerTabNavigator from './CustomerTabNavigator';
-import ProviderTabNavigator from './ProviderTabNavigator';
+import ProviderStackNavigator from './ProviderStackNavigator';
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
 
@@ -36,7 +36,7 @@ const MainNavigator: React.FC = () => {
       {/* Provider experience */}
       <Stack.Screen
         name="ProviderTabs"
-        component={ProviderTabNavigator}
+        component={ProviderStackNavigator}
       />
     </Stack.Navigator>
   );

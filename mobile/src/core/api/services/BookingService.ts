@@ -126,4 +126,32 @@ export class BookingService {
       comment,
     });
   }
+
+  /**
+   * Get pending booking requests for provider
+   * Requirement 8.6: Retrieve pending booking requests
+   */
+  static async getPendingRequests(): Promise<Booking[]> {
+    return api.get<Booking[]>(
+      `${this.BASE_PATH}/?status=${BookingStatus.PENDING}`
+    );
+  }
+
+  /**
+   * Accept a booking request
+   * Requirement 8.9: Update booking status to confirmed
+   */
+  static async acceptBooking(id: string): Promise<Booking> {
+    return this.updateBookingStatus(id, BookingStatus.CONFIRMED);
+  }
+
+  /**
+   * Decline a booking request
+   * Requirement 8.10: Decline booking with reason
+   */
+  static async declineBooking(id: string, reason: string): Promise<Booking> {
+    return api.patch<Booking>(`${this.BASE_PATH}/${id}/decline/`, {
+      reason,
+    });
+  }
 }

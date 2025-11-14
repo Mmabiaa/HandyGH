@@ -8,7 +8,8 @@ I've fixed the bundling errors you were experiencing:
 2. ✅ Updated `babel.config.js` to use `babel-preset-expo`
 3. ✅ Updated `index.js` to use `registerRootComponent` from Expo
 4. ✅ Fixed `app.json` configuration
-5. ✅ Installed `babel-preset-expo` package
+5. ✅ Installed `babel-preset-expo` and `react-native-web` packages
+6. ✅ Disabled web platform (mobile only)
 
 ## Running the App
 
@@ -16,29 +17,43 @@ I've fixed the bundling errors you were experiencing:
 
 ```bash
 cd mobile
-npx expo start --clear
+npm start
+```
+
+Or with cache clearing:
+
+```bash
+npx expo start --clear --no-web
 ```
 
 This will:
 - Clear the Metro bundler cache
-- Start the Expo development server
+- Start the Expo development server (mobile only, no web)
 - Show a QR code you can scan with Expo Go app
 
-### Option 2: Start on a Specific Port
+### Option 2: Start with Tunnel (if on different networks)
+
+If your phone and computer are on different networks:
+
+```bash
+npm run start:tunnel
+```
+
+### Option 3: Start on a Specific Port
 
 If port 8081 is busy:
 
 ```bash
-npx expo start --clear --port 8082
+npx expo start --clear --no-web --port 8082
 ```
 
-### Option 3: Run on Android
+### Option 4: Run on Android
 
 ```bash
 npx expo start --android
 ```
 
-### Option 4: Run on iOS (Mac only)
+### Option 5: Run on iOS (Mac only)
 
 ```bash
 npx expo start --ios
@@ -68,12 +83,16 @@ taskkill /F /PID <PID_NUMBER>
 
 Or use a different port:
 ```bash
-npx expo start --port 8082
+npx expo start --port 8082 --no-web
 ```
 
 ### "Runtime not ready: ReferenceError"
 
 This was caused by the incorrect Babel configuration. It's now fixed with `babel-preset-expo`.
+
+### "Unable to resolve react-native-web"
+
+This has been fixed by installing `react-native-web` and `react-dom`. The app now runs in mobile-only mode (web disabled).
 
 ### Clear Cache
 
@@ -81,13 +100,13 @@ If you still see bundling errors:
 
 ```bash
 # Clear Expo cache
-npx expo start --clear
+npx expo start --clear --no-web
 
 # Or clear all caches
 rm -rf node_modules
 rm -rf .expo
 npm install
-npx expo start --clear
+npx expo start --clear --no-web
 ```
 
 ### Metro Bundler Issues
@@ -110,8 +129,13 @@ Changed from `AppRegistry.registerComponent` to `registerRootComponent` for Expo
 ### 3. `app.json`
 Added proper Expo configuration with app metadata.
 
-### 4. Installed Dependencies
-Added `babel-preset-expo` as a dev dependency.
+### 4. `package.json`
+- Updated start script to use `--no-web` flag
+- Added `start:tunnel` script for different network scenarios
+
+### 5. Installed Dependencies
+- Added `babel-preset-expo` as a dev dependency
+- Added `react-native-web` and `react-dom` for Expo compatibility
 
 ## Next Steps
 
@@ -172,3 +196,4 @@ If you encounter any issues:
 2. Try clearing all caches (see above)
 3. Make sure all dependencies are installed: `npm install`
 4. Ensure you're using Node.js version 18 or higher
+5. Make sure `react-native-web` is installed: `npm list react-native-web`

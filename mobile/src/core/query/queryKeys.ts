@@ -32,6 +32,7 @@ export const queryKeys = {
     details: () => [...queryKeys.bookings.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.bookings.details(), id] as const,
     availability: (params: AvailabilityQueryParams) => [...queryKeys.bookings.all, 'availability', params] as const,
+    pendingRequests: () => [...queryKeys.bookings.all, 'pending-requests'] as const,
   },
 
   // Message queries

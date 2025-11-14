@@ -25,3 +25,9 @@ export {
 } from './useCategories';
 
 export type { ServiceCategory } from './useCategories';
+
+export {
+  usePendingRequests,
+  useAcceptBooking,
+  useDeclineBooking,
+} from './useBookingRequests';
