@@ -21,7 +21,7 @@ import Animated, {
   interpolate,
   Extrapolate,
 } from 'react-native-reanimated';
-import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
+import { triggerHaptic } from '../../../shared/utils/haptics';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Text, Button, AnimatedHeart } from '../../../shared/components';
@@ -46,10 +46,7 @@ type CustomerStackParamList = {
 type ProviderDetailScreenRouteProp = RouteProp<CustomerStackParamList, 'ProviderDetail'>;
 type ProviderDetailScreenNavigationProp = NativeStackNavigationProp<CustomerStackParamList>;
 
-const hapticOptions = {
-  enableVibrateFallback: true,
-  ignoreAndroidSystemSettings: false,
-};
+// Haptic feedback is now handled by triggerHaptic utility (Expo-compatible)
 
 /**
  * Provider Detail Screen Component
@@ -264,24 +261,18 @@ export const ProviderDetailScreen: React.FC = () => {
   };
 
   const handleBookNow = useCallback(() => {
-    if (Platform.OS !== 'web') {
-      ReactNativeHapticFeedback.trigger('impactMedium', hapticOptions);
-    }
+    triggerHaptic('medium');
     navigation.navigate('BookingCreate', { providerId });
   }, [navigation, providerId]);
 
   const handleMessage = useCallback(() => {
-    if (Platform.OS !== 'web') {
-      ReactNativeHapticFeedback.trigger('impactLight', hapticOptions);
-    }
+    triggerHaptic('light');
     // TODO: Navigate to chat screen
     console.log('Message provider');
   }, []);
 
   const handleFavorite = useCallback(() => {
-    if (Platform.OS !== 'web') {
-      ReactNativeHapticFeedback.trigger('impactMedium', hapticOptions);
-    }
+    triggerHaptic('medium');
     toggleFavorite(providerId);
   }, [toggleFavorite, providerId]);
 
@@ -290,23 +281,17 @@ export const ProviderDetailScreen: React.FC = () => {
   }, [navigation]);
 
   const handleViewAllServices = useCallback(() => {
-    if (Platform.OS !== 'web') {
-      ReactNativeHapticFeedback.trigger('impactLight', hapticOptions);
-    }
+    triggerHaptic('light');
     setShowAllServices(!showAllServices);
   }, [showAllServices]);
 
   const handleServiceSelect = useCallback((serviceId: string) => {
-    if (Platform.OS !== 'web') {
-      ReactNativeHapticFeedback.trigger('impactMedium', hapticOptions);
-    }
+    triggerHaptic('medium');
     navigation.navigate('BookingCreate', { providerId, serviceId });
   }, [navigation, providerId]);
 
   const handleSeeAllReviews = useCallback(() => {
-    if (Platform.OS !== 'web') {
-      ReactNativeHapticFeedback.trigger('impactLight', hapticOptions);
-    }
+    triggerHaptic('light');
     navigation.navigate('ProviderReviews', { providerId });
   }, [navigation, providerId]);
 

@@ -41,6 +41,7 @@ export type AuthStackParamList = {
 export type MainStackParamList = {
   CustomerTabs: NavigatorScreenParams<CustomerTabParamList>;
   ProviderTabs: NavigatorScreenParams<ProviderTabParamList>;
+  Settings: undefined;
 };
 
 /**
@@ -176,6 +177,7 @@ export type SharedStackParamList = {
     message?: string;
     estimatedTime?: string;
   };
+  AppLock: undefined;
 };
 
 // Navigation prop types for type-safe navigation

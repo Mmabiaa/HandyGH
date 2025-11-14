@@ -2,7 +2,7 @@
  * App Root Component
  *
  * Main entry point for the HandyGH Mobile Application.
- * Sets up navigation container, theme provider, and deep linking.
+ * Sets up navigation container, theme provider, deep linking, and app lock.
  */
 
 import React from 'react';
@@ -11,76 +11,70 @@ import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider } from './src/core/theme/ThemeProvider';
 import { RootNavigator, navigationRef, linking } from './src/core/navigation';
+import { useAppLock } from './src/core/security';
+import { AppLockScreen } from './src/features/shared/screens';
+import { ConnectionStatusBanner, ErrorBoundary } from './src/shared/components';
+// Note: Toast is not rendered here for Expo Go compatibility
+// Toast messages will use Alert fallback
 
-// Error Boundary Component
-class ErrorBoundary extends React.Component<
-  { children: React.ReactNode },
-  { hasError: boolean; error: Error | null }
-> {
-  constructor(props: { children: React.ReactNode }) {
-    super(props);
-    this.state = { hasError: false, error: null };
+// App Content Component with App Lock
+const AppContent: React.FC = () => {
+  const { isLocked, unlock } = useAppLock();
+
+  if (isLocked) {
+    return <AppLockScreen onUnlock={unlock} />;
   }
-
-  static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('App Error:', error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorTitle}>Something went wrong</Text>
-          <Text style={styles.errorMessage}>
-            {this.state.error?.message || 'Unknown error'}
-          </Text>
-          <Text style={styles.errorStack}>
-            {this.state.error?.stack}
-          </Text>
-        </View>
-      );
-    }
-
-    return this.props.children;
-  }
-}
-
-function App(): React.JSX.Element {
-  console.log('App component rendering...');
 
   return (
-    <ErrorBoundary>
-      <SafeAreaProvider>
-        <ThemeProvider>
-          <NavigationContainer
-            ref={navigationRef}
-            linking={linking}
-            onReady={() => {
-              console.log('Navigation is ready');
-            }}
-            onStateChange={(state) => {
-              console.log('Navigation state changed:', state);
-            }}
-            fallback={
-              <View style={styles.loadingContainer}>
-                <Text>Loading...</Text>
-              </View>
-            }
-          >
-            <StatusBar
-              barStyle="dark-content"
-              backgroundColor="#FFFFFF"
-            />
-            <RootNavigator />
-          </NavigationContainer>
-        </ThemeProvider>
-      </SafeAreaProvider>
-    </ErrorBoundary>
+    <NavigationContainer
+      ref={navigationRef}
+      linking={linking}
+      onReady={() => {
+        console.log('[App] Navigation is ready');
+      }}
+      onStateChange={() => {
+        console.log('[App] Navigation state changed');
+      }}
+      fallback={
+        <View style={styles.loadingContainer}>
+          <Text>Loading...</Text>
+        </View>
+      }
+    >
+      <StatusBar
+        barStyle="dark-content"
+        backgroundColor="#FFFFFF"
+      />
+      <RootNavigator />
+      <ConnectionStatusBanner />
+    </NavigationContainer>
   );
+};
+
+function App(): React.JSX.Element {
+  console.log('[App] Component rendering...');
+
+  try {
+    return (
+      <ErrorBoundary>
+        <SafeAreaProvider>
+          <ThemeProvider>
+            <AppContent />
+          </ThemeProvider>
+        </SafeAreaProvider>
+      </ErrorBoundary>
+    );
+  } catch (error) {
+    console.error('[App] Error during render:', error);
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorTitle}>App Error</Text>
+        <Text style={styles.errorMessage}>
+          {error instanceof Error ? error.message : 'Unknown error'}
+        </Text>
+      </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({

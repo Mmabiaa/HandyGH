@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { MMKVStorage } from '../storage/MMKVStorage';
+import { zustandStorage } from '../storage/ZustandStorageAdapter';
 import type { UserPreferences } from './types';
 
 interface AppSettingsState {
@@ -104,18 +104,7 @@ export const useAppSettingsStore = create<AppSettingsState>()(
     }),
     {
       name: 'app-settings-storage',
-      storage: createJSONStorage(() => ({
-        setItem: (name, value) => {
-          MMKVStorage.set(name, value);
-        },
-        getItem: (name) => {
-          const value = MMKVStorage.getString(name);
-          return value ?? null;
-        },
-        removeItem: (name) => {
-          MMKVStorage.delete(name);
-        },
-      })),
+      storage: createJSONStorage(() => zustandStorage),
     }
   )
 );

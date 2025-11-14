@@ -1,6 +1,7 @@
 // Export query client
 export {
   queryClient,
+  queryPersister,
   invalidateAllQueries,
   clearQueryCache,
   prefetchQuery,
@@ -8,6 +9,9 @@ export {
 
 // Export query keys
 export { queryKeys, getRelatedQueryKeys } from './queryKeys';
+
+// Export cache configuration
+export { CACHE_CONFIG, CACHE_LIMITS, IMAGE_CACHE_CONFIG } from './cacheConfig';
 
 // Export hooks
 export * from './hooks';

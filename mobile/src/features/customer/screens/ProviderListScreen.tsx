@@ -19,7 +19,7 @@ import { FlashList } from '@shopify/flash-list';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
-import { Text } from '../../../shared/components';
+import { Text, CachedContentIndicator, SyncStatusIndicator } from '../../../shared/components';
 import { ProviderCard } from '../components/ProviderCard';
 import { useTheme } from '../../../core/theme/ThemeProvider';
 import { spacing } from '../../../core/theme/spacing';
@@ -29,6 +29,7 @@ import { ProviderService } from '../../../core/api/services/ProviderService';
 import { queryKeys } from '../../../core/query/queryKeys';
 import type { CustomerStackParamList } from '../../../core/navigation/types';
 import type { Provider, ProviderQueryParams } from '../../../core/api/types';
+import { useNetworkStatus } from '../../../shared/hooks/useNetworkStatus';
 
 type ProviderListScreenNavigationProp = NativeStackNavigationProp<
   CustomerStackParamList,
@@ -50,12 +51,14 @@ export const ProviderListScreen: React.FC = () => {
   const navigation = useNavigation<ProviderListScreenNavigationProp>();
   const route = useRoute<ProviderListScreenRouteProp>();
   const { theme } = useTheme();
+  const { isConnected } = useNetworkStatus();
 
   const { categoryId, categoryName } = route.params;
 
   // Sort state
   const [sortBy, setSortBy] = useState<SortOption>('rating');
   const [showSortMenu, setShowSortMenu] = useState(false);
+  const [lastUpdateTime, setLastUpdateTime] = useState(Date.now());
 
   // Build query params
   const queryParams: ProviderQueryParams = {
@@ -70,6 +73,7 @@ export const ProviderListScreen: React.FC = () => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    dataUpdatedAt,
   } = useInfiniteQuery({
     queryKey: queryKeys.providers.list(queryParams),
     queryFn: ({ pageParam = 1 }) =>
@@ -82,6 +86,13 @@ export const ProviderListScreen: React.FC = () => {
     },
     initialPageParam: 1,
   });
+
+  // Update last update time when data changes
+  React.useEffect(() => {
+    if (dataUpdatedAt) {
+      setLastUpdateTime(dataUpdatedAt);
+    }
+  }, [dataUpdatedAt]);
 
   // Flatten paginated data
   const providers = useMemo(() => {
@@ -185,6 +196,17 @@ export const ProviderListScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      {/* Cached Content Indicator */}
+      {!isConnected && (
+        <CachedContentIndicator
+          lastUpdated={lastUpdateTime}
+          visible={!isConnected}
+        />
+      )}
+
+      {/* Sync Status Indicator */}
+      <SyncStatusIndicator />
+
       {/* Header */}
       <View style={[styles.header, { backgroundColor: theme.colors.cardBackground }]}>
         <View style={styles.headerContent}>

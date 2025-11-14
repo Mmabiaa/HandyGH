@@ -1,6 +1,47 @@
-import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-device';
-import Constants from 'expo-constants';
+// Lazy import to avoid loading expo-notifications (which depends on expo-constants) in Expo Go
+let Notifications: any = null;
+let Device: any = null;
+
+/**
+ * Lazy load expo-notifications and expo-device to avoid PlatformConstants error in Expo Go
+ */
+async function getNotificationsModule() {
+  if (Notifications) return Notifications;
+
+  try {
+    const notificationsModule = await import('expo-notifications');
+    Notifications = notificationsModule;
+
+    // Configure notification behavior only if module loaded successfully
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: true,
+        shouldShowBanner: true,
+        shouldShowList: true,
+      }),
+    });
+
+    return Notifications;
+  } catch (error) {
+    console.warn('[NotificationManager] expo-notifications not available:', error);
+    return null;
+  }
+}
+
+async function getDeviceModule() {
+  if (Device) return Device;
+
+  try {
+    const deviceModule = await import('expo-device');
+    Device = deviceModule;
+    return Device;
+  } catch (error) {
+    console.warn('[NotificationManager] expo-device not available:', error);
+    return null;
+  }
+}
 
 /**
  * Notification category types
@@ -21,19 +62,6 @@ export interface NotificationData {
   messageId?: string;
   [key: string]: any;
 }
-
-/**
- * Configure notification behavior
- */
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
 
 /**
  * NotificationManager class for handling push notifications
@@ -58,21 +86,31 @@ class NotificationManager {
 
   /**
    * Initialize notifications and request permissions
+   * In Expo Go, this will skip initialization to avoid PlatformConstants errors
    */
   public async initialize(): Promise<string | null> {
     try {
+      // Lazy load modules - this will fail in Expo Go due to PlatformConstants
+      const NotificationsModule = await getNotificationsModule();
+      const DeviceModule = await getDeviceModule();
+
+      if (!NotificationsModule || !DeviceModule) {
+        console.warn('[NotificationManager] Notification modules not available (likely Expo Go)');
+        return null;
+      }
+
       // Check if running on physical device
-      if (!Device.isDevice) {
+      if (!DeviceModule.isDevice) {
         console.warn('[NotificationManager] Push notifications only work on physical devices');
         return null;
       }
 
       // Request permissions
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      const { status: existingStatus } = await NotificationsModule.getPermissionsAsync();
       let finalStatus = existingStatus;
 
       if (existingStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync();
+        const { status } = await NotificationsModule.requestPermissionsAsync();
         finalStatus = status;
       }
 
@@ -81,58 +119,88 @@ class NotificationManager {
         return null;
       }
 
-      // Get push token
-      this.expoPushToken = await this.getExpoPushToken();
+      // Get push token (this may fail if Constants is not available, but we handle it gracefully)
+      try {
+        this.expoPushToken = await this.getExpoPushToken(NotificationsModule);
+      } catch (tokenError) {
+        console.warn('[NotificationManager] Could not get push token, continuing without it:', tokenError);
+        this.expoPushToken = null;
+      }
 
       // Setup notification listeners
-      this.setupListeners();
+      this.setupListeners(NotificationsModule);
 
       console.log('[NotificationManager] Initialized successfully');
       return this.expoPushToken;
-    } catch (error) {
+    } catch (error: any) {
+      // Catch PlatformConstants and other native module errors
+      const errorMessage = error?.message || String(error);
+      if (
+        errorMessage.includes('PlatformConstants') ||
+        errorMessage.includes('TurboModuleRegistry') ||
+        errorMessage.includes('Constants')
+      ) {
+        console.warn('[NotificationManager] Skipping notifications in Expo Go:', errorMessage);
+        return null;
+      }
+
       console.error('[NotificationManager] Initialization error:', error);
+      // Don't throw - allow app to continue without notifications
       return null;
     }
   }
 
   /**
    * Get Expo push token
+   * In Expo Go, this will fail due to missing PlatformConstants native module
+   * We catch the error and return empty string to allow app to continue
    */
-  private async getExpoPushToken(): Promise<string> {
+  private async getExpoPushToken(NotificationsModule: any): Promise<string> {
     try {
-      const projectId = Constants.expoConfig?.extra?.eas?.projectId;
-
-      if (!projectId) {
-        throw new Error('Project ID not found in app config');
-      }
-
-      const token = await Notifications.getExpoPushTokenAsync({
-        projectId,
-      });
+      // Try to get push token without projectId first
+      // In Expo Go, this may fail due to missing Constants/PlatformConstants
+      // We'll catch that error and gracefully skip push token initialization
+      const token = await NotificationsModule.getExpoPushTokenAsync({});
 
       console.log('[NotificationManager] Push token:', token.data);
       return token.data;
-    } catch (error) {
+    } catch (error: any) {
+      // Catch any errors related to missing native modules (PlatformConstants, Constants, projectId)
+      // This allows the app to run in Expo Go without push notifications
+      const errorMessage = error?.message || String(error);
+      if (
+        errorMessage.includes('projectId') ||
+        errorMessage.includes('Constants') ||
+        errorMessage.includes('PlatformConstants') ||
+        errorMessage.includes('TurboModuleRegistry')
+      ) {
+        console.warn('[NotificationManager] Push token not available (Expo Go limitation):', errorMessage);
+        return '';
+      }
+
       console.error('[NotificationManager] Error getting push token:', error);
-      throw error;
+      // Don't throw - allow app to continue without push notifications
+      return '';
     }
   }
 
   /**
    * Setup notification listeners
    */
-  private setupListeners(): void {
+  private setupListeners(NotificationsModule: any): void {
+    if (!NotificationsModule) return;
+
     // Listener for notifications received while app is foregrounded
-    this.notificationListener = Notifications.addNotificationReceivedListener(
-      (notification) => {
+    this.notificationListener = NotificationsModule.addNotificationReceivedListener(
+      (notification: any) => {
         console.log('[NotificationManager] Notification received:', notification);
         // You can handle foreground notifications here
       }
     );
 
     // Listener for when user taps on notification
-    this.responseListener = Notifications.addNotificationResponseReceivedListener(
-      (response) => {
+    this.responseListener = NotificationsModule.addNotificationResponseReceivedListener(
+      (response: any) => {
         console.log('[NotificationManager] Notification tapped:', response);
         this.handleNotificationResponse(response);
       }
@@ -142,7 +210,7 @@ class NotificationManager {
   /**
    * Handle notification tap/response
    */
-  private handleNotificationResponse(response: Notifications.NotificationResponse): void {
+  private handleNotificationResponse(response: any): void {
     const data = response.notification.request.content.data as NotificationData;
 
     // Navigation will be handled by the app's navigation system
@@ -167,10 +235,15 @@ class NotificationManager {
     title: string,
     body: string,
     data?: NotificationData,
-    trigger?: Notifications.NotificationTriggerInput
+    trigger?: any
   ): Promise<string> {
     try {
-      const notificationId = await Notifications.scheduleNotificationAsync({
+      const NotificationsModule = await getNotificationsModule();
+      if (!NotificationsModule) {
+        throw new Error('Notifications module not available');
+      }
+
+      const notificationId = await NotificationsModule.scheduleNotificationAsync({
         content: {
           title,
           body,
@@ -193,7 +266,11 @@ class NotificationManager {
    */
   public async cancelNotification(notificationId: string): Promise<void> {
     try {
-      await Notifications.cancelScheduledNotificationAsync(notificationId);
+      const NotificationsModule = await getNotificationsModule();
+      if (!NotificationsModule) {
+        throw new Error('Notifications module not available');
+      }
+      await NotificationsModule.cancelScheduledNotificationAsync(notificationId);
       console.log('[NotificationManager] Notification cancelled:', notificationId);
     } catch (error) {
       console.error('[NotificationManager] Error cancelling notification:', error);
@@ -206,7 +283,11 @@ class NotificationManager {
    */
   public async cancelAllNotifications(): Promise<void> {
     try {
-      await Notifications.cancelAllScheduledNotificationsAsync();
+      const NotificationsModule = await getNotificationsModule();
+      if (!NotificationsModule) {
+        throw new Error('Notifications module not available');
+      }
+      await NotificationsModule.cancelAllScheduledNotificationsAsync();
       console.log('[NotificationManager] All notifications cancelled');
     } catch (error) {
       console.error('[NotificationManager] Error cancelling all notifications:', error);
@@ -219,7 +300,9 @@ class NotificationManager {
    */
   public async getBadgeCount(): Promise<number> {
     try {
-      return await Notifications.getBadgeCountAsync();
+      const NotificationsModule = await getNotificationsModule();
+      if (!NotificationsModule) return 0;
+      return await NotificationsModule.getBadgeCountAsync();
     } catch (error) {
       console.error('[NotificationManager] Error getting badge count:', error);
       return 0;
@@ -231,7 +314,9 @@ class NotificationManager {
    */
   public async setBadgeCount(count: number): Promise<void> {
     try {
-      await Notifications.setBadgeCountAsync(count);
+      const NotificationsModule = await getNotificationsModule();
+      if (!NotificationsModule) return;
+      await NotificationsModule.setBadgeCountAsync(count);
       console.log('[NotificationManager] Badge count set to:', count);
     } catch (error) {
       console.error('[NotificationManager] Error setting badge count:', error);
@@ -250,7 +335,9 @@ class NotificationManager {
    */
   public async dismissAllNotifications(): Promise<void> {
     try {
-      await Notifications.dismissAllNotificationsAsync();
+      const NotificationsModule = await getNotificationsModule();
+      if (!NotificationsModule) return;
+      await NotificationsModule.dismissAllNotificationsAsync();
       console.log('[NotificationManager] All notifications dismissed');
     } catch (error) {
       console.error('[NotificationManager] Error dismissing notifications:', error);
@@ -262,7 +349,9 @@ class NotificationManager {
    */
   public async areNotificationsEnabled(): Promise<boolean> {
     try {
-      const { status } = await Notifications.getPermissionsAsync();
+      const NotificationsModule = await getNotificationsModule();
+      if (!NotificationsModule) return false;
+      const { status } = await NotificationsModule.getPermissionsAsync();
       return status === 'granted';
     } catch (error) {
       console.error('[NotificationManager] Error checking notification status:', error);
@@ -275,7 +364,9 @@ class NotificationManager {
    */
   public async requestPermissions(): Promise<boolean> {
     try {
-      const { status } = await Notifications.requestPermissionsAsync();
+      const NotificationsModule = await getNotificationsModule();
+      if (!NotificationsModule) return false;
+      const { status } = await NotificationsModule.requestPermissionsAsync();
       return status === 'granted';
     } catch (error) {
       console.error('[NotificationManager] Error requesting permissions:', error);

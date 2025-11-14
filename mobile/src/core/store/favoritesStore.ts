@@ -9,7 +9,7 @@
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { MMKVStorage } from '../storage/MMKVStorage';
+import { zustandStorage } from '../storage/ZustandStorageAdapter';
 
 interface FavoritesState {
   favoriteProviderIds: string[];
@@ -49,11 +49,7 @@ export const useFavoritesStore = create<FavoritesState>()(
     }),
     {
       name: 'favorites-storage',
-      storage: createJSONStorage(() => ({
-        getItem: (name) => MMKVStorage.getItem(name),
-        setItem: (name, value) => MMKVStorage.setItem(name, value),
-        removeItem: (name) => MMKVStorage.removeItem(name),
-      })),
+      storage: createJSONStorage(() => zustandStorage),
     }
   )
 );

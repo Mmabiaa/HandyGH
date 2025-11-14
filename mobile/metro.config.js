@@ -1,25 +1,14 @@
-const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
+const { getDefaultConfig } = require('expo/metro-config');
 
 /**
- * Metro configuration
- * https://reactnative.dev/docs/metro
+ * Metro configuration for Expo
+ * https://docs.expo.dev/guides/customizing-metro
  *
  * @type {import('metro-config').MetroConfig}
  */
-const config = {
-  transformer: {
-    getTransformOptions: async () => ({
-      transform: {
-        experimentalImportSupport: false,
-        inlineRequires: true,
-      },
-    }),
-  },
-  resolver: {
-    sourceExts: ['jsx', 'js', 'ts', 'tsx', 'json'],
-  },
-  maxWorkers: 2,
-  resetCache: false,
-};
+const config = getDefaultConfig(__dirname);
 
-module.exports = mergeConfig(getDefaultConfig(__dirname), config);
+// Disable package exports to avoid runtime errors with Hermes
+config.resolver.unstable_enablePackageExports = false;
+
+module.exports = config;

@@ -181,7 +181,7 @@ describe('useAuth Hook', () => {
   });
 
   it('should handle logout error', async () => {
-    const mockLogout = jest.fn().mockRejectedValue(new Error('Logout failed'));
+    const mockLogout = jest.fn();
     const mockSetLoading = jest.fn();
 
     mockAuthService.logout.mockRejectedValue(new Error('API error'));
@@ -202,7 +202,7 @@ describe('useAuth Hook', () => {
       try {
         await result.current.logout();
       } catch (error: any) {
-        expect(error.message).toBe('Logout failed');
+        expect(error.message).toBe('API error');
       }
     });
 

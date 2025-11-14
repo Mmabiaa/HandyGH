@@ -1,4 +1,4 @@
-rootProject.name = 'HandyGHMobile'
+rootProject.name = 'HandyGH'
 apply from: file("../node_modules/@react-native/gradle-plugin/settings.gradle")
 includeBuild("../node_modules/@react-native/gradle-plugin")
 

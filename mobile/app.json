@@ -14,7 +14,10 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.handygh.mobile"
+      "bundleIdentifier": "com.handygh.mobile",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.handygh.mobile",
@@ -34,7 +37,13 @@
           "color": "#ffffff",
           "sounds": []
         }
-      ]
-    ]
+      ],
+      "expo-secure-store"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "8c013f0b-028f-48f3-90f2-92cc5eed7979"
+      }
+    }
   }
 }

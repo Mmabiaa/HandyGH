@@ -7,17 +7,31 @@ import {
   DROP_TABLES,
 } from './schema';
 
-// Platform-specific SQLite setup
-let SQLite: any;
+// Platform-specific SQLite setup - use Expo SQLite (Expo-compatible)
+let SQLite: any = null;
 
-if (Platform.OS !== 'web') {
-  const SQLiteModule = require('react-native-sqlite-storage');
-  SQLite = SQLiteModule.default || SQLiteModule;
+/**
+ * Lazy load expo-sqlite (Expo-compatible SQLite)
+ */
+async function getSQLite() {
+  if (SQLite !== null) {
+    return SQLite;
+  }
 
-  // Enable promise API and debug mode in development
-  SQLite.enablePromise(true);
-  if (__DEV__) {
-    SQLite.DEBUG(true);
+  if (Platform.OS === 'web') {
+    SQLite = null;
+    return SQLite;
+  }
+
+  try {
+    // Use Expo SQLite which is compatible with Expo Go
+    const SQLiteModule = await import('expo-sqlite');
+    SQLite = SQLiteModule.default || SQLiteModule;
+    return SQLite;
+  } catch (error) {
+    console.warn('[DatabaseManager] expo-sqlite not available:', error);
+    SQLite = null;
+    return SQLite;
   }
 }
 
@@ -54,11 +68,25 @@ export class DatabaseManager {
         return;
       }
 
-      // Open database connection
-      this.db = await SQLite.openDatabase({
-        name: DATABASE_NAME,
-        location: 'default',
-      });
+      // Get SQLite module (may be null if not available)
+      const SQLiteModule = await getSQLite();
+      if (!SQLiteModule) {
+        console.warn('[DatabaseManager] SQLite not available, skipping database initialization');
+        this.db = null;
+        return;
+      }
+
+      // Open database connection using Expo SQLite API
+      // Note: expo-sqlite API is different from react-native-sqlite-storage
+      // For now, we'll make it optional to allow app to run in Expo Go
+      try {
+        this.db = await SQLiteModule.openDatabaseAsync(DATABASE_NAME);
+      } catch (openError) {
+        console.warn('[DatabaseManager] Failed to open database with expo-sqlite:', openError);
+        // Database will be null, app can continue without it
+        this.db = null;
+        return;
+      }
 
       console.log('Database opened successfully');
 

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { MMKVStorage } from '../storage/MMKVStorage';
+import { zustandStorage } from '../storage/ZustandStorageAdapter';
 import type { CustomerProfile, ProviderProfile } from './types';
 
 interface UserProfileState {
@@ -109,18 +109,7 @@ export const useUserProfileStore = create<UserProfileState>()(
     }),
     {
       name: 'user-profile-storage',
-      storage: createJSONStorage(() => ({
-        setItem: (name, value) => {
-          MMKVStorage.set(name, value);
-        },
-        getItem: (name) => {
-          const value = MMKVStorage.getString(name);
-          return value ?? null;
-        },
-        removeItem: (name) => {
-          MMKVStorage.delete(name);
-        },
-      })),
+      storage: createJSONStorage(() => zustandStorage),
     }
   )
 );

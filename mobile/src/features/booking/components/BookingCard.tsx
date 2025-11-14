@@ -17,7 +17,7 @@ interface BookingCardProps {
   variant?: 'active' | 'upcoming' | 'completed';
 }
 
-const BookingCard: React.FC<BookingCardProps> = ({ booking, onPress, variant }) => {
+export const BookingCard: React.FC<BookingCardProps> = ({ booking, onPress }) => {
   const getStatusColor = (status: BookingStatus): string => {
     switch (status) {
       case BookingStatus.PENDING:
@@ -199,5 +199,3 @@ const styles = StyleSheet.create({
     color: '#212121',
   },
 });
-
-export default BookingCard;

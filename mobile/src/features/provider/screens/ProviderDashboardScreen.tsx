@@ -17,6 +17,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { Text } from '../../../shared/components/Text';
 import { Button } from '../../../shared/components/Button';
+import { CachedContentIndicator, SyncStatusIndicator } from '../../../shared/components';
 import { useTheme } from '../../../core/theme/ThemeProvider';
 import { spacing } from '../../../core/theme/spacing';
 import { useDashboardData } from '../../../core/query/hooks/useDashboard';
@@ -26,6 +27,7 @@ import { UpcomingBookingCard } from '../components/UpcomingBookingCard';
 import { formatCurrency } from '../../../shared/utils/formatting';
 import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '../../../core/query/queryKeys';
+import { useNetworkStatus } from '../../../shared/hooks/useNetworkStatus';
 
 /**
  * Provider Dashboard Screen
@@ -35,11 +37,20 @@ const ProviderDashboardScreen: React.FC = () => {
   const { theme } = useTheme();
   const navigation = useNavigation();
   const queryClient = useQueryClient();
+  const { isConnected } = useNetworkStatus();
   const [refreshing, setRefreshing] = useState(false);
+  const [lastUpdateTime, setLastUpdateTime] = useState(Date.now());
 
   // Fetch dashboard data
   // Requirement 8.1: Retrieve dashboard metrics
-  const { data, isLoading, error, refetch } = useDashboardData();
+  const { data, isLoading, error, refetch, dataUpdatedAt } = useDashboardData();
+
+  // Update last update time when data changes
+  React.useEffect(() => {
+    if (dataUpdatedAt) {
+      setLastUpdateTime(dataUpdatedAt);
+    }
+  }, [dataUpdatedAt]);
 
   // Handle pull-to-refresh
   // Requirement 8.12: Implement pull-to-refresh
@@ -48,6 +59,7 @@ const ProviderDashboardScreen: React.FC = () => {
     try {
       await queryClient.invalidateQueries({ queryKey: queryKeys.provider.all });
       await refetch();
+      setLastUpdateTime(Date.now());
     } finally {
       setRefreshing(false);
     }
@@ -108,27 +120,39 @@ const ProviderDashboardScreen: React.FC = () => {
   const upcomingBookings = data?.upcomingBookings || [];
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={handleRefresh}
-          tintColor={theme.colors.primary}
-          colors={[theme.colors.primary]}
+    <View style={styles.container}>
+      {/* Cached Content Indicator */}
+      {!isConnected && (
+        <CachedContentIndicator
+          lastUpdated={lastUpdateTime}
+          visible={!isConnected}
         />
-      }
-    >
-      {/* Header */}
-      <View style={styles.header}>
-        <Text variant="h4" style={styles.title}>
-          Dashboard
-        </Text>
-        <Text variant="body" color="textSecondary">
-          Your business overview
-        </Text>
-      </View>
+      )}
+
+      {/* Sync Status Indicator */}
+      <SyncStatusIndicator />
+
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={theme.colors.primary}
+            colors={[theme.colors.primary]}
+          />
+        }
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <Text variant="h4" style={styles.title}>
+            Dashboard
+          </Text>
+          <Text variant="body" color="textSecondary">
+            Your business overview
+          </Text>
+        </View>
 
       {/* Key Metrics */}
       {/* Requirements: 8.2, 8.3, 8.4 - Display key business metrics */}
@@ -250,7 +274,8 @@ const ProviderDashboardScreen: React.FC = () => {
           </View>
         )}
       </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -258,6 +283,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F5F5F5',
+  },
+  scrollView: {
+    flex: 1,
   },
   content: {
     padding: spacing.lg,

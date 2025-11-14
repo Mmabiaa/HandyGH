@@ -30,10 +30,10 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.handygh.mobile"
+    namespace 'com.handygh.mobile'
 
     defaultConfig {
-        applicationId "com.handygh.mobile"
+        applicationId 'com.handygh.mobile'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

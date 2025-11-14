@@ -16,7 +16,7 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
+import { triggerHaptic } from '../../../shared/utils/haptics';
 import { Text, Button, TextInput } from '../../../shared/components';
 import { useTheme } from '../../../core/theme/ThemeProvider';
 import { spacing } from '../../../core/theme/spacing';
@@ -29,10 +29,7 @@ type ReviewSubmissionScreenProps = NativeStackScreenProps<any, 'ReviewSubmission
 const MIN_REVIEW_LENGTH = 10;
 const MAX_REVIEW_LENGTH = 500;
 
-const hapticOptions = {
-  enableVibrateFallback: true,
-  ignoreAndroidSystemSettings: false,
-};
+// Haptic feedback is now handled by triggerHaptic utility (Expo-compatible)
 
 /**
  * Review Submission Screen Component
@@ -60,9 +57,7 @@ export const ReviewSubmissionScreen: React.FC<ReviewSubmissionScreenProps> = ({
    */
   const handleRatingPress = (selectedRating: number) => {
     // Trigger haptic feedback
-    if (Platform.OS !== 'web') {
-      ReactNativeHapticFeedback.trigger('impactMedium', hapticOptions);
-    }
+    triggerHaptic('medium');
 
     setRating(selectedRating);
     setError('');

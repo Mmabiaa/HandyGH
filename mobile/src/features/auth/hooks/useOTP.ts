@@ -40,6 +40,12 @@ export const useOTP = () => {
     } catch (error: any) {
       console.error('OTP request error:', error);
 
+      // Re-throw ValidationError as-is
+      if (error instanceof ValidationError) {
+        setOtpError(error.message);
+        throw error;
+      }
+
       // Handle different error types
       if (error.response?.status === 400) {
         const errorMessage = error.response.data?.message || 'Invalid phone number';
@@ -97,11 +103,23 @@ export const useOTP = () => {
         const response = await AuthService.verifyOTP(phoneNumber, code);
 
         // Login user with received tokens
-        await login(response.user, response.access, response.refresh);
+        // Add required User fields that may not be in the API response
+        const userWithTimestamps = {
+          ...response.user,
+          createdAt: response.user.createdAt || new Date().toISOString(),
+          updatedAt: response.user.updatedAt || new Date().toISOString(),
+        };
+        await login(userWithTimestamps, response.access, response.refresh);
 
         return response;
       } catch (error: any) {
         console.error('OTP verification error:', error);
+
+        // Re-throw ValidationError as-is
+        if (error instanceof ValidationError) {
+          setOtpError(error.message);
+          throw error;
+        }
 
         // Handle different error types
         if (error.response?.status === 400) {

@@ -7,13 +7,24 @@ interface AuthTokens {
 
 // Web fallback storage
 const WEB_STORAGE_KEY = 'handygh_auth_tokens';
+const SECURE_STORAGE_KEY = 'handygh_auth_tokens';
+
+/**
+ * Lazy load expo-secure-store (Expo-compatible secure storage)
+ */
+async function getSecureStore() {
+  try {
+    const SecureStore = await import('expo-secure-store');
+    return SecureStore.default || SecureStore;
+  } catch (error) {
+    console.warn('[SecureTokenStorage] expo-secure-store not available:', error);
+    return null;
+  }
+}
 
 export class SecureTokenStorage {
-  private static readonly SERVICE_NAME = 'com.handygh.app';
-  private static readonly USERNAME = 'auth_tokens';
-
   /**
-   * Save authentication tokens securely using Keychain (native) or localStorage (web)
+   * Save authentication tokens securely using Expo SecureStore (native) or localStorage (web)
    */
   static async saveTokens(accessToken: string, refreshToken: string): Promise<void> {
     try {
@@ -21,26 +32,35 @@ export class SecureTokenStorage {
         // Web fallback using localStorage
         localStorage.setItem(WEB_STORAGE_KEY, JSON.stringify({ accessToken, refreshToken }));
       } else {
-        // Native platforms use Keychain
-        const Keychain = require('react-native-keychain');
-        await Keychain.setGenericPassword(
-          this.USERNAME,
-          JSON.stringify({ accessToken, refreshToken }),
-          {
-            service: this.SERVICE_NAME,
-            accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
-            securityLevel: Keychain.SECURITY_LEVEL.SECURE_HARDWARE,
+        // Native platforms use Expo SecureStore - lazy load with error handling
+        try {
+          const SecureStore = await getSecureStore();
+          if (SecureStore) {
+            await SecureStore.setItemAsync(
+              SECURE_STORAGE_KEY,
+              JSON.stringify({ accessToken, refreshToken })
+            );
+            return;
           }
-        );
+        } catch (secureStoreError) {
+          console.warn('[SecureTokenStorage] SecureStore not available, using fallback:', secureStoreError);
+        }
+
+        // Fallback to localStorage if SecureStore is not available (e.g., in Expo Go without secure store)
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem(WEB_STORAGE_KEY, JSON.stringify({ accessToken, refreshToken }));
+        } else {
+          throw new Error('No storage mechanism available');
+        }
       }
     } catch (error) {
-      console.error('Error saving tokens:', error);
+      console.error('[SecureTokenStorage] Error saving tokens:', error);
       throw new Error('Failed to save authentication tokens');
     }
   }
 
   /**
-   * Retrieve authentication tokens from Keychain (native) or localStorage (web)
+   * Retrieve authentication tokens from Expo SecureStore (native) or localStorage (web)
    */
   static async getTokens(): Promise<AuthTokens | null> {
     try {
@@ -49,26 +69,33 @@ export class SecureTokenStorage {
         const data = localStorage.getItem(WEB_STORAGE_KEY);
         return data ? JSON.parse(data) : null;
       } else {
-        // Native platforms use Keychain
-        const Keychain = require('react-native-keychain');
-        const credentials = await Keychain.getGenericPassword({
-          service: this.SERVICE_NAME,
-        });
+        // Native platforms use Expo SecureStore - lazy load with error handling
+        try {
+          const SecureStore = await getSecureStore();
+          if (SecureStore) {
+            const data = await SecureStore.getItemAsync(SECURE_STORAGE_KEY);
+            return data ? JSON.parse(data) : null;
+          }
+        } catch (secureStoreError) {
+          console.warn('[SecureTokenStorage] SecureStore not available, trying localStorage fallback:', secureStoreError);
+        }
 
-        if (credentials && credentials.password) {
-          return JSON.parse(credentials.password) as AuthTokens;
+        // Fallback to localStorage if SecureStore is not available
+        if (typeof localStorage !== 'undefined') {
+          const data = localStorage.getItem(WEB_STORAGE_KEY);
+          return data ? JSON.parse(data) : null;
         }
 
         return null;
       }
     } catch (error) {
-      console.error('Error retrieving tokens:', error);
+      console.error('[SecureTokenStorage] Error retrieving tokens:', error);
       return null;
     }
   }
 
   /**
-   * Clear authentication tokens from Keychain (native) or localStorage (web)
+   * Clear authentication tokens from Expo SecureStore (native) or localStorage (web)
    */
   static async clearTokens(): Promise<void> {
     try {
@@ -76,14 +103,24 @@ export class SecureTokenStorage {
         // Web fallback using localStorage
         localStorage.removeItem(WEB_STORAGE_KEY);
       } else {
-        // Native platforms use Keychain
-        const Keychain = require('react-native-keychain');
-        await Keychain.resetGenericPassword({
-          service: this.SERVICE_NAME,
-        });
+        // Native platforms use Expo SecureStore - lazy load with error handling
+        try {
+          const SecureStore = await getSecureStore();
+          if (SecureStore) {
+            await SecureStore.deleteItemAsync(SECURE_STORAGE_KEY);
+            return;
+          }
+        } catch (secureStoreError) {
+          console.warn('[SecureTokenStorage] SecureStore not available, using localStorage fallback:', secureStoreError);
+        }
+
+        // Fallback to localStorage if SecureStore is not available
+        if (typeof localStorage !== 'undefined') {
+          localStorage.removeItem(WEB_STORAGE_KEY);
+        }
       }
     } catch (error) {
-      console.error('Error clearing tokens:', error);
+      console.error('[SecureTokenStorage] Error clearing tokens:', error);
       throw new Error('Failed to clear authentication tokens');
     }
   }

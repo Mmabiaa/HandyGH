@@ -22,7 +22,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useBookings } from '../../../core/query/hooks/useBookings';
 import { useAllBookingUpdates } from '../../../core/realtime';
 import { Booking, BookingStatus } from '../../../core/api/types';
-import BookingCard from '../components/BookingCard';
+import { BookingCard } from '../components/BookingCard';
+import { CachedContentIndicator, SyncStatusIndicator } from '../../../shared/components';
+import { useNetworkStatus } from '../../../shared/hooks/useNetworkStatus';
 
 type NavigationProp = NativeStackNavigationProp<any>;
 
@@ -31,12 +33,21 @@ type StatusFilter = 'all' | 'active' | 'upcoming' | 'completed';
 const BookingListScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const [selectedFilter, setSelectedFilter] = useState<StatusFilter>('all');
+  const { isConnected } = useNetworkStatus();
+  const [lastUpdateTime, setLastUpdateTime] = useState(Date.now());
 
   // Fetch bookings
-  const { data: bookings = [], isLoading, refetch, isRefetching } = useBookings();
+  const { data: bookings = [], isLoading, refetch, isRefetching, dataUpdatedAt } = useBookings();
 
   // Subscribe to real-time booking updates
   useAllBookingUpdates();
+
+  // Update last update time when data changes
+  React.useEffect(() => {
+    if (dataUpdatedAt) {
+      setLastUpdateTime(dataUpdatedAt);
+    }
+  }, [dataUpdatedAt]);
 
   // Group bookings by status
   const groupedBookings = useMemo(() => {
@@ -81,6 +92,7 @@ const BookingListScreen: React.FC = () => {
   // Handle refresh
   const handleRefresh = useCallback(() => {
     refetch();
+    setLastUpdateTime(Date.now());
   }, [refetch]);
 
   // Handle booking card press
@@ -180,6 +192,17 @@ const BookingListScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
+      {/* Cached Content Indicator */}
+      {!isConnected && (
+        <CachedContentIndicator
+          lastUpdated={lastUpdateTime}
+          visible={!isConnected}
+        />
+      )}
+
+      {/* Sync Status Indicator */}
+      <SyncStatusIndicator />
+
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>My Bookings</Text>

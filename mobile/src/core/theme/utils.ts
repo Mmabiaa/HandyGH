@@ -3,7 +3,7 @@
  * Helper functions for dynamic theming
  */
 
-import { ThemeColors } from './colors';
+import { ThemeColors, lightTheme, darkTheme } from './colors';
 
 /**
  * Get color with opacity
@@ -80,6 +80,14 @@ export const isLightColor = (color: string): boolean => {
 /**
  * Get color from theme by path (e.g., 'primary', 'success', etc.)
  */
-export const getThemeColor = (colors: ThemeColors, colorPath: keyof ThemeColors): string => {
-  return colors[colorPath];
+export const getThemeColor = (
+  colors: typeof lightTheme | typeof darkTheme,
+  colorPath: keyof (typeof lightTheme)
+): string => {
+  const value = colors[colorPath];
+  // Handle nested color objects (like neutral)
+  if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+    return String(Object.values(value)[0] || '');
+  }
+  return String(value);
 };

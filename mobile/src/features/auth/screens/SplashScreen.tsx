@@ -50,16 +50,24 @@ const SplashScreen: React.FC = () => {
     try {
       // Skip AppInitializer on web platform (native modules not available)
       if (Platform.OS !== 'web') {
-        const { AppInitializer } = await import('../../../core/initialization/AppInitializer');
-        await AppInitializer.initialize();
+        try {
+          const { AppInitializer } = await import('../../../core/initialization/AppInitializer');
+          // Don't await - let it run in background, app should render regardless
+          AppInitializer.initialize().catch((initError) => {
+            console.warn('[SplashScreen] App initialization error (non-blocking):', initError);
+          });
+        } catch (importError) {
+          console.warn('[SplashScreen] Failed to import AppInitializer (non-blocking):', importError);
+        }
       } else {
-        console.log('Web platform detected - skipping native initialization');
+        console.log('[SplashScreen] Web platform detected - skipping native initialization');
       }
 
       // Preload any critical images, fonts, or data here
       await new Promise(resolve => setTimeout(resolve, 100));
     } catch (error) {
-      console.error('Error preloading assets:', error);
+      console.error('[SplashScreen] Error preloading assets (non-blocking):', error);
+      // Don't throw - allow app to continue
     }
   };
 

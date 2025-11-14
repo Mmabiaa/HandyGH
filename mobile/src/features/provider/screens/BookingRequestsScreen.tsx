@@ -17,6 +17,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Text } from '../../../shared/components/Text';
 import { Button } from '../../../shared/components/Button';
+import { CachedContentIndicator, SyncStatusIndicator } from '../../../shared/components';
 import { useTheme } from '../../../core/theme/ThemeProvider';
 import { spacing } from '../../../core/theme/spacing';
 import { usePendingRequests } from '../../../core/query/hooks/useBookingRequests';
@@ -26,6 +27,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '../../../core/query/queryKeys';
 import type { ProviderStackParamList } from '../../../core/navigation/types';
 import type { Booking } from '../../../core/api/types';
+import { useNetworkStatus } from '../../../shared/hooks/useNetworkStatus';
 
 type NavigationProp = NativeStackNavigationProp<
   ProviderStackParamList,
@@ -40,11 +42,20 @@ const BookingRequestsScreen: React.FC = () => {
   const { theme } = useTheme();
   const navigation = useNavigation<NavigationProp>();
   const queryClient = useQueryClient();
+  const { isConnected } = useNetworkStatus();
   const [refreshing, setRefreshing] = useState(false);
+  const [lastUpdateTime, setLastUpdateTime] = useState(Date.now());
 
   // Fetch pending booking requests
   // Requirement 8.6: Retrieve pending booking requests
-  const { data: requests, isLoading, error, refetch } = usePendingRequests();
+  const { data: requests, isLoading, error, refetch, dataUpdatedAt } = usePendingRequests();
+
+  // Update last update time when data changes
+  React.useEffect(() => {
+    if (dataUpdatedAt) {
+      setLastUpdateTime(dataUpdatedAt);
+    }
+  }, [dataUpdatedAt]);
 
   // Handle real-time new booking request notifications
   // Requirement 8.11: Implement real-time new request notifications
@@ -68,6 +79,7 @@ const BookingRequestsScreen: React.FC = () => {
     setRefreshing(true);
     try {
       await refetch();
+      setLastUpdateTime(Date.now());
     } finally {
       setRefreshing(false);
     }
@@ -146,6 +158,17 @@ const BookingRequestsScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
+      {/* Cached Content Indicator */}
+      {!isConnected && (
+        <CachedContentIndicator
+          lastUpdated={lastUpdateTime}
+          visible={!isConnected}
+        />
+      )}
+
+      {/* Sync Status Indicator */}
+      <SyncStatusIndicator />
+
       {/* Header */}
       <View style={styles.header}>
         <Text variant="h5">Booking Requests</Text>

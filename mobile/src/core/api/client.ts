@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import { SecureTokenStorage } from '../storage';
+import { convertAxiosError, handleError } from '../../shared/errors';
 
 // API Configuration
 export interface ApiConfig {
@@ -76,6 +77,11 @@ const createApiClient = (config: ApiConfig = defaultConfig): AxiosInstance => {
       return response;
     },
     async (error: AxiosError) => {
+      // Handle maintenance mode (503)
+      if (error.response?.status === 503) {
+        handleMaintenanceMode(error.response.data);
+        return Promise.reject(error);
+      }
       const originalRequest = error.config as AxiosRequestConfig & {
         _retry?: boolean;
         _retryCount?: number;
@@ -143,7 +149,15 @@ const createApiClient = (config: ApiConfig = defaultConfig): AxiosInstance => {
         return instance(originalRequest);
       }
 
-      return Promise.reject(error);
+      // Convert Axios error to AppError and handle it
+      const appError = convertAxiosError(error);
+      handleError(appError, {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+      });
+
+      return Promise.reject(appError);
     }
   );
 
@@ -217,6 +231,25 @@ const handleSessionExpired = async () => {
     }
   } catch (error) {
     console.error('Error handling session expiration:', error);
+  }
+};
+
+// Maintenance mode handler
+let maintenanceModeCallback: ((data: any) => void) | null = null;
+
+/**
+ * Register callback to be called when maintenance mode is detected
+ */
+export const onMaintenanceMode = (callback: (data: any) => void) => {
+  maintenanceModeCallback = callback;
+};
+
+/**
+ * Handle maintenance mode
+ */
+const handleMaintenanceMode = (data: any) => {
+  if (maintenanceModeCallback) {
+    maintenanceModeCallback(data);
   }
 };
 

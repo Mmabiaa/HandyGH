@@ -4,19 +4,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useProviders, useProvider, useFavoriteProvider } from '../useProviders';
 import { ProviderService } from '../../../api/services';
 import type { Provider, PaginatedResponse } from '../../../api/types';
-import { it } from 'node:test';
-import { it } from 'node:test';
-import { describe } from 'node:test';
-import { it } from 'node:test';
-import { it } from 'node:test';
-import { describe } from 'node:test';
-import { it } from 'node:test';
-import { it } from 'node:test';
-import { it } from 'node:test';
-import { describe } from 'node:test';
-import { afterEach } from 'node:test';
-import { beforeEach } from 'node:test';
-import { describe } from 'node:test';
 
 // Mock ProviderService
 jest.mock('../../../api/services/ProviderService', () => ({

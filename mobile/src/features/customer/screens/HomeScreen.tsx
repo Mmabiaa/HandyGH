@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Text } from '../../../shared/components';
+import { Text, CachedContentIndicator, SyncStatusIndicator } from '../../../shared/components';
 import { useTheme } from '../../../core/theme/ThemeProvider';
 import { spacing } from '../../../core/theme/spacing';
 import { useUserProfileStore } from '../../../core/store/userProfileStore';
@@ -29,6 +29,7 @@ import { useAllBookingUpdates } from '../../../core/realtime';
 import { useQueryClient } from '@tanstack/react-query';
 import type { CustomerStackParamList } from '../../../core/navigation/types';
 import { CategoryGrid, FeaturedProviders, ActiveBookings } from '../components';
+import { useNetworkStatus } from '../../../shared/hooks/useNetworkStatus';
 
 const { width } = Dimensions.get('window');
 
@@ -92,12 +93,14 @@ const HomeScreen: React.FC = () => {
   const isFavoriteProvider = useUserProfileStore((state) => state.isFavoriteProvider);
   const addFavoriteProvider = useUserProfileStore((state) => state.addFavoriteProvider);
   const removeFavoriteProvider = useUserProfileStore((state) => state.removeFavoriteProvider);
+  const { isConnected } = useNetworkStatus();
 
   // Subscribe to real-time booking updates
   useAllBookingUpdates();
 
   // State
   const [refreshing, setRefreshing] = useState(false);
+  const [lastUpdateTime, setLastUpdateTime] = useState(Date.now());
 
   // Mutations
   const favoriteProviderMutation = useFavoriteProvider();
@@ -140,6 +143,7 @@ const HomeScreen: React.FC = () => {
     setRefreshing(true);
     try {
       await queryClient.invalidateQueries();
+      setLastUpdateTime(Date.now());
     } finally {
       setRefreshing(false);
     }
@@ -229,6 +233,17 @@ const HomeScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      {/* Cached Content Indicator */}
+      {!isConnected && (
+        <CachedContentIndicator
+          lastUpdated={lastUpdateTime}
+          visible={!isConnected}
+        />
+      )}
+
+      {/* Sync Status Indicator */}
+      <SyncStatusIndicator />
+
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { SecureTokenStorage } from '../storage';
-import { MMKVStorage } from '../storage/MMKVStorage';
+import { zustandStorage } from '../storage/ZustandStorageAdapter';
 import type { User } from './types';
 
 interface AuthState {
@@ -124,18 +124,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
-      storage: createJSONStorage(() => ({
-        setItem: (name, value) => {
-          MMKVStorage.set(name, value);
-        },
-        getItem: (name) => {
-          const value = MMKVStorage.getString(name);
-          return value ?? null;
-        },
-        removeItem: (name) => {
-          MMKVStorage.delete(name);
-        },
-      })),
+      storage: createJSONStorage(() => zustandStorage),
       // Only persist user data, not loading states
       partialize: (state) => ({
         user: state.user,
