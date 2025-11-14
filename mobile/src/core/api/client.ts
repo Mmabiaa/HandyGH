@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
-import { SecureTokenStorage } from '../storage/SecureTokenStorage';
+import { SecureTokenStorage } from '../storage';
 
 // API Configuration
 export interface ApiConfig {

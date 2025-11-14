@@ -209,15 +209,17 @@ describe('PaymentService', () => {
         message: 'Processing',
       });
 
-      const promise = PaymentService.pollPaymentStatus('txn-123', 3, 1000);
+      // Use real timers for this test to avoid timing issues
+      jest.useRealTimers();
 
-      // Fast-forward through all polling attempts
-      for (let i = 0; i < 3; i++) {
-        await jest.advanceTimersByTimeAsync(1000);
-      }
+      await expect(
+        PaymentService.pollPaymentStatus('txn-123', 3, 10)
+      ).rejects.toThrow('Payment verification timeout');
 
-      await expect(promise).rejects.toThrow('Payment verification timeout');
       expect(mockApi.get).toHaveBeenCalledTimes(3);
+
+      // Restore fake timers for other tests
+      jest.useFakeTimers();
     });
   });
 });
