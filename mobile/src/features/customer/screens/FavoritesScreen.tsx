@@ -12,9 +12,7 @@ import {
   View,
   StyleSheet,
   FlatList,
-  Platform,
 } from 'react-native';
-import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Text } from '../../../shared/components';
@@ -29,11 +27,6 @@ type CustomerStackParamList = {
 };
 
 type FavoritesScreenNavigationProp = NativeStackNavigationProp<CustomerStackParamList>;
-
-const hapticOptions = {
-  enableVibrateFallback: true,
-  ignoreAndroidSystemSettings: false,
-};
 
 /**
  * Favorites Screen Component
@@ -80,9 +73,6 @@ const FavoritesScreen: React.FC = () => {
   // Handlers
   const handleProviderPress = useCallback(
     (providerId: string) => {
-      if (Platform.OS !== 'web') {
-        ReactNativeHapticFeedback.trigger('impactLight', hapticOptions);
-      }
       navigation.navigate('ProviderDetail', { providerId });
     },
     [navigation]
@@ -90,9 +80,6 @@ const FavoritesScreen: React.FC = () => {
 
   const handleFavoriteToggle = useCallback(
     (providerId: string) => {
-      if (Platform.OS !== 'web') {
-        ReactNativeHapticFeedback.trigger('impactMedium', hapticOptions);
-      }
       toggleFavorite(providerId);
     },
     [toggleFavorite]

@@ -17,7 +17,24 @@
       "bundleIdentifier": "com.handygh.mobile"
     },
     "android": {
-      "package": "com.handygh.mobile"
-    }
+      "package": "com.handygh.mobile",
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "notification": {
+      "color": "#000000",
+      "androidMode": "default",
+      "androidCollapsedTitle": "{{unread_count}} new notifications"
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "color": "#ffffff",
+          "sounds": []
+        }
+      ]
+    ]
   }
 }

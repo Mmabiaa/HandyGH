@@ -6,6 +6,9 @@
  */
 
 import { Platform } from 'react-native';
+import SocketManager from '../realtime/SocketManager';
+import { SOCKET_CONFIG } from '../realtime/config';
+import NotificationManager from '../notifications/NotificationManager';
 
 let isInitialized = false;
 
@@ -33,6 +36,14 @@ export class AppInitializer {
         const { databaseManager } = await import('../storage/database/DatabaseManager');
         await databaseManager.initialize();
       }
+
+      // Initialize WebSocket manager (works on all platforms)
+      console.log('Initializing WebSocket manager');
+      SocketManager.getInstance(SOCKET_CONFIG);
+
+      // Initialize notification manager
+      console.log('Initializing notification manager');
+      await NotificationManager.getInstance().initialize();
 
       isInitialized = true;
       console.log('App initialization complete');

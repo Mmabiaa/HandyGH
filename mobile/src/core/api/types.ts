@@ -262,3 +262,31 @@ export interface PaymentStatusResponse {
   status: PaymentStatus;
   message: string;
 }
+
+// Message types
+export interface Message {
+  id: string;
+  bookingId: string;
+  senderId: string;
+  receiverId: string;
+  content: string;
+  type: 'text' | 'image' | 'system';
+  isRead: boolean;
+  createdAt: string;
+  sender?: {
+    firstName: string;
+    lastName: string;
+    profilePhoto?: string;
+  };
+}
+
+export interface SendMessageRequest {
+  bookingId: string;
+  content: string;
+  type?: 'text' | 'image';
+}
+
+export interface MessageHistoryResponse {
+  messages: Message[];
+  count: number;
+}

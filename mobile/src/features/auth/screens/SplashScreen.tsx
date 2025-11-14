@@ -12,7 +12,7 @@
  */
 
 import React, { useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Animated, {
@@ -48,9 +48,13 @@ const SplashScreen: React.FC = () => {
   // Preload critical assets and initialize app
   const preloadAssets = async () => {
     try {
-      // Initialize app (platform-specific modules)
-      const { AppInitializer } = await import('../../../core/initialization/AppInitializer');
-      await AppInitializer.initialize();
+      // Skip AppInitializer on web platform (native modules not available)
+      if (Platform.OS !== 'web') {
+        const { AppInitializer } = await import('../../../core/initialization/AppInitializer');
+        await AppInitializer.initialize();
+      } else {
+        console.log('Web platform detected - skipping native initialization');
+      }
 
       // Preload any critical images, fonts, or data here
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -61,7 +65,13 @@ const SplashScreen: React.FC = () => {
 
   // Navigate to next screen
   const navigateToAuth = () => {
-    navigation.replace('Auth', { screen: 'Welcome' });
+    console.log('navigateToAuth called, attempting navigation...');
+    try {
+      navigation.replace('Auth', { screen: 'Welcome' });
+      console.log('Navigation command executed');
+    } catch (error) {
+      console.error('Navigation error:', error);
+    }
   };
 
   useEffect(() => {
@@ -98,12 +108,22 @@ const SplashScreen: React.FC = () => {
 
     // Preload assets and navigate after 2 seconds
     const initializeApp = async () => {
-      await preloadAssets();
+      try {
+        await preloadAssets();
+        console.log('Assets preloaded, navigating to auth...');
 
-      // Wait for minimum splash duration (2 seconds)
-      setTimeout(() => {
-        runOnJS(navigateToAuth)();
-      }, 2000);
+        // Wait for minimum splash duration (2 seconds)
+        setTimeout(() => {
+          console.log('Timeout complete, calling navigateToAuth...');
+          runOnJS(navigateToAuth)();
+        }, 2000);
+      } catch (error) {
+        console.error('Error in initializeApp:', error);
+        // Navigate anyway even if there's an error
+        setTimeout(() => {
+          runOnJS(navigateToAuth)();
+        }, 2000);
+      }
     };
 
     initializeApp();

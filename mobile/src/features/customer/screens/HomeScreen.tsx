@@ -25,6 +25,7 @@ import { useProviders } from '../../../core/query/hooks/useProviders';
 import { useCategories } from '../../../core/query/hooks/useCategories';
 import { useActiveBookings } from '../../../core/query/hooks/useBookings';
 import { useFavoriteProvider, useUnfavoriteProvider } from '../../../core/query/hooks/useProviders';
+import { useAllBookingUpdates } from '../../../core/realtime';
 import { useQueryClient } from '@tanstack/react-query';
 import type { CustomerStackParamList } from '../../../core/navigation/types';
 import { CategoryGrid, FeaturedProviders, ActiveBookings } from '../components';
@@ -91,6 +92,9 @@ const HomeScreen: React.FC = () => {
   const isFavoriteProvider = useUserProfileStore((state) => state.isFavoriteProvider);
   const addFavoriteProvider = useUserProfileStore((state) => state.addFavoriteProvider);
   const removeFavoriteProvider = useUserProfileStore((state) => state.removeFavoriteProvider);
+
+  // Subscribe to real-time booking updates
+  useAllBookingUpdates();
 
   // State
   const [refreshing, setRefreshing] = useState(false);

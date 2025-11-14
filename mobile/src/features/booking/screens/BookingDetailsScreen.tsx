@@ -19,6 +19,7 @@ import {
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useBooking } from '../../../core/query/hooks/useBookings';
+import { useAllBookingUpdates } from '../../../core/realtime';
 import { BookingStatus } from '../../../core/api/types';
 import { formatDate, formatTime, formatCurrency } from '../../../shared/utils/formatting';
 import { Button } from '../../../shared/components';
@@ -37,6 +38,9 @@ const BookingDetailsScreen: React.FC = () => {
   const { bookingId } = route.params;
 
   const { data: booking, isLoading } = useBooking(bookingId);
+
+  // Subscribe to real-time booking updates
+  useAllBookingUpdates(bookingId);
 
   const getStatusColor = (status: BookingStatus): string => {
     switch (status) {

@@ -20,6 +20,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useBookings } from '../../../core/query/hooks/useBookings';
+import { useAllBookingUpdates } from '../../../core/realtime';
 import { Booking, BookingStatus } from '../../../core/api/types';
 import BookingCard from '../components/BookingCard';
 
@@ -33,6 +34,9 @@ const BookingListScreen: React.FC = () => {
 
   // Fetch bookings
   const { data: bookings = [], isLoading, refetch, isRefetching } = useBookings();
+
+  // Subscribe to real-time booking updates
+  useAllBookingUpdates();
 
   // Group bookings by status
   const groupedBookings = useMemo(() => {

@@ -62,6 +62,26 @@ export const queryKeys = {
     earnings: (period?: 'week' | 'month' | 'year') => [...queryKeys.providerDashboard.all, 'earnings', { period }] as const,
     performance: () => [...queryKeys.providerDashboard.all, 'performance'] as const,
   },
+
+  // Provider queries (for provider-specific data)
+  provider: {
+    all: ['provider'] as const,
+    dashboard: () => [...queryKeys.provider.all, 'dashboard'] as const,
+    dashboardMetrics: () => [...queryKeys.provider.all, 'dashboard', 'metrics'] as const,
+    earningsTrend: (days: number) => [...queryKeys.provider.all, 'earnings-trend', days] as const,
+    upcomingBookings: (days: number) => [...queryKeys.provider.all, 'upcoming-bookings', days] as const,
+  },
+
+  // Review queries
+  reviews: {
+    all: ['reviews'] as const,
+    lists: () => [...queryKeys.reviews.all, 'list'] as const,
+    list: (providerId: string, params?: any) => [...queryKeys.reviews.lists(), providerId, params] as const,
+    details: () => [...queryKeys.reviews.all, 'detail'] as const,
+    detail: (id: string) => [...queryKeys.reviews.details(), id] as const,
+    breakdown: (providerId: string) => [...queryKeys.reviews.all, 'breakdown', providerId] as const,
+    myReviews: (page?: number, pageSize?: number) => [...queryKeys.reviews.all, 'my-reviews', { page, pageSize }] as const,
+  },
 } as const;
 
 /**

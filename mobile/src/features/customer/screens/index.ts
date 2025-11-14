@@ -13,3 +13,4 @@ export { default as MessagesScreen } from './MessagesScreen';
 export { default as ProfileScreen } from './ProfileScreen';
 export { ProviderDetailScreen } from './ProviderDetailScreen';
 export { ProviderReviewsScreen } from './ProviderReviewsScreen';
+export { ReviewSubmissionScreen } from './ReviewSubmissionScreen';

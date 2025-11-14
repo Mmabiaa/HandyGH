@@ -25,7 +25,9 @@ import { spacing } from '../../../core/theme/spacing';
 import { borderRadius } from '../../../core/theme/borderRadius';
 import { shadows } from '../../../core/theme/shadows';
 import { ReviewCard, RatingBreakdown } from '../components';
-import type { Review } from '../../../core/api/types';
+import { useProviderReviews, useProviderRatingBreakdown } from '../../../core/query/hooks/useReviews';
+import type { Review, PaginatedResponse } from '../../../core/api/types';
+import type { InfiniteData } from '@tanstack/react-query';
 
 type CustomerStackParamList = {
   ProviderReviews: { providerId: string };
@@ -52,64 +54,25 @@ export const ProviderReviewsScreen: React.FC = () => {
 
   // State
   const [sortBy, setSortBy] = useState<SortOption>('recent');
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
 
-  // Mock reviews data (in real app, this would come from API with pagination)
-  const generateMockReviews = (count: number): Review[] => {
-    const names = [
-      { firstName: 'John', lastName: 'Mensah' },
-      { firstName: 'Ama', lastName: 'Osei' },
-      { firstName: 'Kwame', lastName: 'Asante' },
-      { firstName: 'Akua', lastName: 'Boateng' },
-      { firstName: 'Kofi', lastName: 'Adjei' },
-    ];
+  // Fetch reviews and rating breakdown
+  const {
+    data: reviewsData,
+    isLoading: isLoadingReviews,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useProviderReviews(providerId, { sortBy, pageSize: 10 });
 
-    const comments = [
-      'Excellent service! Very professional and fixed my plumbing issue quickly. Highly recommend!',
-      'Good work and fair pricing. Arrived on time and completed the job efficiently.',
-      'Best plumber in Accra! Fixed a complex issue that others couldn\'t solve. Very knowledgeable.',
-      'Professional and courteous. Would definitely use their services again.',
-      'Quick response and quality work. Very satisfied with the service provided.',
-    ];
+  const {
+    data: ratingBreakdown,
+    isLoading: isLoadingBreakdown,
+  } = useProviderRatingBreakdown(providerId);
 
-    return Array.from({ length: count }, (_, index) => {
-      const nameIndex = index % names.length;
-      const commentIndex = index % comments.length;
-      const rating = Math.floor(Math.random() * 2) + 4; // 4 or 5 stars
-      const daysAgo = Math.floor(Math.random() * 60) + 1;
-
-      return {
-        id: `review-${index + 1}`,
-        bookingId: `booking-${index + 1}`,
-        customerId: `customer-${index + 1}`,
-        providerId,
-        rating,
-        comment: comments[commentIndex],
-        createdAt: new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString(),
-        updatedAt: new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString(),
-        customer: {
-          ...names[nameIndex],
-          profilePhoto: index % 2 === 0 ? 'https://via.placeholder.com/100' : undefined,
-        },
-        response: index % 3 === 0 ? 'Thank you for your kind words! We are always happy to help.' : undefined,
-      };
-    });
-  };
-
-  const [reviews, setReviews] = useState<Review[]>(generateMockReviews(10));
-
-  const ratingBreakdown = {
-    average: 4.8,
-    total: 156,
-    distribution: {
-      5: 120,
-      4: 25,
-      3: 8,
-      2: 2,
-      1: 1,
-    },
-  };
+  // Flatten paginated results from infinite query
+  const infiniteData = reviewsData as InfiniteData<PaginatedResponse<Review>> | undefined;
+  const reviews = infiniteData?.pages ? infiniteData.pages.flatMap((page) => page.results) : [];
+  const isLoading = isLoadingReviews || isLoadingBreakdown;
 
   // Sort reviews
   const sortedReviews = [...reviews].sort((a, b) => {
@@ -138,22 +101,9 @@ export const ProviderReviewsScreen: React.FC = () => {
   }, []);
 
   const handleLoadMore = useCallback(() => {
-    if (isLoadingMore || !hasMore) return;
-
-    setIsLoadingMore(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      const newReviews = generateMockReviews(10);
-      setReviews((prev) => [...prev, ...newReviews]);
-      setIsLoadingMore(false);
-
-      // Stop loading more after 3 pages
-      if (reviews.length >= 30) {
-        setHasMore(false);
-      }
-    }, 1000);
-  }, [isLoadingMore, hasMore, reviews.length]);
+    if (isFetchingNextPage || !hasNextPage) return;
+    fetchNextPage();
+  }, [isFetchingNextPage, hasNextPage, fetchNextPage]);
 
   const renderSortButton = (option: SortOption, label: string) => {
     const isSelected = sortBy === option;
@@ -186,13 +136,15 @@ export const ProviderReviewsScreen: React.FC = () => {
   const renderHeader = () => (
     <View>
       {/* Rating Summary */}
-      <View style={[styles.summaryCard, { backgroundColor: theme.colors.cardBackground }]}>
-        <RatingBreakdown
-          average={ratingBreakdown.average}
-          total={ratingBreakdown.total}
-          distribution={ratingBreakdown.distribution}
-        />
-      </View>
+      {ratingBreakdown && (
+        <View style={[styles.summaryCard, { backgroundColor: theme.colors.cardBackground }]}>
+          <RatingBreakdown
+            average={ratingBreakdown.average}
+            total={ratingBreakdown.total}
+            distribution={ratingBreakdown.distribution}
+          />
+        </View>
+      )}
 
       {/* Sort Options */}
       <View style={styles.sortContainer}>
@@ -213,7 +165,7 @@ export const ProviderReviewsScreen: React.FC = () => {
   );
 
   const renderFooter = () => {
-    if (!isLoadingMore) return null;
+    if (!isFetchingNextPage) return null;
 
     return (
       <View style={styles.loadingFooter}>
@@ -224,6 +176,34 @@ export const ProviderReviewsScreen: React.FC = () => {
       </View>
     );
   };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+        <View style={[styles.header, { backgroundColor: theme.colors.cardBackground, ...shadows.sm }]}>
+          <TouchableOpacity
+            onPress={handleBack}
+            style={styles.backButton}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+          >
+            <Text variant="h6">←</Text>
+          </TouchableOpacity>
+          <Text variant="h6" style={styles.headerTitle}>
+            Reviews & Ratings
+          </Text>
+          <View style={styles.headerSpacer} />
+        </View>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text variant="body" color="textSecondary" style={styles.loadingText}>
+            Loading reviews...
+          </Text>
+        </View>
+      </View>
+    );
+  }
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
@@ -337,5 +317,11 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     marginTop: spacing.sm,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: spacing.xl * 2,
   },
 });
