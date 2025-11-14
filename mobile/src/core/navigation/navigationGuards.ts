@@ -177,7 +177,7 @@ export function canAccessScreen(
  */
 export function getDefaultScreen(
   authStatus: AuthStatus,
-  userRole: UserRole
+  _userRole: UserRole
 ): keyof RootStackParamList {
   if (authStatus === 'loading') {
     return 'Splash';

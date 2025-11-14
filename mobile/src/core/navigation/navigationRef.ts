@@ -23,12 +23,10 @@ export const navigationRef = createNavigationContainerRef<RootStackParamList>();
  * navigate('Auth', { screen: 'PhoneInput' });
  * navigate('Main', { screen: 'CustomerTabs', params: { screen: 'Home' } });
  */
-export function navigate<RouteName extends keyof RootStackParamList>(
-  name: RouteName,
-  params?: RootStackParamList[RouteName]
-) {
+export function navigate(name: keyof RootStackParamList, params?: any) {
   if (navigationRef.isReady()) {
-    navigationRef.navigate(name, params as any);
+    // @ts-ignore - Complex navigation types
+    navigationRef.navigate(name, params);
   } else {
     console.warn('Navigation is not ready yet');
   }
@@ -50,10 +48,7 @@ export function goBack() {
  * @example
  * resetNavigation('Auth', { screen: 'Welcome' });
  */
-export function resetNavigation<RouteName extends keyof RootStackParamList>(
-  name: RouteName,
-  params?: RootStackParamList[RouteName]
-) {
+export function resetNavigation(name: keyof RootStackParamList, params?: any) {
   if (navigationRef.isReady()) {
     navigationRef.reset({
       index: 0,

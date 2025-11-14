@@ -7,8 +7,11 @@
  * Requirements: 11.7
  */
 
-import type { StackNavigationOptions } from '@react-navigation/stack';
+import type { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 import { Platform } from 'react-native';
+
+// Type alias for cleaner code
+type StackNavigationOptions = NativeStackNavigationOptions;
 
 /**
  * Slide from right transition (default)
