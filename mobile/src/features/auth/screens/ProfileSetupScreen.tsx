@@ -21,23 +21,20 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTheme } from '../../../core/theme/ThemeProvider';
 import { Text } from '../../../shared/components/Text';
 import { TextInput } from '../../../shared/components/TextInput';
 import { Button } from '../../../shared/components/Button';
 import { spacing } from '../../../core/theme/spacing';
-import { borderRadius } from '../../../core/theme/borderRadius';
 import { validateEmail, validateRequired } from '../../../shared/utils/validation';
-import type { AuthStackParamList, RootStackParamList } from '../../../core/navigation/types';
+import type { AuthStackParamList } from '../../../core/navigation/types';
 
 type ProfileSetupScreenNavigationProp = NativeStackNavigationProp<
   AuthStackParamList,
   'ProfileSetup'
 >;
-
-type ProfileSetupScreenRouteProp = RouteProp<AuthStackParamList, 'ProfileSetup'>;
 
 interface FormData {
   firstName: string;
@@ -54,10 +51,7 @@ interface FormErrors {
 
 const ProfileSetupScreen: React.FC = () => {
   const navigation = useNavigation<ProfileSetupScreenNavigationProp>();
-  const route = useRoute<ProfileSetupScreenRouteProp>();
   const { theme } = useTheme();
-
-  const { role } = route.params;
 
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
