@@ -21,5 +21,11 @@ module.exports = {
         'react-hooks/exhaustive-deps': 'warn',
       },
     },
+    {
+      files: ['jest.setup.js', '**/__tests__/**', '**/*.test.ts', '**/*.test.tsx'],
+      env: {
+        jest: true,
+      },
+    },
   ],
 };

@@ -1,5 +1,4 @@
 // Jest setup file
-import 'react-native-gesture-handler/jestSetup';
 
 // Mock react-native-reanimated
 jest.mock('react-native-reanimated', () => {
@@ -26,6 +25,3 @@ jest.mock('react-native-mmkv', () => ({
     clearAll: jest.fn(),
   })),
 }));
-
-// Silence the warning: Animated: `useNativeDriver` is not supported
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
