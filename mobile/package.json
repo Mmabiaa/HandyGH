@@ -23,7 +23,8 @@
     "react-native-reanimated": "^3.16.4",
     "axios": "^1.7.9",
     "react-native-mmkv": "^3.1.0",
-    "react-native-keychain": "^8.2.0"
+    "react-native-keychain": "^8.2.0",
+    "react-native-haptic-feedback": "^2.3.3"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
