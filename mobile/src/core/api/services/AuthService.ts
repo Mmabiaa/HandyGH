@@ -54,10 +54,21 @@ export class AuthService {
   static async refreshToken(refreshToken: string): Promise<TokenRefreshResponse> {
     const payload: TokenRefreshRequest = { refresh: refreshToken };
 
-    return api.post<TokenRefreshResponse>(
+    const response = await api.post<TokenRefreshResponse>(
       `${this.BASE_PATH}/token/refresh/`,
       payload
     );
+
+    // Update stored tokens
+    if (response.access) {
+      const tokens = await SecureTokenStorage.getTokens();
+      await SecureTokenStorage.saveTokens(
+        response.access,
+        response.refresh || tokens?.refreshToken || refreshToken
+      );
+    }
+
+    return response;
   }
 
   /**

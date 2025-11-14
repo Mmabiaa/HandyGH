@@ -76,10 +76,15 @@ const createApiClient = (config: ApiConfig = defaultConfig): AxiosInstance => {
       return response;
     },
     async (error: AxiosError) => {
-      const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean; _retryCount?: number };
+      const originalRequest = error.config as AxiosRequestConfig & {
+        _retry?: boolean;
+        _retryCount?: number;
+        _skipTokenRefresh?: boolean;
+      };
 
       // Handle 401 Unauthorized - Token refresh
-      if (error.response?.status === 401 && !originalRequest._retry) {
+      // Requirement 13.1, 16.7: Token refresh and session expiration handling
+      if (error.response?.status === 401 && !originalRequest._retry && !originalRequest._skipTokenRefresh) {
         originalRequest._retry = true;
 
         try {
@@ -89,13 +94,20 @@ const createApiClient = (config: ApiConfig = defaultConfig): AxiosInstance => {
             // Attempt to refresh the token
             const refreshResponse = await axios.post(
               `${defaultConfig.baseURL}/api/v1/auth/token/refresh/`,
-              { refresh: tokens.refreshToken }
+              { refresh: tokens.refreshToken },
+              {
+                // Skip token refresh for the refresh request itself
+                _skipTokenRefresh: true,
+              } as any
             );
 
             const { access: newAccessToken, refresh: newRefreshToken } = refreshResponse.data;
 
             // Save new tokens
-            await SecureTokenStorage.saveTokens(newAccessToken, newRefreshToken || tokens.refreshToken);
+            await SecureTokenStorage.saveTokens(
+              newAccessToken,
+              newRefreshToken || tokens.refreshToken
+            );
 
             // Retry original request with new token
             if (originalRequest.headers) {
@@ -103,12 +115,21 @@ const createApiClient = (config: ApiConfig = defaultConfig): AxiosInstance => {
             }
 
             return instance(originalRequest);
+          } else {
+            // No refresh token available - user needs to login
+            await handleSessionExpired();
+            return Promise.reject(new Error('Session expired. Please login again.'));
           }
-        } catch (refreshError) {
-          // Token refresh failed - clear tokens and redirect to login
-          await SecureTokenStorage.clearTokens();
-          // Navigation to login will be handled by the app's auth state listener
-          return Promise.reject(refreshError);
+        } catch (refreshError: any) {
+          // Token refresh failed - clear tokens and handle session expiration
+          console.error('Token refresh failed:', refreshError);
+
+          await handleSessionExpired();
+
+          // Return a more specific error
+          const sessionError = new Error('Session expired. Please login again.');
+          (sessionError as any).code = 'SESSION_EXPIRED';
+          return Promise.reject(sessionError);
         }
       }
 
@@ -169,6 +190,36 @@ const sleep = (ms: number): Promise<void> => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
 
+// Session expiration handler
+// Requirement 16.7: Session expiration handling
+let sessionExpiredCallback: (() => void) | null = null;
+
+/**
+ * Register callback to be called when session expires
+ * This allows the app to handle navigation to login screen
+ */
+export const onSessionExpired = (callback: () => void) => {
+  sessionExpiredCallback = callback;
+};
+
+/**
+ * Handle session expiration
+ * Clears tokens and triggers callback
+ */
+const handleSessionExpired = async () => {
+  try {
+    // Clear tokens
+    await SecureTokenStorage.clearTokens();
+
+    // Trigger callback if registered
+    if (sessionExpiredCallback) {
+      sessionExpiredCallback();
+    }
+  } catch (error) {
+    console.error('Error handling session expiration:', error);
+  }
+};
+
 // Create and export the API client instance
 export const apiClient = createApiClient();
 
@@ -215,5 +266,6 @@ declare module 'axios' {
     metadata?: {
       startTime: number;
     };
+    _skipTokenRefresh?: boolean;
   }
 }

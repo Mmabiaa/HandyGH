@@ -1,13 +1,9 @@
-export { api, apiClient } from './client';
+/**
+ * API Module Exports
+ */
+
+export { api, apiClient, onSessionExpired } from './client';
 export type { ApiClient, ApiConfig } from './client';
-
-// Export services
-export {
-  AuthService,
-  ProviderService,
-  BookingService,
-  PaymentService,
-} from './services';
-
-// Export types
+export { TokenManager } from './tokenManager';
 export * from './types';
+export * from './services/AuthService';
