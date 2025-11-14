@@ -11,7 +11,7 @@
  */
 
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
+import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Animated, {
@@ -34,7 +34,6 @@ type RoleSelectionScreenNavigationProp = NativeStackNavigationProp<
 type Role = 'customer' | 'provider';
 
 interface RoleCardProps {
-  role: Role;
   title: string;
   description: string;
   icon: string;
@@ -44,7 +43,6 @@ interface RoleCardProps {
 }
 
 const RoleCard: React.FC<RoleCardProps> = ({
-  role,
   title,
   description,
   icon,
@@ -211,7 +209,6 @@ const RoleSelectionScreen: React.FC = () => {
         {roles.map(role => (
           <RoleCard
             key={role.role}
-            role={role.role}
             title={role.title}
             description={role.description}
             icon={role.icon}
