@@ -65,6 +65,8 @@ export interface ProviderQueryParams {
   longitude?: number;
   radius?: number;
   minRating?: number;
+  featured?: boolean;
+  limit?: number;
   page?: number;
   pageSize?: number;
 }

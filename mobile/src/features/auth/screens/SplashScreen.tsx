@@ -25,7 +25,7 @@ import Animated, {
   runOnJS,
 } from 'react-native-reanimated';
 import { useTheme } from '../../../core/theme/ThemeProvider';
-import { Text } from '../../../shared/components/Text';
+import { Text } from 'react-native';
 import type { RootStackParamList } from '../../../core/navigation/types';
 
 type SplashScreenNavigationProp = NativeStackNavigationProp<
@@ -45,11 +45,14 @@ const SplashScreen: React.FC = () => {
   const subtitleOpacity = useSharedValue(0);
   const loadingOpacity = useSharedValue(0);
 
-  // Preload critical assets
+  // Preload critical assets and initialize app
   const preloadAssets = async () => {
     try {
+      // Initialize app (platform-specific modules)
+      const { AppInitializer } = await import('../../../core/initialization/AppInitializer');
+      await AppInitializer.initialize();
+
       // Preload any critical images, fonts, or data here
-      // For now, we'll just simulate asset loading
       await new Promise(resolve => setTimeout(resolve, 100));
     } catch (error) {
       console.error('Error preloading assets:', error);
@@ -136,7 +139,7 @@ const SplashScreen: React.FC = () => {
       {/* Logo Container */}
       <Animated.View style={[styles.logoContainer, logoAnimatedStyle]}>
         <View style={[styles.logoCircle, { backgroundColor: theme.colors.primary }]}>
-          <Text variant="h1" color="textOnPrimary" style={styles.logoText}>
+          <Text style={[styles.logoText, { color: theme.colors.textOnPrimary }]}>
             H
           </Text>
         </View>
@@ -144,14 +147,14 @@ const SplashScreen: React.FC = () => {
 
       {/* Title */}
       <Animated.View style={titleAnimatedStyle}>
-        <Text variant="h1" color="textOnSecondary" style={styles.title}>
+        <Text style={[styles.title, { color: theme.colors.textOnSecondary }]}>
           HandyGH
         </Text>
       </Animated.View>
 
       {/* Subtitle */}
       <Animated.View style={subtitleAnimatedStyle}>
-        <Text variant="body" color="textOnSecondary" style={styles.subtitle}>
+        <Text style={[styles.subtitle, { color: theme.colors.textOnSecondary }]}>
           Connecting You to Quality Services
         </Text>
       </Animated.View>
@@ -198,10 +201,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   title: {
+    fontSize: 32,
+    fontWeight: 'bold',
     marginBottom: 8,
     textAlign: 'center',
   },
   subtitle: {
+    fontSize: 16,
     textAlign: 'center',
     opacity: 0.9,
   },

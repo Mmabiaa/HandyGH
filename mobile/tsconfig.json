@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "module": "commonjs",
+    "module": "esnext",
     "lib": [
       "es2021"
     ],
@@ -23,7 +23,7 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
@@ -50,7 +50,11 @@
     "node_modules",
     "babel.config.js",
     "metro.config.js",
-    "jest.config.js"
+    "jest.config.js",
+    "**/__tests__/**",
+    "**/__mocks__/**",
+    "**/*.test.ts",
+    "**/*.test.tsx"
   ],
   "extends": "expo/tsconfig.base"
 }

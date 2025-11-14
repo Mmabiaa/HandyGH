@@ -1,4 +1,4 @@
-import SQLite, { SQLiteDatabase } from 'react-native-sqlite-storage';
+import { Platform } from 'react-native';
 import {
   DATABASE_NAME,
   DATABASE_VERSION,
@@ -7,10 +7,18 @@ import {
   DROP_TABLES,
 } from './schema';
 
-// Enable promise API and debug mode in development
-SQLite.enablePromise(true);
-if (__DEV__) {
-  SQLite.DEBUG(true);
+// Platform-specific SQLite setup
+let SQLite: any;
+
+if (Platform.OS !== 'web') {
+  const SQLiteModule = require('react-native-sqlite-storage');
+  SQLite = SQLiteModule.default || SQLiteModule;
+
+  // Enable promise API and debug mode in development
+  SQLite.enablePromise(true);
+  if (__DEV__) {
+    SQLite.DEBUG(true);
+  }
 }
 
 /**
@@ -18,7 +26,7 @@ if (__DEV__) {
  */
 export class DatabaseManager {
   private static instance: DatabaseManager;
-  private db: SQLiteDatabase | null = null;
+  private db: any | null = null;
 
   private constructor() {}
 
@@ -38,6 +46,13 @@ export class DatabaseManager {
   async initialize(): Promise<void> {
     try {
       console.log('Initializing database...');
+
+      if (Platform.OS === 'web') {
+        // Web platform: Skip SQLite initialization
+        console.log('Web platform detected - using in-memory storage fallback');
+        this.db = null; // Web doesn't use SQLite
+        return;
+      }
 
       // Open database connection
       this.db = await SQLite.openDatabase({
@@ -69,7 +84,11 @@ export class DatabaseManager {
   /**
    * Get the database instance
    */
-  getDatabase(): SQLiteDatabase {
+  getDatabase(): any {
+    if (Platform.OS === 'web') {
+      console.warn('SQLite not available on web platform');
+      return null;
+    }
     if (!this.db) {
       throw new Error('Database not initialized. Call initialize() first.');
     }
