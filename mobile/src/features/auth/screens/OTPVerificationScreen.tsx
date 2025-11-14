@@ -70,6 +70,7 @@ const OTPVerificationScreen: React.FC = () => {
       return () => clearTimeout(timer);
     } else {
       setCanResend(true);
+      return undefined;
     }
   }, [resendTimer]);
 
