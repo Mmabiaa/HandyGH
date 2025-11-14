@@ -1,11 +1,10 @@
 import { useQuery, useMutation, useQueryClient, UseQueryOptions, UseMutationOptions } from '@tanstack/react-query';
 import { BookingService } from '../../api/services';
 import { queryKeys, getRelatedQueryKeys } from '../queryKeys';
+import { BookingStatus } from '../../api/types';
 import type {
   Booking,
-  BookingStatus,
   CreateBookingRequest,
-  UpdateBookingRequest,
   TimeSlot,
   AvailabilityQueryParams,
 } from '../../api/types';
@@ -48,7 +47,7 @@ export const useAvailability = (
 ) => {
   return useQuery({
     queryKey: queryKeys.bookings.availability(params),
-    queryFn: () => BookingService.checkAvailability(params.providerId, params.date),
+    queryFn: () => BookingService.checkAvailability(params),
     enabled: !!params.providerId && !!params.date,
     ...options,
   });
@@ -72,8 +71,9 @@ export const useCreateBooking = (
       );
 
       // Invalidate related queries
-      getRelatedQueryKeys.afterBookingCreate().forEach((key) => {
-        queryClient.invalidateQueries({ queryKey: key });
+      const relatedKeys = getRelatedQueryKeys.afterBookingCreate();
+      relatedKeys.forEach((key) => {
+        queryClient.invalidateQueries({ queryKey: key as any });
       });
     },
     ...options,
@@ -84,7 +84,7 @@ export const useCreateBooking = (
  * Hook to update booking status
  */
 export const useUpdateBookingStatus = (
-  options?: Omit<UseMutationOptions<Booking, Error, { bookingId: string; status: BookingStatus }>, 'mutationFn'>
+  options?: Omit<UseMutationOptions<Booking, Error, { bookingId: string; status: BookingStatus }, { previousBooking: Booking | undefined }>, 'mutationFn'>
 ) => {
   const queryClient = useQueryClient();
 
@@ -108,7 +108,7 @@ export const useUpdateBookingStatus = (
 
       return { previousBooking };
     },
-    onError: (err, { bookingId }, context) => {
+    onError: (_error, { bookingId }, context) => {
       // Rollback on error
       if (context?.previousBooking) {
         queryClient.setQueryData(queryKeys.bookings.detail(bookingId), context.previousBooking);
@@ -116,8 +116,9 @@ export const useUpdateBookingStatus = (
     },
     onSuccess: (_, { bookingId }) => {
       // Invalidate related queries
-      getRelatedQueryKeys.afterBookingUpdate(bookingId).forEach((key) => {
-        queryClient.invalidateQueries({ queryKey: key });
+      const relatedKeys = getRelatedQueryKeys.afterBookingUpdate(bookingId);
+      relatedKeys.forEach((key) => {
+        queryClient.invalidateQueries({ queryKey: key as any });
       });
     },
     ...options,
@@ -128,7 +129,7 @@ export const useUpdateBookingStatus = (
  * Hook to cancel a booking
  */
 export const useCancelBooking = (
-  options?: Omit<UseMutationOptions<void, Error, { bookingId: string; reason: string }>, 'mutationFn'>
+  options?: Omit<UseMutationOptions<Booking, Error, { bookingId: string; reason: string }>, 'mutationFn'>
 ) => {
   const queryClient = useQueryClient();
 
@@ -137,8 +138,9 @@ export const useCancelBooking = (
       BookingService.cancelBooking(bookingId, reason),
     onSuccess: (_, { bookingId }) => {
       // Invalidate related queries
-      getRelatedQueryKeys.afterBookingUpdate(bookingId).forEach((key) => {
-        queryClient.invalidateQueries({ queryKey: key });
+      const relatedKeys = getRelatedQueryKeys.afterBookingUpdate(bookingId);
+      relatedKeys.forEach((key) => {
+        queryClient.invalidateQueries({ queryKey: key as any });
       });
     },
     ...options,

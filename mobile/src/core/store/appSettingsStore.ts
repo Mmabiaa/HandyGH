@@ -38,7 +38,7 @@ const defaultPreferences: UserPreferences = {
  */
 export const useAppSettingsStore = create<AppSettingsState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       // Initial state
       preferences: defaultPreferences,
 

@@ -73,8 +73,9 @@ export const useFavoriteProvider = () => {
     mutationFn: (providerId: string) => ProviderService.favoriteProvider(providerId),
     onSuccess: (_, providerId) => {
       // Invalidate related queries
-      getRelatedQueryKeys.afterProviderFavorite(providerId).forEach((key) => {
-        queryClient.invalidateQueries({ queryKey: key });
+      const relatedKeys = getRelatedQueryKeys.afterProviderFavorite(providerId);
+      relatedKeys.forEach((key) => {
+        queryClient.invalidateQueries({ queryKey: key as any });
       });
     },
   });
@@ -90,8 +91,9 @@ export const useUnfavoriteProvider = () => {
     mutationFn: (providerId: string) => ProviderService.unfavoriteProvider(providerId),
     onSuccess: (_, providerId) => {
       // Invalidate related queries
-      getRelatedQueryKeys.afterProviderFavorite(providerId).forEach((key) => {
-        queryClient.invalidateQueries({ queryKey: key });
+      const relatedKeys = getRelatedQueryKeys.afterProviderFavorite(providerId);
+      relatedKeys.forEach((key) => {
+        queryClient.invalidateQueries({ queryKey: key as any });
       });
     },
   });

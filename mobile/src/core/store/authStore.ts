@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { SecureTokenStorage } from '../storage';
-import { MMKVStorage, StorageKeys } from '../storage/MMKVStorage';
+import { MMKVStorage } from '../storage/MMKVStorage';
 import type { User } from './types';
 
 interface AuthState {
