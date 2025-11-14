@@ -18,7 +18,7 @@ DerivedData
 *.hmap
 *.ipa
 *.xcuserstate
-project.xcworkspace
+ios/.xcode.env.local
 
 # Android/IntelliJ
 build/
@@ -27,37 +27,35 @@ build/
 local.properties
 *.iml
 *.hprof
+.cxx/
+*.keystore
+!debug.keystore
 
 # node.js
 node_modules/
 npm-debug.log
 yarn-error.log
 
-# BUCK
-buck-out/
-\.buckd/
-*.keystore
-!debug.keystore
+# fastlane
+**/fastlane/report.xml
+**/fastlane/Preview.html
+**/fastlane/screenshots
+**/fastlane/test_output
 
-# Expo
-.expo/
-.expo-shared/
-dist/
-web-build/
+# Bundle artifact
+*.jsbundle
 
-# Environment
-.env
-.env.local
-.env.*.local
+# Ruby / CocoaPods
+**/Pods/
+/vendor/bundle/
 
-# Testing
-coverage/
-.nyc_output
+# Temporary files created by Metro to check the health of the file watcher
+.metro-health-check*
+
+# testing
+/coverage
 
 # Misc
-*.log
-*.swp
-*.swo
-*~
-.vscode/
-.idea/
+.env
+.env.local
+.env.production
