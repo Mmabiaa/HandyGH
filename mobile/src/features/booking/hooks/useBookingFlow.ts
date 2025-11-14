@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import { Location } from '../../../core/api/types';
+import { Location, PaymentMethod } from '../../../core/api/types';
 
 /**
  * Booking Flow Steps
@@ -10,6 +10,9 @@ export enum BookingFlowStep {
   DATE_TIME_SELECTION = 'date_time_selection',
   LOCATION_SELECTION = 'location_selection',
   BOOKING_SUMMARY = 'booking_summary',
+  PAYMENT_METHOD = 'payment_method',
+  PAYMENT_PROCESSING = 'payment_processing',
+  BOOKING_CONFIRMATION = 'booking_confirmation',
 }
 
 /**
@@ -29,6 +32,16 @@ export interface BookingFlowState {
   // Location
   location?: Location;
   locationNotes?: string;
+
+  // Payment
+  paymentMethod?: PaymentMethod;
+  transactionId?: string;
+
+  // Booking data
+  bookingData: {
+    totalAmount?: number;
+    bookingId?: string;
+  };
 
   // Current step
   currentStep: BookingFlowStep;
@@ -53,6 +66,9 @@ export interface BookingFlowActions {
   setServiceSelection: (serviceId: string, addOnIds?: string[]) => void;
   setDateTimeSelection: (date: string, time: string) => void;
   setLocationSelection: (location: Location, notes?: string) => void;
+  setPaymentMethod: (method: PaymentMethod) => void;
+  setTransactionId: (transactionId: string) => void;
+  setBookingData: (data: { totalAmount?: number; bookingId?: string }) => void;
 
   // State management
   resetFlow: () => void;
@@ -83,6 +99,9 @@ export const useBookingFlow = (
     BookingFlowStep.DATE_TIME_SELECTION,
     BookingFlowStep.LOCATION_SELECTION,
     BookingFlowStep.BOOKING_SUMMARY,
+    BookingFlowStep.PAYMENT_METHOD,
+    BookingFlowStep.PAYMENT_PROCESSING,
+    BookingFlowStep.BOOKING_CONFIRMATION,
   ];
 
   // Initialize state
@@ -90,6 +109,7 @@ export const useBookingFlow = (
     providerId,
     currentStep: initialStep,
     isStepValid: false,
+    bookingData: {},
   });
 
   // Get current step index
@@ -128,6 +148,17 @@ export const useBookingFlow = (
           !!state.scheduledTime &&
           !!state.location?.address
         );
+
+      case BookingFlowStep.PAYMENT_METHOD:
+        return !!state.paymentMethod;
+
+      case BookingFlowStep.PAYMENT_PROCESSING:
+        // Payment processing step is valid when transaction is initiated
+        return !!state.transactionId || state.paymentMethod?.type === 'cash';
+
+      case BookingFlowStep.BOOKING_CONFIRMATION:
+        // Confirmation step is always valid (final step)
+        return true;
 
       default:
         return false;
@@ -224,12 +255,42 @@ export const useBookingFlow = (
     }));
   }, []);
 
+  // Set payment method
+  const setPaymentMethod = useCallback((method: PaymentMethod): void => {
+    setState((prev) => ({
+      ...prev,
+      paymentMethod: method,
+      isStepValid: true,
+    }));
+  }, []);
+
+  // Set transaction ID
+  const setTransactionId = useCallback((transactionId: string): void => {
+    setState((prev) => ({
+      ...prev,
+      transactionId,
+      isStepValid: true,
+    }));
+  }, []);
+
+  // Set booking data
+  const setBookingData = useCallback((data: { totalAmount?: number; bookingId?: string }): void => {
+    setState((prev) => ({
+      ...prev,
+      bookingData: {
+        ...prev.bookingData,
+        ...data,
+      },
+    }));
+  }, []);
+
   // Reset flow
   const resetFlow = useCallback((): void => {
     setState({
       providerId,
       currentStep: BookingFlowStep.SERVICE_SELECTION,
       isStepValid: false,
+      bookingData: {},
     });
   }, [providerId]);
 
@@ -244,6 +305,9 @@ export const useBookingFlow = (
       setServiceSelection,
       setDateTimeSelection,
       setLocationSelection,
+      setPaymentMethod,
+      setTransactionId,
+      setBookingData,
       resetFlow,
       getProgress,
       getCurrentStepIndex,
@@ -258,6 +322,9 @@ export const useBookingFlow = (
       setServiceSelection,
       setDateTimeSelection,
       setLocationSelection,
+      setPaymentMethod,
+      setTransactionId,
+      setBookingData,
       resetFlow,
       getProgress,
       getCurrentStepIndex,
