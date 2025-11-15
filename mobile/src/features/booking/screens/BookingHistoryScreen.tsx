@@ -21,7 +21,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useBookings } from '../../../core/query/hooks/useBookings';
 import { Booking, BookingStatus } from '../../../core/api/types';
-import BookingCard from '../components/BookingCard';
+import { BookingCard } from '../components/BookingCard';
 
 type NavigationProp = NativeStackNavigationProp<any>;
 

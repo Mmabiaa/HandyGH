@@ -10,7 +10,6 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
-  Platform,
 } from 'react-native';
 import { useTheme } from '../../../core/theme/ThemeProvider';
 import { Text } from '../Text';
@@ -223,11 +222,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     fontSize: 16,
-    ...Platform.select({
-      web: {
-        outlineStyle: 'none',
-      },
-    }),
   },
   leftIcon: {
     marginLeft: spacing.md,

@@ -18,7 +18,7 @@ You need Android Studio installed to run the Android emulator.
 Add these to your Windows environment variables:
 
 ```
-ANDROID_HOME = C:\Users\dell\AppData\Local\Android\Sdk
+ANDROID_HOME = C:\Users\YourUsername\AppData\Local\Android\Sdk
 ```
 
 Add to PATH:

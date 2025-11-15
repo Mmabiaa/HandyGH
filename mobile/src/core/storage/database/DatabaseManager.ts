@@ -25,7 +25,8 @@ async function getSQLite() {
 
   try {
     // Use Expo SQLite which is compatible with Expo Go
-    const SQLiteModule = await import('expo-sqlite');
+    // @ts-ignore - Dynamic import may not have type declarations
+    const SQLiteModule = await import('expo-sqlite') as any;
     SQLite = SQLiteModule.default || SQLiteModule;
     return SQLite;
   } catch (error) {

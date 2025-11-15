@@ -243,7 +243,9 @@ const OTPVerificationScreen: React.FC = () => {
           {otp.map((digit, index) => (
             <RNTextInput
               key={index}
-              ref={ref => (inputRefs.current[index] = ref)}
+              ref={ref => {
+                inputRefs.current[index] = ref;
+              }}
               style={[
                 styles.otpInput,
                 {

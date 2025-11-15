@@ -223,17 +223,14 @@ async function getStorage() {
 // For synchronous access, use the MMKVStorage class methods which handle async internally
 export const storage = new Proxy({} as any, {
   get(_target, prop) {
-    const instance = getStorage();
-    const method = instance[prop as keyof typeof instance];
-    // If it's a function and storage is async, wrap it to handle promises
-    if (typeof method === 'function') {
-      return (...args: any[]) => {
-        const result = method.apply(instance, args);
-        // If result is a promise, return it; otherwise return a resolved promise
-        return result instanceof Promise ? result : Promise.resolve(result);
-      };
-    }
-    return method;
+    return async (...args: any[]) => {
+      const instance = await getStorage();
+      const method = instance[prop as keyof typeof instance];
+      if (typeof method === 'function') {
+        return await method.apply(instance, args);
+      }
+      return method;
+    };
   },
 });
 

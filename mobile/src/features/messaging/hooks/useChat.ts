@@ -43,7 +43,7 @@ export const useChat = ({
 
   const [isTyping, setIsTyping] = useState(false);
   const [isConnected, setIsConnected] = useState(socketManager.isConnected());
-  const typingTimeoutRef = useRef<NodeJS.Timeout>();
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Query key for messages
   const queryKey = ['messages', bookingId];

@@ -3,7 +3,7 @@
  * Helper functions for dynamic theming
  */
 
-import { ThemeColors, lightTheme, darkTheme } from './colors';
+import { lightTheme, darkTheme } from './colors';
 
 /**
  * Get color with opacity

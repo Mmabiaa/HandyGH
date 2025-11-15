@@ -3,7 +3,7 @@
  * Main theme object combining colors, spacing, typography, etc.
  */
 
-import { lightTheme, darkTheme, type ThemeColors } from './colors';
+import { lightTheme, darkTheme } from './colors';
 import { spacing } from './spacing';
 import { shadows } from './shadows';
 import { borderRadius } from './borderRadius';
