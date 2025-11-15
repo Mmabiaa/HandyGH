@@ -108,7 +108,7 @@ export const useOTP = () => {
           ...response.user,
           createdAt: response.user.createdAt || new Date().toISOString(),
           updatedAt: response.user.updatedAt || new Date().toISOString(),
-        };
+        } as typeof response.user;
         await login(userWithTimestamps, response.access, response.refresh);
 
         return response;

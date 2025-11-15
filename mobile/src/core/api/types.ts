@@ -34,18 +34,22 @@ export interface OTPVerifyRequest {
   code: string;
 }
 
+export interface User {
+  id: string;
+  phoneNumber: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
+  role: 'customer' | 'provider';
+  isVerified: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface AuthResponse {
   access: string;
   refresh: string;
-  user: {
-    id: string;
-    phoneNumber: string;
-    firstName: string;
-    lastName: string;
-    email?: string;
-    role: 'customer' | 'provider';
-    isVerified: boolean;
-  };
+  user: User;
 }
 
 export interface TokenRefreshRequest {

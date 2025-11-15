@@ -1,0 +1,10 @@
+# Ignore android folder - let EAS Build generate it
+android/
+
+# Ignore iOS folder if present
+ios/
+
+# Ignore build artifacts
+*.apk
+*.aab
+*.ipa

@@ -64,13 +64,20 @@ export interface NotificationData {
 }
 
 /**
+ * Notification subscription type
+ */
+type NotificationSubscription = {
+  remove: () => void;
+} | null;
+
+/**
  * NotificationManager class for handling push notifications
  */
 class NotificationManager {
   private static instance: NotificationManager;
   private expoPushToken: string | null = null;
-  private notificationListener: Notifications.Subscription | null = null;
-  private responseListener: Notifications.Subscription | null = null;
+  private notificationListener: NotificationSubscription = null;
+  private responseListener: NotificationSubscription = null;
 
   private constructor() {}
 

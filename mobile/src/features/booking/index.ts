@@ -26,4 +26,4 @@ export { BookingFlowProvider, useBookingFlowContext } from './context/BookingFlo
 
 // Components
 export { BookingProgressIndicator } from './components/BookingProgressIndicator';
-export { default as BookingCard } from './components/BookingCard';
+export { BookingCard } from './components/BookingCard';

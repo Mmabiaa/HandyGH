@@ -95,7 +95,7 @@ export const BookingConfirmationScreen: React.FC = () => {
             style={[
               styles.checkmarkCircle,
               {
-                backgroundColor: theme.colors.success || theme.colors.primary,
+                backgroundColor: (theme.colors as any).success || theme.colors.primary,
                 transform: [{ scale: scaleAnim }],
               },
             ]}

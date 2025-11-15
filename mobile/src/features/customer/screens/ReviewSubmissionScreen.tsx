@@ -13,7 +13,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Platform,
   Alert,
 } from 'react-native';
 import { triggerHaptic } from '../../../shared/utils/haptics';
